@@ -1,0 +1,32 @@
+package com.example.restaurantbackendapplication1.service;
+
+import com.example.restaurantbackendapplication1.commons.dto.request.PaginatedRequest;
+import com.example.restaurantbackendapplication1.commons.dto.response.PaginatedResponse;
+import com.example.restaurantbackendapplication1.commons.dto.response.SuccessResponse;
+import com.example.restaurantbackendapplication1.dto.request.item.CreateItemRequest;
+import com.example.restaurantbackendapplication1.dto.request.item.UpdateItemRequest;
+import com.example.restaurantbackendapplication1.dto.response.ItemResponse;
+import com.example.restaurantbackendapplication1.model.entity.ItemEntity;
+import com.example.restaurantbackendapplication1.model.entity.LocaleEntity;
+import com.example.restaurantbackendapplication1.model.entity.UnitEntity;
+import com.example.restaurantbackendapplication1.model.projection.ItemSummary;
+
+import java.util.Map;
+
+public interface ItemService {
+    SuccessResponse create(CreateItemRequest request,
+                           UnitEntity unitEntity,
+                           Map<Long, LocaleEntity> localeEntityMap);
+
+    ItemEntity getEntityById(Long id);
+
+    ItemResponse getById(Long id);
+
+    PaginatedResponse<ItemSummary> getAll(PaginatedRequest request);
+
+    SuccessResponse update(ItemEntity entity,
+                           UpdateItemRequest request,
+                           UnitEntity unitEntity);
+
+    SuccessResponse delete(Long id);
+}

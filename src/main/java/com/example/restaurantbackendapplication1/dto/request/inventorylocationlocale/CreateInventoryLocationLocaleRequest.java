@@ -1,0 +1,4 @@
+package com.example.restaurantbackendapplication1.dto.request.inventorylocationlocale;
+
+public class CreateInventoryLocationLocaleRequest extends InventoryLocationLocaleRequest {
+}

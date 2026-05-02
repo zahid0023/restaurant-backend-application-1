@@ -1,0 +1,92 @@
+package com.example.restaurantbackendapplication1.serviceImpl;
+
+import com.example.restaurantbackendapplication1.commons.dto.request.PaginatedRequest;
+import com.example.restaurantbackendapplication1.commons.dto.response.PaginatedResponse;
+import com.example.restaurantbackendapplication1.commons.dto.response.SuccessResponse;
+import com.example.restaurantbackendapplication1.dto.request.unit.CreateUnitRequest;
+import com.example.restaurantbackendapplication1.dto.request.unit.UpdateUnitRequest;
+import com.example.restaurantbackendapplication1.dto.response.UnitResponse;
+import com.example.restaurantbackendapplication1.model.dto.UnitDto;
+import com.example.restaurantbackendapplication1.model.entity.LocaleEntity;
+import com.example.restaurantbackendapplication1.model.entity.UnitEntity;
+import com.example.restaurantbackendapplication1.model.entity.UnitTypeEntity;
+import com.example.restaurantbackendapplication1.model.enums.UnitSortField;
+import com.example.restaurantbackendapplication1.model.mapper.UnitMapper;
+import com.example.restaurantbackendapplication1.model.projection.UnitSummary;
+import com.example.restaurantbackendapplication1.repository.UnitRepository;
+import com.example.restaurantbackendapplication1.service.UnitService;
+import com.example.restaurantbackendapplication1.utils.Pagination;
+import jakarta.persistence.EntityNotFoundException;
+import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.NonNull;
+import org.springframework.data.domain.Page;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Map;
+import java.util.Set;
+
+@Service
+@Slf4j
+public class UnitServiceImpl implements UnitService {
+
+    private static final Set<String> ALLOWED_SORT_FIELDS = UnitSortField.allowedFields();
+
+    private final UnitRepository unitRepository;
+
+    public UnitServiceImpl(UnitRepository unitRepository) {
+        this.unitRepository = unitRepository;
+    }
+
+    @Transactional
+    @Override
+    public SuccessResponse create(CreateUnitRequest request,
+                                  UnitTypeEntity unitTypeEntity,
+                                  Map<Long, LocaleEntity> localeEntityMap) {
+        UnitEntity entity = UnitMapper.fromRequest(request, unitTypeEntity, localeEntityMap);
+        unitRepository.save(entity);
+        log.info("Unit created with id: {}", entity.getId());
+        return new SuccessResponse(true, entity.getId());
+    }
+
+    @Override
+    public UnitResponse getById(Long id) {
+        UnitEntity entity = getEntityById(id);
+        UnitDto dto = UnitMapper.toDto(entity);
+        return new UnitResponse(dto);
+    }
+
+    @Override
+    public PaginatedResponse<UnitSummary> getAll(PaginatedRequest request) {
+        Page<@NonNull UnitSummary> page = unitRepository.findAllByIsActiveAndIsDeleted(
+                true, false, request.toPageable(ALLOWED_SORT_FIELDS)
+        );
+        return Pagination.buildPaginatedResponse(page);
+    }
+
+    @Transactional
+    @Override
+    public SuccessResponse update(UnitEntity entity, UpdateUnitRequest request, UnitTypeEntity unitTypeEntity) {
+        UnitMapper.update(entity, request, unitTypeEntity);
+        unitRepository.save(entity);
+        log.info("Unit updated with id: {}", entity.getId());
+        return new SuccessResponse(true, entity.getId());
+    }
+
+    @Transactional
+    @Override
+    public SuccessResponse delete(Long id) {
+        UnitEntity entity = getEntityById(id);
+        entity.setIsDeleted(true);
+        entity.setIsActive(false);
+        unitRepository.save(entity);
+        log.info("Unit soft-deleted with id: {}", entity.getId());
+        return new SuccessResponse(true, entity.getId());
+    }
+
+    @Override
+    public UnitEntity getEntityById(Long id) {
+        return unitRepository.findByIdAndIsActiveAndIsDeleted(id, true, false)
+                .orElseThrow(() -> new EntityNotFoundException("Unit not found with id: " + id));
+    }
+}

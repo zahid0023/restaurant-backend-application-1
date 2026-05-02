@@ -1,0 +1,75 @@
+package com.example.restaurantbackendapplication1.controller;
+
+import com.example.restaurantbackendapplication1.commons.dto.request.PaginatedRequest;
+import com.example.restaurantbackendapplication1.dto.request.item.CreateItemRequest;
+import com.example.restaurantbackendapplication1.dto.request.item.UpdateItemRequest;
+import com.example.restaurantbackendapplication1.dto.request.itemlocale.ItemLocaleRequest;
+import com.example.restaurantbackendapplication1.model.entity.ItemEntity;
+import com.example.restaurantbackendapplication1.model.entity.LocaleEntity;
+import com.example.restaurantbackendapplication1.model.entity.UnitEntity;
+import com.example.restaurantbackendapplication1.service.ItemService;
+import com.example.restaurantbackendapplication1.service.LocaleService;
+import com.example.restaurantbackendapplication1.service.UnitService;
+import com.example.restaurantbackendapplication1.utils.LocaleUtils;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
+
+@RestController
+@RequestMapping("/api/v1/items")
+public class ItemController {
+
+    private final ItemService itemService;
+    private final UnitService unitService;
+    private final LocaleService localeService;
+
+    public ItemController(ItemService itemService,
+                          UnitService unitService,
+                          LocaleService localeService) {
+        this.itemService = itemService;
+        this.unitService = unitService;
+        this.localeService = localeService;
+    }
+
+    @PostMapping
+    public ResponseEntity<?> create(@Valid @RequestBody CreateItemRequest request) {
+        UnitEntity unitEntity = unitService.getEntityById(request.getUnitId());
+        Map<Long, LocaleEntity> localeEntityMap = LocaleUtils.resolveLocaleMap(
+                request.getLocales(), ItemLocaleRequest::getLocaleId, localeService);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(itemService.create(request, unitEntity, localeEntityMap));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getById(@Parameter(description = "Item ID") @PathVariable Long id) {
+        return ResponseEntity.ok(itemService.getById(id));
+    }
+
+    @GetMapping
+    public ResponseEntity<?> getAll(@Valid @ParameterObject PaginatedRequest request) {
+        return ResponseEntity.ok(itemService.getAll(request));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> update(
+            @PathVariable Long id,
+            @Valid @RequestBody UpdateItemRequest request) {
+        ItemEntity entity = itemService.getEntityById(id);
+        UnitEntity unitEntity = unitService.getEntityById(request.getUnitId());
+        return ResponseEntity.ok(itemService.update(entity, request, unitEntity));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> delete(@PathVariable Long id) {
+        return ResponseEntity.ok(itemService.delete(id));
+    }
+}
