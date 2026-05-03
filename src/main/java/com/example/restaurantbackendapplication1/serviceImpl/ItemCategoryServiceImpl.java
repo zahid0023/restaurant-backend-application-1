@@ -49,25 +49,23 @@ public class ItemCategoryServiceImpl implements ItemCategoryService {
     }
 
     @Override
-    public ItemCategoryResponse getById(Long id) {
-        ItemCategoryEntity entity = getEntityById(id);
+    public ItemCategoryResponse getById(Long itemTypeId, Long id) {
+        ItemCategoryEntity entity = getEntityById(itemTypeId, id);
         ItemCategoryDto dto = ItemCategoryMapper.toDto(entity);
         return new ItemCategoryResponse(dto);
     }
 
     @Override
-    public PaginatedResponse<ItemCategorySummary> getAll(PaginatedRequest request) {
-        Page<@NonNull ItemCategorySummary> page = itemCategoryRepository.findAllByIsActiveAndIsDeleted(
-                true, false, request.toPageable(ALLOWED_SORT_FIELDS)
-        );
+    public PaginatedResponse<ItemCategorySummary> getAll(Long itemTypeId, PaginatedRequest request) {
+        Page<@NonNull ItemCategorySummary> page = itemCategoryRepository.findAllByItemTypeEntityIdAndIsActiveAndIsDeleted(itemTypeId, true, false, request.toPageable(ALLOWED_SORT_FIELDS));
         return Pagination.buildPaginatedResponse(page);
     }
 
     @Transactional
     @Override
-    public SuccessResponse update(ItemCategoryEntity entity, UpdateItemCategoryRequest request,
-                                  ItemTypeEntity itemTypeEntity) {
-        ItemCategoryMapper.update(entity, request, itemTypeEntity);
+    public SuccessResponse update(ItemCategoryEntity entity,
+                                  UpdateItemCategoryRequest request) {
+        ItemCategoryMapper.update(entity, request);
         itemCategoryRepository.save(entity);
         log.info("ItemCategory updated with id: {}", entity.getId());
         return new SuccessResponse(true, entity.getId());
@@ -75,8 +73,8 @@ public class ItemCategoryServiceImpl implements ItemCategoryService {
 
     @Transactional
     @Override
-    public SuccessResponse delete(Long id) {
-        ItemCategoryEntity entity = getEntityById(id);
+    public SuccessResponse delete(Long itemTypeId, Long id) {
+        ItemCategoryEntity entity = getEntityById(itemTypeId, id);
         entity.setIsDeleted(true);
         entity.setIsActive(false);
         itemCategoryRepository.save(entity);
@@ -85,8 +83,8 @@ public class ItemCategoryServiceImpl implements ItemCategoryService {
     }
 
     @Override
-    public ItemCategoryEntity getEntityById(Long id) {
-        return itemCategoryRepository.findByIdAndIsActiveAndIsDeleted(id, true, false)
-                .orElseThrow(() -> new EntityNotFoundException("ItemCategory not found with id: " + id));
+    public ItemCategoryEntity getEntityById(Long itemTypeId, Long id) {
+        return itemCategoryRepository.findByItemTypeEntity_IdAndIdAndIsActiveAndIsDeleted(itemTypeId, id, true, false)
+                .orElseThrow(() -> new EntityNotFoundException("ItemCategoryEntity with id: " + itemTypeId + " and id: " + id));
     }
 }

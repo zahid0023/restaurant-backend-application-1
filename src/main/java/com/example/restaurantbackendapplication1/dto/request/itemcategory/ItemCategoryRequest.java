@@ -13,10 +13,6 @@ import java.util.List;
 @Data
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class ItemCategoryRequest {
-
-    @NotNull
-    private Long itemTypeId;
-
     @NotBlank
     @Size(max = 50)
     private String code;

@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/v1/item-categories")
+@RequestMapping("/api/v1/item-types/{item-type-id}/item-categories")
 public class ItemCategoryController {
 
     private final ItemCategoryService itemCategoryService;
@@ -36,8 +36,10 @@ public class ItemCategoryController {
     }
 
     @PostMapping
-    public ResponseEntity<?> create(@Valid @RequestBody CreateItemCategoryRequest request) {
-        ItemTypeEntity itemTypeEntity = itemTypeService.getEntityById(request.getItemTypeId());
+    public ResponseEntity<?> create(
+            @PathVariable("item-type-id") Long itemTypeId,
+            @Valid @RequestBody CreateItemCategoryRequest request) {
+        ItemTypeEntity itemTypeEntity = itemTypeService.getEntityById(itemTypeId);
 
         Map<Long, LocaleEntity> localeEntityMap = LocaleUtils.resolveLocaleMap(
                 request.getLocales(), ItemCategoryLocaleRequest::getLocaleId, localeService);
@@ -46,26 +48,32 @@ public class ItemCategoryController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable Long id) {
-        return ResponseEntity.ok(itemCategoryService.getById(id));
+    public ResponseEntity<?> getById(
+            @PathVariable("item-type-id") Long itemTypeId,
+            @PathVariable Long id) {
+        return ResponseEntity.ok(itemCategoryService.getById(itemTypeId, id));
     }
 
     @GetMapping
-    public ResponseEntity<?> getAll(@Valid @ParameterObject PaginatedRequest request) {
-        return ResponseEntity.ok(itemCategoryService.getAll(request));
+    public ResponseEntity<?> getAll(
+            @PathVariable("item-type-id") Long itemTypeId,
+            @Valid @ParameterObject PaginatedRequest request) {
+        return ResponseEntity.ok(itemCategoryService.getAll(itemTypeId, request));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<?> update(
+            @PathVariable("item-type-id") Long itemTypeId,
             @PathVariable Long id,
             @Valid @RequestBody UpdateItemCategoryRequest request) {
-        ItemCategoryEntity entity = itemCategoryService.getEntityById(id);
-        ItemTypeEntity itemTypeEntity = itemTypeService.getEntityById(request.getItemTypeId());
-        return ResponseEntity.ok(itemCategoryService.update(entity, request, itemTypeEntity));
+        ItemCategoryEntity entity = itemCategoryService.getEntityById(itemTypeId, id);
+        return ResponseEntity.ok(itemCategoryService.update(entity, request));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> delete(@PathVariable Long id) {
-        return ResponseEntity.ok(itemCategoryService.delete(id));
+    public ResponseEntity<?> delete(
+            @PathVariable("item-type-id") Long itemTypeId,
+            @PathVariable Long id) {
+        return ResponseEntity.ok(itemCategoryService.delete(itemTypeId, id));
     }
 }

@@ -33,9 +33,8 @@ public class ItemCategoryMapper {
         return entity;
     }
 
-    public static void update(ItemCategoryEntity entity, UpdateItemCategoryRequest request,
-                              ItemTypeEntity itemTypeEntity) {
-        entity.setItemTypeEntity(itemTypeEntity);
+    public static void update(ItemCategoryEntity entity,
+                              UpdateItemCategoryRequest request) {
         entity.setCode(request.getCode());
         entity.setSortOrder(request.getSortOrder());
     }

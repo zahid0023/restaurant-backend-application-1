@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/v1/units")
+@RequestMapping("/api/v1/unit-types/{unit-type-id}/units")
 public class UnitController {
 
     private final UnitService unitService;
@@ -36,8 +36,10 @@ public class UnitController {
     }
 
     @PostMapping
-    public ResponseEntity<?> create(@Valid @RequestBody CreateUnitRequest request) {
-        UnitTypeEntity unitTypeEntity = unitTypeService.getEntityById(request.getUnitTypeId());
+    public ResponseEntity<?> create(
+            @PathVariable("unit-type-id") Long unitTypeId,
+            @Valid @RequestBody CreateUnitRequest request) {
+        UnitTypeEntity unitTypeEntity = unitTypeService.getEntityById(unitTypeId);
 
         Map<Long, LocaleEntity> localeEntityMap = LocaleUtils.resolveLocaleMap(
                 request.getLocales(), UnitLocaleRequest::getLocaleId, localeService);
@@ -46,26 +48,32 @@ public class UnitController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable Long id) {
-        return ResponseEntity.ok(unitService.getById(id));
+    public ResponseEntity<?> getById(
+            @PathVariable("unit-type-id") Long unitTypeId,
+            @PathVariable Long id) {
+        return ResponseEntity.ok(unitService.getById(unitTypeId, id));
     }
 
     @GetMapping
-    public ResponseEntity<?> getAll(@Valid @ParameterObject PaginatedRequest request) {
-        return ResponseEntity.ok(unitService.getAll(request));
+    public ResponseEntity<?> getAll(
+            @PathVariable("unit-type-id") Long unitTypeId,
+            @Valid @ParameterObject PaginatedRequest request) {
+        return ResponseEntity.ok(unitService.getAll(unitTypeId, request));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<?> update(
+            @PathVariable("unit-type-id") Long unitTypeId,
             @PathVariable Long id,
             @Valid @RequestBody UpdateUnitRequest request) {
-        UnitEntity entity = unitService.getEntityById(id);
-        UnitTypeEntity unitTypeEntity = unitTypeService.getEntityById(request.getUnitTypeId());
-        return ResponseEntity.ok(unitService.update(entity, request, unitTypeEntity));
+        UnitEntity entity = unitService.getEntityById(unitTypeId, id);
+        return ResponseEntity.ok(unitService.update(entity, request));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> delete(@PathVariable Long id) {
-        return ResponseEntity.ok(unitService.delete(id));
+    public ResponseEntity<?> delete(
+            @PathVariable("unit-type-id") Long unitTypeId,
+            @PathVariable Long id) {
+        return ResponseEntity.ok(unitService.delete(unitTypeId, id));
     }
 }

@@ -12,17 +12,26 @@ Authorization: Bearer <token>
 
 ## Units
 
+Unit endpoints are nested under unit types. All paths include `{unit-type-id}` which must refer to an existing active unit type.
+
+---
+
 ### Create Unit
 
-Creates a new unit with optional embedded locales.
+Creates a new unit with optional embedded locale translations.
 
-**`POST /api/v1/units`**
+**`POST /api/v1/unit-types/{unit-type-id}/units`**
+
+#### Path Parameters
+
+| Parameter | Type | Description |
+|---|---|---|
+| `unit-type-id` | long | Unit type ID |
 
 #### Request Body
 
 ```json
 {
-  "unit_type_id": 1,
   "code": "KG",
   "is_base": true,
   "sort_order": 1,
@@ -68,12 +77,13 @@ Creates a new unit with optional embedded locales.
 
 ### Get Unit by ID
 
-**`GET /api/v1/units/{id}`**
+**`GET /api/v1/unit-types/{unit-type-id}/units/{id}`**
 
 #### Path Parameters
 
 | Parameter | Type | Description |
 |---|---|---|
+| `unit-type-id` | long | Unit type ID |
 | `id` | long | Unit ID |
 
 #### Response `200 OK`
@@ -94,9 +104,15 @@ Creates a new unit with optional embedded locales.
 
 ### List Units
 
-Returns a paginated list of all active units.
+Returns a paginated list of all active units for the specified unit type.
 
-**`GET /api/v1/units`**
+**`GET /api/v1/unit-types/{unit-type-id}/units`**
+
+#### Path Parameters
+
+| Parameter | Type | Description |
+|---|---|---|
+| `unit-type-id` | long | Unit type ID |
 
 #### Query Parameters
 
@@ -142,12 +158,13 @@ Returns a paginated list of all active units.
 
 Updates the fields of an existing unit. Locale translations are managed separately via the Unit Locales API.
 
-**`PUT /api/v1/units/{id}`**
+**`PUT /api/v1/unit-types/{unit-type-id}/units/{id}`**
 
 #### Path Parameters
 
 | Parameter | Type | Description |
 |---|---|---|
+| `unit-type-id` | long | Unit type ID |
 | `id` | long | Unit ID |
 
 #### Request Body
@@ -183,12 +200,13 @@ Updates the fields of an existing unit. Locale translations are managed separate
 
 Soft-deletes a unit (sets `is_active = false`, `is_deleted = true`).
 
-**`DELETE /api/v1/units/{id}`**
+**`DELETE /api/v1/unit-types/{unit-type-id}/units/{id}`**
 
 #### Path Parameters
 
 | Parameter | Type | Description |
 |---|---|---|
+| `unit-type-id` | long | Unit type ID |
 | `id` | long | Unit ID |
 
 #### Response `200 OK`
@@ -204,18 +222,19 @@ Soft-deletes a unit (sets `is_active = false`, `is_deleted = true`).
 
 ## Unit Locales
 
-Manage locale-specific translations for a unit. The `{unit-id}` in all paths must refer to an existing active unit.
+Manage locale-specific translations for a unit. Both `{unit-type-id}` and `{unit-id}` must refer to existing active records.
 
 ---
 
 ### Create Unit Locale
 
-**`POST /api/v1/units/{unit-id}/locales`**
+**`POST /api/v1/unit-types/{unit-type-id}/units/{unit-id}/locales`**
 
 #### Path Parameters
 
 | Parameter | Type | Description |
 |---|---|---|
+| `unit-type-id` | long | Unit type ID |
 | `unit-id` | long | Unit ID |
 
 #### Request Body
@@ -249,12 +268,13 @@ Manage locale-specific translations for a unit. The `{unit-id}` in all paths mus
 
 ### Get Unit Locale by ID
 
-**`GET /api/v1/units/{unit-id}/locales/{id}`**
+**`GET /api/v1/unit-types/{unit-type-id}/units/{unit-id}/locales/{id}`**
 
 #### Path Parameters
 
 | Parameter | Type | Description |
 |---|---|---|
+| `unit-type-id` | long | Unit type ID |
 | `unit-id` | long | Unit ID |
 | `id` | long | Unit locale ID |
 
@@ -278,12 +298,13 @@ Manage locale-specific translations for a unit. The `{unit-id}` in all paths mus
 
 Returns a paginated list of all active locales for a given unit.
 
-**`GET /api/v1/units/{unit-id}/locales`**
+**`GET /api/v1/unit-types/{unit-type-id}/units/{unit-id}/locales`**
 
 #### Path Parameters
 
 | Parameter | Type | Description |
 |---|---|---|
+| `unit-type-id` | long | Unit type ID |
 | `unit-id` | long | Unit ID |
 
 #### Query Parameters
@@ -328,12 +349,13 @@ Returns a paginated list of all active locales for a given unit.
 
 ### Update Unit Locale
 
-**`PUT /api/v1/units/{unit-id}/locales/{id}`**
+**`PUT /api/v1/unit-types/{unit-type-id}/units/{unit-id}/locales/{id}`**
 
 #### Path Parameters
 
 | Parameter | Type | Description |
 |---|---|---|
+| `unit-type-id` | long | Unit type ID |
 | `unit-id` | long | Unit ID |
 | `id` | long | Unit locale ID |
 
@@ -370,12 +392,13 @@ Returns a paginated list of all active locales for a given unit.
 
 Soft-deletes a locale translation.
 
-**`DELETE /api/v1/units/{unit-id}/locales/{id}`**
+**`DELETE /api/v1/unit-types/{unit-type-id}/units/{unit-id}/locales/{id}`**
 
 #### Path Parameters
 
 | Parameter | Type | Description |
 |---|---|---|
+| `unit-type-id` | long | Unit type ID |
 | `unit-id` | long | Unit ID |
 | `id` | long | Unit locale ID |
 

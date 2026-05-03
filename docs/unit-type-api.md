@@ -43,7 +43,7 @@ Creates a new unit type with optional embedded locales.
 
 | Field | Type | Required | Constraints |
 |---|---|---|---|
-| `code` | string | yes | `WEIGHT`, `VOLUME`, `COUNT` |
+| `code` | string | yes | max 50 chars |
 | `sort_order` | integer | yes | |
 | `locales` | array | no | see locale fields below |
 | `locales[].locale_id` | long | yes | must be an existing active locale |
@@ -156,7 +156,7 @@ Updates the fields of an existing unit type. Locale translations are managed sep
 
 | Field | Type | Required | Constraints |
 |---|---|---|---|
-| `code` | string | yes | `WEIGHT`, `VOLUME`, `COUNT` |
+| `code` | string | yes | max 50 chars |
 | `sort_order` | integer | yes | |
 
 #### Response `200 OK`

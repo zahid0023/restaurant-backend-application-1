@@ -14,15 +14,18 @@ import com.example.restaurantbackendapplication1.model.projection.ItemCategorySu
 import java.util.Map;
 
 public interface ItemCategoryService {
-    SuccessResponse create(CreateItemCategoryRequest request, ItemTypeEntity itemTypeEntity, Map<Long, LocaleEntity> localeEntityMap);
+    SuccessResponse create(CreateItemCategoryRequest request,
+                           ItemTypeEntity itemTypeEntity,
+                           Map<Long, LocaleEntity> localeEntityMap);
 
-    ItemCategoryEntity getEntityById(Long id);
+    ItemCategoryEntity getEntityById(Long itemTypeId, Long id);
 
-    ItemCategoryResponse getById(Long id);
+    ItemCategoryResponse getById(Long itemTypeId, Long id);
 
-    PaginatedResponse<ItemCategorySummary> getAll(PaginatedRequest request);
+    PaginatedResponse<ItemCategorySummary> getAll(Long itemTypeId, PaginatedRequest request);
 
-    SuccessResponse update(ItemCategoryEntity entity, UpdateItemCategoryRequest request, ItemTypeEntity itemTypeEntity);
+    SuccessResponse update(ItemCategoryEntity entity,
+                           UpdateItemCategoryRequest request);
 
-    SuccessResponse delete(Long id);
+    SuccessResponse delete(Long itemTypeId, Long id);
 }

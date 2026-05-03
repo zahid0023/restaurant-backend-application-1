@@ -13,7 +13,8 @@ import com.example.restaurantbackendapplication1.model.projection.ItemTypeSummar
 import java.util.Map;
 
 public interface ItemTypeService {
-    SuccessResponse create(CreateItemTypeRequest request, Map<Long, LocaleEntity> localeEntityMap);
+    SuccessResponse create(CreateItemTypeRequest request,
+                           Map<Long, LocaleEntity> localeEntityMap);
 
     ItemTypeEntity getEntityById(Long id);
 

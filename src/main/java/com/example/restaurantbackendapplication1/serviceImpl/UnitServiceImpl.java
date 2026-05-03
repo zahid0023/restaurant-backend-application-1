@@ -50,24 +50,23 @@ public class UnitServiceImpl implements UnitService {
     }
 
     @Override
-    public UnitResponse getById(Long id) {
-        UnitEntity entity = getEntityById(id);
+    public UnitResponse getById(Long unitTypeId, Long id) {
+        UnitEntity entity = getEntityById(unitTypeId, id);
         UnitDto dto = UnitMapper.toDto(entity);
         return new UnitResponse(dto);
     }
 
     @Override
-    public PaginatedResponse<UnitSummary> getAll(PaginatedRequest request) {
-        Page<@NonNull UnitSummary> page = unitRepository.findAllByIsActiveAndIsDeleted(
-                true, false, request.toPageable(ALLOWED_SORT_FIELDS)
-        );
+    public PaginatedResponse<UnitSummary> getAll(Long unitTypeId, PaginatedRequest request) {
+        Page<@NonNull UnitSummary> page = unitRepository.findAllByUnitTypeEntity_IdAndIsActiveAndIsDeleted(unitTypeId, true, false, request.toPageable(ALLOWED_SORT_FIELDS));
         return Pagination.buildPaginatedResponse(page);
     }
 
     @Transactional
     @Override
-    public SuccessResponse update(UnitEntity entity, UpdateUnitRequest request, UnitTypeEntity unitTypeEntity) {
-        UnitMapper.update(entity, request, unitTypeEntity);
+    public SuccessResponse update(UnitEntity entity,
+                                  UpdateUnitRequest request) {
+        UnitMapper.update(entity, request);
         unitRepository.save(entity);
         log.info("Unit updated with id: {}", entity.getId());
         return new SuccessResponse(true, entity.getId());
@@ -75,8 +74,8 @@ public class UnitServiceImpl implements UnitService {
 
     @Transactional
     @Override
-    public SuccessResponse delete(Long id) {
-        UnitEntity entity = getEntityById(id);
+    public SuccessResponse delete(Long unitTypeId, Long id) {
+        UnitEntity entity = getEntityById(unitTypeId, id);
         entity.setIsDeleted(true);
         entity.setIsActive(false);
         unitRepository.save(entity);
@@ -87,6 +86,12 @@ public class UnitServiceImpl implements UnitService {
     @Override
     public UnitEntity getEntityById(Long id) {
         return unitRepository.findByIdAndIsActiveAndIsDeleted(id, true, false)
-                .orElseThrow(() -> new EntityNotFoundException("Unit not found with id: " + id));
+                .orElseThrow(() -> new EntityNotFoundException("Entity not found with id: " + id));
+    }
+
+    @Override
+    public UnitEntity getEntityById(Long unitTypeId, Long id) {
+        return unitRepository.findByUnitTypeEntity_IdAndIdAndIsActiveAndIsDeleted(unitTypeId, id, true, false)
+                .orElseThrow(() -> new EntityNotFoundException("Entity not found with id: " + id));
     }
 }

@@ -12,5 +12,7 @@ import java.util.Optional;
 public interface UnitRepository extends JpaRepository<@NonNull UnitEntity, @NonNull Long> {
     Optional<UnitEntity> findByIdAndIsActiveAndIsDeleted(Long id, Boolean isActive, Boolean isDeleted);
 
-    Page<UnitSummary> findAllByIsActiveAndIsDeleted(Boolean isActive, Boolean isDeleted, Pageable pageable);
+    Optional<UnitEntity> findByUnitTypeEntity_IdAndIdAndIsActiveAndIsDeleted(Long unitTypeId, Long id, Boolean isActive, Boolean isDeleted);
+
+    Page<@NonNull UnitSummary> findAllByUnitTypeEntity_IdAndIsActiveAndIsDeleted(Long unitTypeId, Boolean isActive, Boolean isDeleted, Pageable pageable);
 }

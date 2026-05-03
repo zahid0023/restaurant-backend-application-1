@@ -14,15 +14,20 @@ import com.example.restaurantbackendapplication1.model.projection.UnitSummary;
 import java.util.Map;
 
 public interface UnitService {
-    SuccessResponse create(CreateUnitRequest request, UnitTypeEntity unitTypeEntity, Map<Long, LocaleEntity> localeEntityMap);
+    SuccessResponse create(CreateUnitRequest request,
+                           UnitTypeEntity unitTypeEntity,
+                           Map<Long, LocaleEntity> localeEntityMap);
 
-    UnitEntity getEntityById(Long id);
+    UnitEntity getEntityById(Long unitId);
 
-    UnitResponse getById(Long id);
+    UnitEntity getEntityById(Long unitTypeId, Long id);
 
-    PaginatedResponse<UnitSummary> getAll(PaginatedRequest request);
+    UnitResponse getById(Long unitTypeId, Long id);
 
-    SuccessResponse update(UnitEntity entity, UpdateUnitRequest request, UnitTypeEntity unitTypeEntity);
+    PaginatedResponse<UnitSummary> getAll(Long unitTypeId, PaginatedRequest request);
 
-    SuccessResponse delete(Long id);
+    SuccessResponse update(UnitEntity entity,
+                           UpdateUnitRequest request);
+
+    SuccessResponse delete(Long unitTypeId, Long id);
 }

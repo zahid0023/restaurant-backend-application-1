@@ -34,8 +34,8 @@ public class UnitMapper {
         return entity;
     }
 
-    public static void update(UnitEntity entity, UpdateUnitRequest request, UnitTypeEntity unitTypeEntity) {
-        entity.setUnitTypeEntity(unitTypeEntity);
+    public static void update(UnitEntity entity,
+                              UpdateUnitRequest request) {
         entity.setCode(request.getCode());
         entity.setIsBase(request.getIsBase());
         entity.setSortOrder(request.getSortOrder());

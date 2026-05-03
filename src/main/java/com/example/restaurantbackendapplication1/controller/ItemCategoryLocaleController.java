@@ -16,7 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/v1/item-categories/{item-category-id}/locales")
+@RequestMapping("/api/v1/item-types/{item-type-id}/item-categories/{item-category-id}/locales")
 public class ItemCategoryLocaleController {
 
     private final ItemCategoryLocaleService itemCategoryLocaleService;
@@ -34,9 +34,10 @@ public class ItemCategoryLocaleController {
 
     @PostMapping
     public ResponseEntity<?> create(
+            @PathVariable("item-type-id") Long itemTypeId,
             @PathVariable("item-category-id") Long itemCategoryId,
             @Valid @RequestBody CreateItemCategoryLocaleRequest request) {
-        ItemCategoryEntity itemCategoryEntity = itemCategoryService.getEntityById(itemCategoryId);
+        ItemCategoryEntity itemCategoryEntity = itemCategoryService.getEntityById(itemTypeId, itemCategoryId);
         LocaleEntity localeEntity = localeService.getEntityById(request.getLocaleId());
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(itemCategoryLocaleService.create(itemCategoryEntity, localeEntity, request));
@@ -44,26 +45,29 @@ public class ItemCategoryLocaleController {
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getById(
+            @PathVariable("item-type-id") Long itemTypeId,
             @PathVariable("item-category-id") Long itemCategoryId,
             @PathVariable Long id) {
-        ItemCategoryEntity itemCategoryEntity = itemCategoryService.getEntityById(itemCategoryId);
+        ItemCategoryEntity itemCategoryEntity = itemCategoryService.getEntityById(itemTypeId, itemCategoryId);
         return ResponseEntity.ok(itemCategoryLocaleService.getById(id, itemCategoryEntity));
     }
 
     @GetMapping
     public ResponseEntity<?> getAll(
+            @PathVariable("item-type-id") Long itemTypeId,
             @PathVariable("item-category-id") Long itemCategoryId,
             @Valid @ParameterObject PaginatedRequest request) {
-        ItemCategoryEntity itemCategoryEntity = itemCategoryService.getEntityById(itemCategoryId);
+        ItemCategoryEntity itemCategoryEntity = itemCategoryService.getEntityById(itemTypeId, itemCategoryId);
         return ResponseEntity.ok(itemCategoryLocaleService.getAll(itemCategoryEntity, request));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<?> update(
+            @PathVariable("item-type-id") Long itemTypeId,
             @PathVariable("item-category-id") Long itemCategoryId,
             @PathVariable Long id,
             @Valid @RequestBody UpdateItemCategoryLocaleRequest request) {
-        ItemCategoryEntity itemCategoryEntity = itemCategoryService.getEntityById(itemCategoryId);
+        ItemCategoryEntity itemCategoryEntity = itemCategoryService.getEntityById(itemTypeId, itemCategoryId);
         ItemCategoryLocaleEntity entity = itemCategoryLocaleService.getEntityById(id, itemCategoryEntity);
         LocaleEntity locale = localeService.getEntityById(request.getLocaleId());
         return ResponseEntity.ok(itemCategoryLocaleService.update(entity, locale, request));
@@ -71,9 +75,10 @@ public class ItemCategoryLocaleController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(
+            @PathVariable("item-type-id") Long itemTypeId,
             @PathVariable("item-category-id") Long itemCategoryId,
             @PathVariable Long id) {
-        ItemCategoryEntity itemCategoryEntity = itemCategoryService.getEntityById(itemCategoryId);
+        ItemCategoryEntity itemCategoryEntity = itemCategoryService.getEntityById(itemTypeId, itemCategoryId);
         ItemCategoryLocaleEntity entity = itemCategoryLocaleService.getEntityById(id, itemCategoryEntity);
         return ResponseEntity.ok(itemCategoryLocaleService.delete(entity));
     }

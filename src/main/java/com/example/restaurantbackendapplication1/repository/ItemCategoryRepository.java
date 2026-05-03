@@ -10,7 +10,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 
 public interface ItemCategoryRepository extends JpaRepository<@NonNull ItemCategoryEntity, @NonNull Long> {
-    Optional<ItemCategoryEntity> findByIdAndIsActiveAndIsDeleted(Long id, Boolean isActive, Boolean isDeleted);
 
-    Page<@NonNull ItemCategorySummary> findAllByIsActiveAndIsDeleted(Boolean isActive, Boolean isDeleted, Pageable pageable);
+    Optional<ItemCategoryEntity> findByItemTypeEntity_IdAndIdAndIsActiveAndIsDeleted(Long itemTypeId, Long id, Boolean isActive, Boolean isDeleted);
+
+    Page<@NonNull ItemCategorySummary> findAllByItemTypeEntityIdAndIsActiveAndIsDeleted(Long itemTypeId, Boolean isActive, Boolean isDeleted, Pageable pageable);
 }

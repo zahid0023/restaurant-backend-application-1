@@ -15,7 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/v1/item-categories/{item-category-id}/items")
+@RequestMapping("/api/v1/item-types/{item-type-id}/item-categories/{item-category-id}/items")
 public class ItemItemCategoryController {
 
     private final ItemItemCategoryService itemItemCategoryService;
@@ -33,9 +33,10 @@ public class ItemItemCategoryController {
 
     @PostMapping
     public ResponseEntity<?> assign(
+            @PathVariable("item-type-id") Long itemTypeId,
             @PathVariable("item-category-id") Long itemCategoryId,
             @RequestBody AssignItemRequest request) {
-        ItemCategoryEntity itemCategoryEntity = itemCategoryService.getEntityById(itemCategoryId);
+        ItemCategoryEntity itemCategoryEntity = itemCategoryService.getEntityById(itemTypeId, itemCategoryId);
         ItemEntity itemEntity = itemService.getEntityById(request.getItemId());
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(itemItemCategoryService.assign(itemCategoryEntity, itemEntity));
@@ -43,17 +44,19 @@ public class ItemItemCategoryController {
 
     @GetMapping
     public ResponseEntity<?> getAll(
+            @PathVariable("item-type-id") Long itemTypeId,
             @PathVariable("item-category-id") Long categoryId,
             @Valid @ParameterObject PaginatedRequest request) {
-        ItemCategoryEntity itemCategoryEntity = itemCategoryService.getEntityById(categoryId);
+        ItemCategoryEntity itemCategoryEntity = itemCategoryService.getEntityById(itemTypeId, categoryId);
         return ResponseEntity.ok(itemItemCategoryService.getAllItems(itemCategoryEntity, request));
     }
 
     @DeleteMapping("/{item-id}")
     public ResponseEntity<?> unassign(
+            @PathVariable("item-type-id") Long itemTypeId,
             @PathVariable("item-category-id") Long categoryId,
             @PathVariable("item-id") Long itemId) {
-        ItemCategoryEntity itemCategoryEntity = itemCategoryService.getEntityById(categoryId);
+        ItemCategoryEntity itemCategoryEntity = itemCategoryService.getEntityById(itemTypeId, categoryId);
         ItemEntity itemEntity = itemService.getEntityById(itemId);
         ItemItemCategoryEntity itemItemCategoryEntity = itemItemCategoryService.getAssignment(itemCategoryEntity, itemEntity);
         return ResponseEntity.ok(itemItemCategoryService.unassign(itemItemCategoryEntity));

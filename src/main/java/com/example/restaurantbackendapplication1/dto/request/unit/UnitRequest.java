@@ -13,10 +13,6 @@ import java.util.List;
 @Data
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class UnitRequest {
-
-    @NotNull
-    private Long unitTypeId;
-
     @NotBlank
     @Size(max = 20)
     private String code;
