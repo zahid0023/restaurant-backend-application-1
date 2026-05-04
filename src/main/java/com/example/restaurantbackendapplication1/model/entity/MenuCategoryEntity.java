@@ -1,0 +1,41 @@
+package com.example.restaurantbackendapplication1.model.entity;
+
+import com.example.restaurantbackendapplication1.commons.model.entity.AuditableEntity;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+import lombok.Getter;
+import lombok.Setter;
+import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
+import java.util.LinkedHashSet;
+import java.util.Set;
+
+@Getter
+@Setter
+@Entity
+@Table(name = "menu_categories")
+public class MenuCategoryEntity extends AuditableEntity {
+
+    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(name = "menu_id", nullable = false)
+    private MenuEntity menuEntity;
+
+    @Size(max = 50)
+    @NotNull
+    @Column(name = "code", nullable = false, length = 50)
+    private String code;
+
+    @NotNull
+    @ColumnDefault("0")
+    @Column(name = "sort_order", nullable = false)
+    private Integer sortOrder;
+
+    @OneToMany(mappedBy = "menuCategoryEntity", cascade = CascadeType.ALL)
+    private Set<MenuCategoryLocaleEntity> menuCategoryLocaleEntities = new LinkedHashSet<>();
+
+}

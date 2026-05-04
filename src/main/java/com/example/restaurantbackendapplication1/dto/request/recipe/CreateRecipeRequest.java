@@ -1,4 +1,0 @@
-package com.example.restaurantbackendapplication1.dto.request.recipe;
-
-public class CreateRecipeRequest extends RecipeRequest {
-}
