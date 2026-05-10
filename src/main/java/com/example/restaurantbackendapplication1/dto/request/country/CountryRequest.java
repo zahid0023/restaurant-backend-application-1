@@ -18,10 +18,6 @@ public class CountryRequest {
     @Size(max = 10)
     private String code;
 
-    @NotBlank
-    @Size(max = 255)
-    private String name;
-
     @Size(max = 10)
     private String iso3Code;
 

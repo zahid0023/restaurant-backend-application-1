@@ -40,9 +40,11 @@ public class ItemCategoryServiceImpl implements ItemCategoryService {
 
     @Transactional
     @Override
-    public SuccessResponse create(CreateItemCategoryRequest request, ItemTypeEntity itemTypeEntity,
+    public SuccessResponse create(CreateItemCategoryRequest request,
+                                  ItemTypeEntity itemTypeEntity,
+                                  ItemCategoryEntity itemCategoryEntity,
                                   Map<Long, LocaleEntity> localeEntityMap) {
-        ItemCategoryEntity entity = ItemCategoryMapper.fromRequest(request, itemTypeEntity, localeEntityMap);
+        ItemCategoryEntity entity = ItemCategoryMapper.fromRequest(request, itemTypeEntity, itemCategoryEntity, localeEntityMap);
         itemCategoryRepository.save(entity);
         log.info("ItemCategory created with id: {}", entity.getId());
         return new SuccessResponse(true, entity.getId());
@@ -57,7 +59,19 @@ public class ItemCategoryServiceImpl implements ItemCategoryService {
 
     @Override
     public PaginatedResponse<ItemCategorySummary> getAll(Long itemTypeId, PaginatedRequest request) {
-        Page<@NonNull ItemCategorySummary> page = itemCategoryRepository.findAllByItemTypeEntityIdAndIsActiveAndIsDeleted(itemTypeId, true, false, request.toPageable(ALLOWED_SORT_FIELDS));
+        Page<@NonNull ItemCategorySummary> page = itemCategoryRepository.findAllByItemTypeEntity_IdAndIsActiveAndIsDeleted(itemTypeId, true, false, request.toPageable(ALLOWED_SORT_FIELDS));
+        return Pagination.buildPaginatedResponse(page);
+    }
+
+    @Override
+    public PaginatedResponse<ItemCategorySummary> getAllRoots(Long itemTypeId, PaginatedRequest request) {
+        Page<@NonNull ItemCategorySummary> page = itemCategoryRepository.findAllByItemTypeEntity_IdAndItemCategoryEntityIsNullAndIsActiveAndIsDeleted(itemTypeId, true, false, request.toPageable(ALLOWED_SORT_FIELDS));
+        return Pagination.buildPaginatedResponse(page);
+    }
+
+    @Override
+    public PaginatedResponse<ItemCategorySummary> getAllSubCategories(Long itemTypeId, Long itemCategoryId, PaginatedRequest request) {
+        Page<@NonNull ItemCategorySummary> page = itemCategoryRepository.findAllByItemTypeEntity_IdAndItemCategoryEntity_IdAndIsActiveAndIsDeleted(itemTypeId, itemCategoryId, true, false, request.toPageable(ALLOWED_SORT_FIELDS));
         return Pagination.buildPaginatedResponse(page);
     }
 

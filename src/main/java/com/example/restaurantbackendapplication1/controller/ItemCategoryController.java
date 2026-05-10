@@ -40,11 +40,12 @@ public class ItemCategoryController {
             @PathVariable("item-type-id") Long itemTypeId,
             @Valid @RequestBody CreateItemCategoryRequest request) {
         ItemTypeEntity itemTypeEntity = itemTypeService.getEntityById(itemTypeId);
+        ItemCategoryEntity itemCategoryEntity = request.getParentId() != null ? itemCategoryService.getEntityById(itemTypeId, request.getParentId()) : null;
 
         Map<Long, LocaleEntity> localeEntityMap = LocaleUtils.resolveLocaleMap(
                 request.getLocales(), ItemCategoryLocaleRequest::getLocaleId, localeService);
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(itemCategoryService.create(request, itemTypeEntity, localeEntityMap));
+                .body(itemCategoryService.create(request, itemTypeEntity, itemCategoryEntity, localeEntityMap));
     }
 
     @GetMapping("/{id}")
@@ -59,6 +60,23 @@ public class ItemCategoryController {
             @PathVariable("item-type-id") Long itemTypeId,
             @Valid @ParameterObject PaginatedRequest request) {
         return ResponseEntity.ok(itemCategoryService.getAll(itemTypeId, request));
+    }
+
+    @GetMapping("/root")
+    public ResponseEntity<?> getAllRoots(
+            @PathVariable("item-type-id") Long itemTypeId,
+            @Valid @ParameterObject PaginatedRequest request
+    ) {
+        return ResponseEntity.ok(itemCategoryService.getAllRoots(itemTypeId, request));
+    }
+
+    @GetMapping("/{item-category-id}/sub-categories")
+    public ResponseEntity<?> getAllSubCategories(
+            @PathVariable("item-type-id") Long itemTypeId,
+            @PathVariable("item-category-id") Long itemCategoryId,
+            @Valid @ParameterObject PaginatedRequest request
+    ) {
+        return ResponseEntity.ok(itemCategoryService.getAllSubCategories(itemTypeId, itemCategoryId, request));
     }
 
     @PutMapping("/{id}")

@@ -9,4 +9,5 @@ import tools.jackson.databind.annotation.JsonNaming;
 @EqualsAndHashCode(callSuper = false)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class CreateItemCategoryRequest extends ItemCategoryRequest {
+    private Long parentId;
 }

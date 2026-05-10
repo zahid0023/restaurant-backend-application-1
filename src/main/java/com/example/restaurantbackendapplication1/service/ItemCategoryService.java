@@ -16,6 +16,7 @@ import java.util.Map;
 public interface ItemCategoryService {
     SuccessResponse create(CreateItemCategoryRequest request,
                            ItemTypeEntity itemTypeEntity,
+                           ItemCategoryEntity itemCategoryEntity,
                            Map<Long, LocaleEntity> localeEntityMap);
 
     ItemCategoryEntity getEntityById(Long itemTypeId, Long id);
@@ -23,6 +24,10 @@ public interface ItemCategoryService {
     ItemCategoryResponse getById(Long itemTypeId, Long id);
 
     PaginatedResponse<ItemCategorySummary> getAll(Long itemTypeId, PaginatedRequest request);
+
+    PaginatedResponse<ItemCategorySummary> getAllRoots(Long itemTypeId, PaginatedRequest request);
+
+    PaginatedResponse<ItemCategorySummary> getAllSubCategories(Long itemTypeId, Long itemCategoryId, PaginatedRequest request);
 
     SuccessResponse update(ItemCategoryEntity entity,
                            UpdateItemCategoryRequest request);

@@ -37,4 +37,9 @@ public class ItemCategoryEntity extends AuditableEntity {
 
     @OneToMany(mappedBy = "itemCategoryEntity", cascade = CascadeType.ALL)
     private Set<ItemItemCategoryEntity> itemItemCategoryEntities = new LinkedHashSet<>();
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_id")
+    private ItemCategoryEntity itemCategoryEntity;
+
 }

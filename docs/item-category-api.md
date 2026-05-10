@@ -14,11 +14,13 @@ Authorization: Bearer <token>
 
 Item categories are nested under item types. All paths include `{item-type-id}` which must refer to an existing active item type.
 
+Categories support a parent–child hierarchy. A category can optionally have a `parent_id` pointing to another category within the same item type. Note that `parent_id` is accepted on creation but is **not returned** in any Get or List response.
+
 ---
 
 ### Create Item Category
 
-Creates a new item category with optional embedded locale translations.
+Creates a new item category with optional parent and optional embedded locale translations.
 
 **`POST /api/v1/item-types/{item-type-id}/item-categories`**
 
@@ -32,6 +34,7 @@ Creates a new item category with optional embedded locale translations.
 
 ```json
 {
+  "parent_id": null,
   "code": "APPETIZER",
   "sort_order": 1,
   "locales": [
@@ -53,12 +56,13 @@ Creates a new item category with optional embedded locale translations.
 
 | Field | Type | Required | Constraints |
 |---|---|---|---|
+| `parent_id` | long | no | must be an existing active item category within the same item type |
 | `code` | string | yes | max 50 chars |
 | `sort_order` | integer | yes | |
 | `locales` | array | no | see locale fields below |
 | `locales[].locale_id` | long | yes | must be an existing active locale |
 | `locales[].name` | string | yes | max 255 chars |
-| `locales[].description` | string | no | |
+| `locales[].description` | string | no | defaults to `""` |
 | `locales[].sort_order` | integer | yes | |
 
 #### Response `201 Created`
@@ -96,11 +100,13 @@ Creates a new item category with optional embedded locale translations.
 }
 ```
 
+> Note: `parent_id` is not included in the response even if the category has a parent.
+
 ---
 
 ### List Item Categories
 
-Returns a paginated list of all active item categories for the specified item type.
+Returns a paginated list of all active item categories for the specified item type, including both root categories and their children in a flat list.
 
 **`GET /api/v1/item-types/{item-type-id}/item-categories`**
 
@@ -146,11 +152,13 @@ Returns a paginated list of all active item categories for the specified item ty
 }
 ```
 
+> Note: `parent_id` is not included in list items. All categories (roots and children) are returned in a single flat list.
+
 ---
 
 ### Update Item Category
 
-Updates the fields of an existing item category. Locale translations are managed separately via the Item Category Locales API.
+Updates `code` and `sort_order` of an existing item category. `parent_id` is set only at creation and cannot be changed. Locale translations are managed separately via the Item Category Locales API.
 
 **`PUT /api/v1/item-types/{item-type-id}/item-categories/{id}`**
 
@@ -242,7 +250,7 @@ Manage locale-specific translations for an item category. Both `{item-type-id}` 
 |---|---|---|---|
 | `locale_id` | long | yes | must be an existing active locale |
 | `name` | string | yes | max 255 chars |
-| `description` | string | no | |
+| `description` | string | no | defaults to `""` |
 | `sort_order` | integer | yes | |
 
 #### Response `201 Created`
@@ -364,7 +372,7 @@ Returns a paginated list of all active locales for a given item category.
 |---|---|---|---|
 | `locale_id` | long | yes | must be an existing active locale |
 | `name` | string | yes | max 255 chars |
-| `description` | string | no | |
+| `description` | string | no | defaults to `""` |
 | `sort_order` | integer | yes | |
 
 #### Response `200 OK`

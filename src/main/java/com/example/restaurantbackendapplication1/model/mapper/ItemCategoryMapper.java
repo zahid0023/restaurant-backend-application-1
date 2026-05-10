@@ -18,9 +18,11 @@ public class ItemCategoryMapper {
 
     public static ItemCategoryEntity fromRequest(CreateItemCategoryRequest request,
                                                  ItemTypeEntity itemTypeEntity,
+                                                 ItemCategoryEntity itemCategoryEntity,
                                                  Map<Long, LocaleEntity> localeEntityMap) {
         ItemCategoryEntity entity = new ItemCategoryEntity();
         entity.setItemTypeEntity(itemTypeEntity);
+        entity.setItemCategoryEntity(itemCategoryEntity);
         entity.setCode(request.getCode());
         entity.setSortOrder(request.getSortOrder());
 
