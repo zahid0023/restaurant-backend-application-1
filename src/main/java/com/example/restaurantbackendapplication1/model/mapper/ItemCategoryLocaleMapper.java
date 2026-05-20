@@ -6,6 +6,7 @@ import com.example.restaurantbackendapplication1.model.dto.ItemCategoryLocaleDto
 import com.example.restaurantbackendapplication1.model.entity.ItemCategoryEntity;
 import com.example.restaurantbackendapplication1.model.entity.ItemCategoryLocaleEntity;
 import com.example.restaurantbackendapplication1.model.entity.LocaleEntity;
+
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
@@ -26,21 +27,19 @@ public class ItemCategoryLocaleMapper {
 
     public static void update(
             ItemCategoryLocaleEntity entity,
-            UpdateItemCategoryLocaleRequest request,
-            LocaleEntity locale) {
-        entity.setLocaleEntity(locale);
+            UpdateItemCategoryLocaleRequest request) {
         entity.setName(request.getName());
         entity.setDescription(request.getDescription() != null ? request.getDescription() : "");
         entity.setSortOrder(request.getSortOrder());
     }
 
     public static ItemCategoryLocaleDto toDto(ItemCategoryLocaleEntity entity) {
-        ItemCategoryLocaleDto dto = new ItemCategoryLocaleDto();
-        dto.setId(entity.getId());
-        dto.setLocaleId(entity.getLocaleEntity().getId());
-        dto.setName(entity.getName());
-        dto.setDescription(entity.getDescription());
-        dto.setSortOrder(entity.getSortOrder());
-        return dto;
+        return ItemCategoryLocaleDto.builder()
+                .id(entity.getId())
+                .localeId(entity.getLocaleEntity().getId())
+                .name(entity.getName())
+                .description(entity.getDescription())
+                .sortOrder(entity.getSortOrder())
+                .build();
     }
 }

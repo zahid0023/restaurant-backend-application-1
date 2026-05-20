@@ -35,12 +35,12 @@ public class DiningSpaceLocaleMapper {
     }
 
     public static DiningSpaceLocaleDto toDto(DiningSpaceLocaleEntity entity) {
-        DiningSpaceLocaleDto dto = new DiningSpaceLocaleDto();
-        dto.setId(entity.getId());
-        dto.setLocaleId(entity.getLocaleEntity().getId());
-        dto.setName(entity.getName());
-        dto.setDescription(entity.getDescription());
-        dto.setSortOrder(entity.getSortOrder());
-        return dto;
+        return DiningSpaceLocaleDto.builder()
+                .id(entity.getId())
+                .localeId(entity.getLocaleEntity().getId())
+                .name(entity.getName())
+                .description(entity.getDescription())
+                .sortOrder(entity.getSortOrder())
+                .build();
     }
 }

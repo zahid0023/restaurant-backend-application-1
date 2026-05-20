@@ -50,6 +50,7 @@ public class ItemCategoryServiceImpl implements ItemCategoryService {
         return new SuccessResponse(true, entity.getId());
     }
 
+    @Transactional(readOnly = true)
     @Override
     public ItemCategoryResponse getById(Long itemTypeId, Long id) {
         ItemCategoryEntity entity = getEntityById(itemTypeId, id);
@@ -87,8 +88,7 @@ public class ItemCategoryServiceImpl implements ItemCategoryService {
 
     @Transactional
     @Override
-    public SuccessResponse delete(Long itemTypeId, Long id) {
-        ItemCategoryEntity entity = getEntityById(itemTypeId, id);
+    public SuccessResponse delete(ItemCategoryEntity entity) {
         entity.setIsDeleted(true);
         entity.setIsActive(false);
         itemCategoryRepository.save(entity);
@@ -100,5 +100,11 @@ public class ItemCategoryServiceImpl implements ItemCategoryService {
     public ItemCategoryEntity getEntityById(Long itemTypeId, Long id) {
         return itemCategoryRepository.findByItemTypeEntity_IdAndIdAndIsActiveAndIsDeleted(itemTypeId, id, true, false)
                 .orElseThrow(() -> new EntityNotFoundException("ItemCategoryEntity with id: " + itemTypeId + " and id: " + id));
+    }
+
+    @Override
+    public ItemCategoryEntity getEntityById(Long id) {
+        return itemCategoryRepository.findByIdAndIsActiveAndIsDeleted(id, true, false)
+                .orElseThrow(() -> new EntityNotFoundException("ItemCategoryEntity with id: " + id));
     }
 }

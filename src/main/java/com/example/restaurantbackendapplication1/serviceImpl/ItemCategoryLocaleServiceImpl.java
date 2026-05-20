@@ -1,35 +1,22 @@
 package com.example.restaurantbackendapplication1.serviceImpl;
 
-import com.example.restaurantbackendapplication1.commons.dto.request.PaginatedRequest;
-import com.example.restaurantbackendapplication1.commons.dto.response.PaginatedResponse;
 import com.example.restaurantbackendapplication1.commons.dto.response.SuccessResponse;
 import com.example.restaurantbackendapplication1.dto.request.itemcategorylocale.CreateItemCategoryLocaleRequest;
 import com.example.restaurantbackendapplication1.dto.request.itemcategorylocale.UpdateItemCategoryLocaleRequest;
-import com.example.restaurantbackendapplication1.dto.response.ItemCategoryLocaleResponse;
-import com.example.restaurantbackendapplication1.model.dto.ItemCategoryLocaleDto;
 import com.example.restaurantbackendapplication1.model.entity.ItemCategoryEntity;
 import com.example.restaurantbackendapplication1.model.entity.ItemCategoryLocaleEntity;
 import com.example.restaurantbackendapplication1.model.entity.LocaleEntity;
-import com.example.restaurantbackendapplication1.model.enums.ItemCategoryLocaleSortField;
 import com.example.restaurantbackendapplication1.model.mapper.ItemCategoryLocaleMapper;
-import com.example.restaurantbackendapplication1.model.projection.ItemCategoryLocaleSummary;
 import com.example.restaurantbackendapplication1.repository.ItemCategoryLocaleRepository;
 import com.example.restaurantbackendapplication1.service.ItemCategoryLocaleService;
-import com.example.restaurantbackendapplication1.utils.Pagination;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
-import org.jspecify.annotations.NonNull;
-import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Set;
 
 @Service
 @Slf4j
 public class ItemCategoryLocaleServiceImpl implements ItemCategoryLocaleService {
-
-    private static final Set<String> ALLOWED_SORT_FIELDS = ItemCategoryLocaleSortField.allowedFields();
 
     private final ItemCategoryLocaleRepository itemCategoryLocaleRepository;
 
@@ -46,26 +33,10 @@ public class ItemCategoryLocaleServiceImpl implements ItemCategoryLocaleService 
         return new SuccessResponse(true, entity.getId());
     }
 
-    @Override
-    public ItemCategoryLocaleResponse getById(Long id, ItemCategoryEntity itemCategoryEntity) {
-        ItemCategoryLocaleEntity entity = getEntityById(id, itemCategoryEntity);
-        ItemCategoryLocaleDto dto = ItemCategoryLocaleMapper.toDto(entity);
-        return new ItemCategoryLocaleResponse(dto);
-    }
-
-    @Override
-    public PaginatedResponse<ItemCategoryLocaleSummary> getAll(ItemCategoryEntity itemCategoryEntity, PaginatedRequest request) {
-        Page<@NonNull ItemCategoryLocaleSummary> page = itemCategoryLocaleRepository
-                .findAllByItemCategoryEntityAndIsActiveAndIsDeleted(
-                        itemCategoryEntity, true, false, request.toPageable(ALLOWED_SORT_FIELDS)
-                );
-        return Pagination.buildPaginatedResponse(page);
-    }
-
     @Transactional
     @Override
-    public SuccessResponse update(ItemCategoryLocaleEntity entity, LocaleEntity locale, UpdateItemCategoryLocaleRequest request) {
-        ItemCategoryLocaleMapper.update(entity, request, locale);
+    public SuccessResponse update(ItemCategoryLocaleEntity entity, UpdateItemCategoryLocaleRequest request) {
+        ItemCategoryLocaleMapper.update(entity, request);
         itemCategoryLocaleRepository.save(entity);
         log.info("ItemCategoryLocale updated with id: {}", entity.getId());
         return new SuccessResponse(true, entity.getId());

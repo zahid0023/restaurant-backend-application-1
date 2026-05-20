@@ -13,6 +13,8 @@ public interface ItemCategoryRepository extends JpaRepository<@NonNull ItemCateg
 
     Optional<ItemCategoryEntity> findByItemTypeEntity_IdAndIdAndIsActiveAndIsDeleted(Long itemTypeId, Long id, Boolean isActive, Boolean isDeleted);
 
+    Optional<ItemCategoryEntity> findByIdAndIsActiveAndIsDeleted(Long id, Boolean isActive, Boolean isDeleted);
+
     Page<@NonNull ItemCategorySummary> findAllByItemTypeEntity_IdAndIsActiveAndIsDeleted(Long itemTypeId, Boolean isActive, Boolean isDeleted, Pageable pageable);
 
     Page<@NonNull ItemCategorySummary> findAllByItemTypeEntity_IdAndItemCategoryEntityIsNullAndIsActiveAndIsDeleted(Long itemTypeId, Boolean isActive, Boolean isDeleted, Pageable pageable);

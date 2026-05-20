@@ -11,9 +11,6 @@ import tools.jackson.databind.annotation.JsonNaming;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class DishVariantLocaleRequest {
 
-    @NotNull
-    private Long localeId;
-
     @NotBlank
     @Size(max = 100)
     private String name;

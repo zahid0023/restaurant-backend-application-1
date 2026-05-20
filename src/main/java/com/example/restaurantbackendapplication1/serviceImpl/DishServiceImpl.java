@@ -8,8 +8,10 @@ import com.example.restaurantbackendapplication1.dto.request.dish.UpdateDishRequ
 import com.example.restaurantbackendapplication1.dto.response.DishResponse;
 import com.example.restaurantbackendapplication1.model.dto.DishDto;
 import com.example.restaurantbackendapplication1.model.entity.DishEntity;
+import com.example.restaurantbackendapplication1.model.entity.ItemEntity;
 import com.example.restaurantbackendapplication1.model.entity.LocaleEntity;
 import com.example.restaurantbackendapplication1.model.entity.MenuCategoryEntity;
+import com.example.restaurantbackendapplication1.model.entity.UnitEntity;
 import com.example.restaurantbackendapplication1.model.enums.DishSortField;
 import com.example.restaurantbackendapplication1.model.mapper.DishMapper;
 import com.example.restaurantbackendapplication1.model.projection.DishSummary;
@@ -42,8 +44,10 @@ public class DishServiceImpl implements DishService {
     @Override
     public SuccessResponse create(CreateDishRequest request,
                                   MenuCategoryEntity menuCategoryEntity,
-                                  Map<Long, LocaleEntity> localeEntityMap) {
-        DishEntity entity = DishMapper.fromRequest(request, menuCategoryEntity, localeEntityMap);
+                                  Map<Long, LocaleEntity> localeEntityMap,
+                                  Map<Long, ItemEntity> itemEntityMap,
+                                  Map<Long, UnitEntity> unitEntityMap) {
+        DishEntity entity = DishMapper.create(request, menuCategoryEntity, localeEntityMap, itemEntityMap, unitEntityMap);
         dishRepository.save(entity);
         log.info("Dish created with id: {}", entity.getId());
         return new SuccessResponse(true, entity.getId());

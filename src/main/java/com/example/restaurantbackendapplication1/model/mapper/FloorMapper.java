@@ -36,10 +36,10 @@ public class FloorMapper {
     }
 
     public static FloorDto toDto(FloorEntity entity) {
-        FloorDto dto = new FloorDto();
-        dto.setId(entity.getId());
-        dto.setCode(entity.getCode());
-        dto.setSortOrder(entity.getSortOrder());
-        return dto;
+        return FloorDto.builder()
+                .id(entity.getId())
+                .code(entity.getCode())
+                .sortOrder(entity.getSortOrder())
+                .build();
     }
 }

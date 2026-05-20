@@ -11,7 +11,9 @@ import com.example.restaurantbackendapplication1.model.entity.LocaleEntity;
 import com.example.restaurantbackendapplication1.model.entity.UnitEntity;
 import com.example.restaurantbackendapplication1.model.projection.ItemSummary;
 
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public interface ItemService {
     SuccessResponse create(CreateItemRequest request,
@@ -19,6 +21,8 @@ public interface ItemService {
                            Map<Long, LocaleEntity> localeEntityMap);
 
     ItemEntity getEntityById(Long id);
+
+    List<ItemEntity> getAll(Set<Long> ids);
 
     ItemResponse getById(Long id);
 

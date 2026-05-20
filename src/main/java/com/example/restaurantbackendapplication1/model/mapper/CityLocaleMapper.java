@@ -1,7 +1,8 @@
 package com.example.restaurantbackendapplication1.model.mapper;
 
-import com.example.restaurantbackendapplication1.dto.request.citylocale.CityLocaleRequest;
-import com.example.restaurantbackendapplication1.dto.request.citylocale.UpdateCityLocaleRequest;
+import com.example.restaurantbackendapplication1.dto.request.city.citylocale.CityLocaleRequest;
+import com.example.restaurantbackendapplication1.dto.request.city.citylocale.CreateCityLocaleRequest;
+import com.example.restaurantbackendapplication1.dto.request.city.citylocale.UpdateCityLocaleRequest;
 import com.example.restaurantbackendapplication1.model.dto.CityLocaleDto;
 import com.example.restaurantbackendapplication1.model.entity.CityEntity;
 import com.example.restaurantbackendapplication1.model.entity.CityLocaleEntity;
@@ -11,36 +12,33 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class CityLocaleMapper {
 
-    public static CityLocaleEntity fromRequest(
-            CityLocaleRequest request,
-            CityEntity cityEntity,
-            LocaleEntity localeEntity) {
+    public CityLocaleEntity create(CreateCityLocaleRequest request,
+                                   CityEntity cityEntity,
+                                   LocaleEntity localeEntity) {
         CityLocaleEntity entity = new CityLocaleEntity();
         entity.setCityEntity(cityEntity);
         entity.setLocaleEntity(localeEntity);
-        entity.setName(request.getName());
-        entity.setDescription(request.getDescription() != null ? request.getDescription() : "");
-        entity.setSortOrder(request.getSortOrder());
+        applyCommonFields(entity, request);
         return entity;
     }
 
-    public static void update(
-            CityLocaleEntity entity,
-            UpdateCityLocaleRequest request,
-            LocaleEntity locale) {
-        entity.setLocaleEntity(locale);
+    public void update(CityLocaleEntity entity, UpdateCityLocaleRequest request) {
+        applyCommonFields(entity, request);
+    }
+
+    private void applyCommonFields(CityLocaleEntity entity, CityLocaleRequest request) {
         entity.setName(request.getName());
         entity.setDescription(request.getDescription() != null ? request.getDescription() : "");
         entity.setSortOrder(request.getSortOrder());
     }
 
-    public static CityLocaleDto toDto(CityLocaleEntity entity) {
-        CityLocaleDto dto = new CityLocaleDto();
-        dto.setId(entity.getId());
-        dto.setLocaleId(entity.getLocaleEntity().getId());
-        dto.setName(entity.getName());
-        dto.setDescription(entity.getDescription());
-        dto.setSortOrder(entity.getSortOrder());
-        return dto;
+    public CityLocaleDto toDto(CityLocaleEntity entity) {
+        return CityLocaleDto.builder()
+                .id(entity.getId())
+                .localeId(entity.getLocaleEntity().getId())
+                .name(entity.getName())
+                .description(entity.getDescription())
+                .sortOrder(entity.getSortOrder())
+                .build();
     }
 }

@@ -24,11 +24,11 @@ public class LocaleMapper {
     }
 
     public static LocaleDto toDto(LocaleEntity entity) {
-        LocaleDto dto = new LocaleDto();
-        dto.setId(entity.getId());
-        dto.setCode(entity.getCode());
-        dto.setName(entity.getName());
-        dto.setSortOrder(entity.getSortOrder());
-        return dto;
+        return LocaleDto.builder()
+                .id(entity.getId())
+                .code(entity.getCode())
+                .name(entity.getName())
+                .sortOrder(entity.getSortOrder())
+                .build();
     }
 }

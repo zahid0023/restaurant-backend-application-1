@@ -79,7 +79,11 @@ Creates a new menu with optional embedded locale translations.
   "menu": {
     "id": 1,
     "code": "LUNCH_MENU",
-    "sort_order": 1
+    "sort_order": 1,
+    "locales": [
+      { "id": 1, "locale_id": 1, "name": "Lunch Menu", "description": "Available from 12:00 to 15:00", "sort_order": 1 },
+      { "id": 2, "locale_id": 2, "name": "Öğle Menüsü", "description": "12:00 - 15:00 arası geçerlidir", "sort_order": 1 }
+    ]
   }
 }
 ```
@@ -109,12 +113,19 @@ Returns a paginated list of all active menus.
     {
       "id": 1,
       "code": "LUNCH_MENU",
-      "sort_order": 1
+      "sort_order": 1,
+      "locales": [
+        { "id": 1, "locale_id": 1, "name": "Lunch Menu", "description": "Available from 12:00 to 15:00", "sort_order": 1 },
+        { "id": 2, "locale_id": 2, "name": "Öğle Menüsü", "description": "12:00 - 15:00 arası geçerlidir", "sort_order": 1 }
+      ]
     },
     {
       "id": 2,
       "code": "DINNER_MENU",
-      "sort_order": 2
+      "sort_order": 2,
+      "locales": [
+        { "id": 3, "locale_id": 1, "name": "Dinner Menu", "description": "Available from 18:00 to 22:00", "sort_order": 1 }
+      ]
     }
   ],
   "current_page": 0,
@@ -130,7 +141,7 @@ Returns a paginated list of all active menus.
 
 ### Update Menu
 
-Updates the fields of an existing menu. Locale translations are managed separately via the Menu Locales API.
+Updates the mutable fields of an existing menu. `code` is immutable and cannot be changed. Locale translations are managed separately via the Menu Locales API.
 
 **`PUT /api/v1/menus/{id}`**
 
@@ -144,14 +155,12 @@ Updates the fields of an existing menu. Locale translations are managed separate
 
 ```json
 {
-  "code": "LUNCH_MENU",
   "sort_order": 2
 }
 ```
 
 | Field | Type | Required | Constraints |
 |---|---|---|---|
-| `code` | string | yes | max 50 chars, not blank |
 | `sort_order` | integer | yes | |
 
 #### Response `200 OK`
@@ -233,86 +242,9 @@ Manage locale-specific translations for a menu. The `{menu-id}` in all paths mus
 
 ---
 
-### Get Menu Locale by ID
-
-**`GET /api/v1/menus/{menu-id}/locales/{id}`**
-
-#### Path Parameters
-
-| Parameter | Type | Description |
-|---|---|---|
-| `menu-id` | long | Menu ID |
-| `id` | long | Menu locale ID |
-
-#### Response `200 OK`
-
-```json
-{
-  "menu_locale": {
-    "id": 1,
-    "locale_id": 1,
-    "name": "Lunch Menu",
-    "description": "Available from 12:00 to 15:00",
-    "sort_order": 1
-  }
-}
-```
-
----
-
-### List Menu Locales
-
-Returns a paginated list of all active locale translations for a given menu.
-
-**`GET /api/v1/menus/{menu-id}/locales`**
-
-#### Path Parameters
-
-| Parameter | Type | Description |
-|---|---|---|
-| `menu-id` | long | Menu ID |
-
-#### Query Parameters
-
-| Parameter | Type | Default | Constraints | Description |
-|---|---|---|---|---|
-| `page` | integer | `0` | min 0 | Page index (zero-based) |
-| `size` | integer | `10` | 1–50 | Items per page |
-| `sort_by` | string | `id` | `id`, `name`, `sortOrder`, `createdAt` | Field to sort by |
-| `sort_dir` | string | `ASC` | `ASC`, `DESC` | Sort direction |
-
-#### Response `200 OK`
-
-```json
-{
-  "data": [
-    {
-      "id": 1,
-      "locale_id": 1,
-      "name": "Lunch Menu",
-      "sort_order": 1
-    },
-    {
-      "id": 2,
-      "locale_id": 2,
-      "name": "Öğle Menüsü",
-      "sort_order": 1
-    }
-  ],
-  "current_page": 0,
-  "total_pages": 1,
-  "total_elements": 2,
-  "page_size": 10,
-  "has_next": false,
-  "has_previous": false
-}
-```
-
-> Note: The list response returns a summary shape (`id`, `locale_id`, `name`, `sort_order`). Use the Get by ID endpoint to retrieve `description`.
-
----
-
 ### Update Menu Locale
+
+Updates the translation fields. The locale cannot be changed; use delete + create to switch locale.
 
 **`PUT /api/v1/menus/{menu-id}/locales/{id}`**
 
@@ -327,7 +259,6 @@ Returns a paginated list of all active locale translations for a given menu.
 
 ```json
 {
-  "locale_id": 1,
   "name": "Lunch Menu",
   "description": "Available from 12:00 to 15:00 - updated",
   "sort_order": 1
@@ -336,7 +267,6 @@ Returns a paginated list of all active locale translations for a given menu.
 
 | Field | Type | Required | Constraints |
 |---|---|---|---|
-| `locale_id` | long | yes | must be an existing active locale |
 | `name` | string | yes | max 255 chars, not blank |
 | `description` | string | no | defaults to `""` |
 | `sort_order` | integer | yes | |
@@ -398,7 +328,6 @@ Returned when request validation fails.
   "status": 400,
   "message": "Validation failed",
   "errors": {
-    "code": "must not be blank",
     "sort_order": "must not be null"
   }
 }

@@ -15,6 +15,7 @@ import com.example.restaurantbackendapplication1.model.mapper.UnitMapper;
 import com.example.restaurantbackendapplication1.model.projection.UnitSummary;
 import com.example.restaurantbackendapplication1.repository.UnitRepository;
 import com.example.restaurantbackendapplication1.service.UnitService;
+import com.example.restaurantbackendapplication1.utils.EntityValidator;
 import com.example.restaurantbackendapplication1.utils.Pagination;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +24,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -43,7 +45,7 @@ public class UnitServiceImpl implements UnitService {
     public SuccessResponse create(CreateUnitRequest request,
                                   UnitTypeEntity unitTypeEntity,
                                   Map<Long, LocaleEntity> localeEntityMap) {
-        UnitEntity entity = UnitMapper.fromRequest(request, unitTypeEntity, localeEntityMap);
+        UnitEntity entity = UnitMapper.create(request, unitTypeEntity, localeEntityMap);
         unitRepository.save(entity);
         log.info("Unit created with id: {}", entity.getId());
         return new SuccessResponse(true, entity.getId());
@@ -58,14 +60,14 @@ public class UnitServiceImpl implements UnitService {
 
     @Override
     public PaginatedResponse<UnitSummary> getAll(Long unitTypeId, PaginatedRequest request) {
-        Page<@NonNull UnitSummary> page = unitRepository.findAllByUnitTypeEntity_IdAndIsActiveAndIsDeleted(unitTypeId, true, false, request.toPageable(ALLOWED_SORT_FIELDS));
+        Page<@NonNull UnitSummary> page = unitRepository.findAllByUnitTypeEntity_IdAndIsActiveAndIsDeleted(
+                unitTypeId, true, false, request.toPageable(ALLOWED_SORT_FIELDS));
         return Pagination.buildPaginatedResponse(page);
     }
 
     @Transactional
     @Override
-    public SuccessResponse update(UnitEntity entity,
-                                  UpdateUnitRequest request) {
+    public SuccessResponse update(UnitEntity entity, UpdateUnitRequest request) {
         UnitMapper.update(entity, request);
         unitRepository.save(entity);
         log.info("Unit updated with id: {}", entity.getId());
@@ -74,8 +76,7 @@ public class UnitServiceImpl implements UnitService {
 
     @Transactional
     @Override
-    public SuccessResponse delete(Long unitTypeId, Long id) {
-        UnitEntity entity = getEntityById(unitTypeId, id);
+    public SuccessResponse delete(UnitEntity entity) {
         entity.setIsDeleted(true);
         entity.setIsActive(false);
         unitRepository.save(entity);
@@ -86,12 +87,19 @@ public class UnitServiceImpl implements UnitService {
     @Override
     public UnitEntity getEntityById(Long id) {
         return unitRepository.findByIdAndIsActiveAndIsDeleted(id, true, false)
-                .orElseThrow(() -> new EntityNotFoundException("Entity not found with id: " + id));
+                .orElseThrow(() -> new EntityNotFoundException("Unit not found with id: " + id));
+    }
+
+    @Override
+    public List<UnitEntity> getAll(Set<Long> ids) {
+        List<UnitEntity> entities = unitRepository.findAllByIdInAndIsActiveAndIsDeleted(ids, true, false);
+        EntityValidator.validateAllFound(ids, entities, UnitEntity::getId, "Unit");
+        return entities;
     }
 
     @Override
     public UnitEntity getEntityById(Long unitTypeId, Long id) {
         return unitRepository.findByUnitTypeEntity_IdAndIdAndIsActiveAndIsDeleted(unitTypeId, id, true, false)
-                .orElseThrow(() -> new EntityNotFoundException("Entity not found with id: " + id));
+                .orElseThrow(() -> new EntityNotFoundException("Unit not found with id: " + id));
     }
 }

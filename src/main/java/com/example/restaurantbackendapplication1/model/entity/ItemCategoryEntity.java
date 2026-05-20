@@ -42,4 +42,7 @@ public class ItemCategoryEntity extends AuditableEntity {
     @JoinColumn(name = "parent_id")
     private ItemCategoryEntity itemCategoryEntity;
 
+    @OneToMany(mappedBy = "itemCategoryEntity", fetch = FetchType.LAZY)
+    private Set<ItemCategoryEntity> subCategoryEntities = new LinkedHashSet<>();
+
 }

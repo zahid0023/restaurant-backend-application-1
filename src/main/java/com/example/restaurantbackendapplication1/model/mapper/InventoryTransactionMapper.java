@@ -39,15 +39,15 @@ public class InventoryTransactionMapper {
     }
 
     public static InventoryTransactionDto toDto(InventoryTransactionEntity entity) {
-        InventoryTransactionDto dto = new InventoryTransactionDto();
-        dto.setId(entity.getId());
-        dto.setItemId(entity.getItemEntity().getId());
-        dto.setLocationId(entity.getInventoryLocationEntity().getId());
-        dto.setTransactionType(entity.getTransactionType());
-        dto.setQuantity(entity.getQuantity());
-        dto.setUnitCost(entity.getUnitCost());
-        dto.setTotalCost(entity.getTotalCost());
-        dto.setNotes(entity.getNotes());
-        return dto;
+        return InventoryTransactionDto.builder()
+                .id(entity.getId())
+                .itemId(entity.getItemEntity().getId())
+                .locationId(entity.getInventoryLocationEntity().getId())
+                .transactionType(entity.getTransactionType())
+                .quantity(entity.getQuantity())
+                .unitCost(entity.getUnitCost())
+                .totalCost(entity.getTotalCost())
+                .notes(entity.getNotes())
+                .build();
     }
 }

@@ -17,4 +17,7 @@ public interface DishRecipeIngredientSummary {
     Long getItemId();
 
     BigDecimal getQuantity();
+
+    @Value("#{target.unitEntity != null ? target.unitEntity.id : null}")
+    Long getUnitId();
 }

@@ -9,6 +9,9 @@ import lombok.Setter;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import java.util.LinkedHashSet;
+import java.util.Set;
+
 @Getter
 @Setter
 @Entity
@@ -24,4 +27,7 @@ public class DishRecipeEntity extends AuditableEntity {
     @Size(max = 50)
     @Column(name = "code", length = 50)
     private String code;
+
+    @OneToMany(mappedBy = "dishRecipeEntity", cascade = CascadeType.ALL)
+    private Set<DishRecipeIngredientEntity> dishRecipeIngredientEntities = new LinkedHashSet<>();
 }

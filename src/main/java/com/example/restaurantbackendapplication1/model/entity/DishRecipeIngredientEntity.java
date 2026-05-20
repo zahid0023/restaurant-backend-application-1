@@ -29,4 +29,8 @@ public class DishRecipeIngredientEntity extends AuditableEntity {
 
     @Column(name = "quantity", precision = 18, scale = 6)
     private BigDecimal quantity;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "unit_id")
+    private UnitEntity unitEntity;
 }

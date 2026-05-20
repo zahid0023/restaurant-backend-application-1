@@ -3,7 +3,7 @@ package com.example.restaurantbackendapplication1.controller;
 import com.example.restaurantbackendapplication1.commons.dto.request.PaginatedRequest;
 import com.example.restaurantbackendapplication1.dto.request.city.CreateCityRequest;
 import com.example.restaurantbackendapplication1.dto.request.city.UpdateCityRequest;
-import com.example.restaurantbackendapplication1.dto.request.citylocale.CityLocaleRequest;
+import com.example.restaurantbackendapplication1.dto.request.city.citylocale.CreateCityLocaleRequest;
 import com.example.restaurantbackendapplication1.model.entity.CityEntity;
 import com.example.restaurantbackendapplication1.model.entity.CountryEntity;
 import com.example.restaurantbackendapplication1.model.entity.LocaleEntity;
@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/v1/cities")
+@RequestMapping("/api/v1/countries/{country-id}/cities")
 public class CityController {
 
     private final CityService cityService;
@@ -36,33 +36,43 @@ public class CityController {
     }
 
     @PostMapping
-    public ResponseEntity<?> create(@Valid @RequestBody CreateCityRequest request) {
+    public ResponseEntity<?> create(
+            @PathVariable("country-id") Long countryId,
+            @Valid @RequestBody CreateCityRequest request) {
         Map<Long, LocaleEntity> localeEntityMap = LocaleUtils.resolveLocaleMap(
-                request.getLocales(), CityLocaleRequest::getLocaleId, localeService);
-        CountryEntity countryEntity = countryService.getEntityById(request.getCountryId());
+                request.getLocales(), CreateCityLocaleRequest::getLocaleId, localeService);
+        CountryEntity countryEntity = countryService.getEntityById(countryId);
         return ResponseEntity.status(HttpStatus.CREATED).body(cityService.create(request, countryEntity, localeEntityMap));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable Long id) {
-        return ResponseEntity.ok(cityService.getById(id));
+    public ResponseEntity<?> getById(
+            @PathVariable("country-id") Long countryId,
+            @PathVariable Long id) {
+        return ResponseEntity.ok(cityService.getById(countryId, id));
     }
 
     @GetMapping
-    public ResponseEntity<?> getAll(@Valid @ParameterObject PaginatedRequest request) {
-        return ResponseEntity.ok(cityService.getAll(request));
+    public ResponseEntity<?> getAll(
+            @PathVariable("country-id") Long countryId,
+            @Valid @ParameterObject PaginatedRequest request) {
+        return ResponseEntity.ok(cityService.getAll(countryId, request));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<?> update(
+            @PathVariable("country-id") Long countryId,
             @PathVariable Long id,
             @Valid @RequestBody UpdateCityRequest request) {
-        CityEntity entity = cityService.getEntityById(id);
+        CityEntity entity = cityService.getEntityById(countryId, id);
         return ResponseEntity.ok(cityService.update(entity, request));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> delete(@PathVariable Long id) {
-        return ResponseEntity.ok(cityService.delete(id));
+    public ResponseEntity<?> delete(
+            @PathVariable("country-id") Long countryId,
+            @PathVariable Long id) {
+        CityEntity entity = cityService.getEntityById(countryId, id);
+        return ResponseEntity.ok(cityService.delete(entity));
     }
 }

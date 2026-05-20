@@ -14,7 +14,7 @@ import java.util.Set;
 public interface CountryRepository extends JpaRepository<@NonNull CountryEntity, @NonNull Long> {
     Optional<CountryEntity> findByIdAndIsActiveAndIsDeleted(Long id, Boolean isActive, Boolean isDeleted);
 
-    Page<CountrySummary> findAllByIsActiveAndIsDeleted(Boolean isActive, Boolean isDeleted, Pageable pageable);
+    Page<@NonNull CountrySummary> findAllByIsActiveAndIsDeleted(Boolean isActive, Boolean isDeleted, Pageable pageable);
 
     List<CountryEntity> findAllByIdInAndIsActiveAndIsDeleted(Set<Long> ids, Boolean isActive, Boolean isDeleted);
 }

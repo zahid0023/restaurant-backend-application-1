@@ -35,10 +35,10 @@ public class DiningSpaceTypeMapper {
     }
 
     public static DiningSpaceTypeDto toDto(DiningSpaceTypeEntity entity) {
-        DiningSpaceTypeDto dto = new DiningSpaceTypeDto();
-        dto.setId(entity.getId());
-        dto.setCode(entity.getCode());
-        dto.setSortOrder(entity.getSortOrder());
-        return dto;
+        return DiningSpaceTypeDto.builder()
+                .id(entity.getId())
+                .code(entity.getCode())
+                .sortOrder(entity.getSortOrder())
+                .build();
     }
 }

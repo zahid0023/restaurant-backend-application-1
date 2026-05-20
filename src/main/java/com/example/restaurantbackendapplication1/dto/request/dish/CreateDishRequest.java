@@ -1,7 +1,10 @@
 package com.example.restaurantbackendapplication1.dto.request.dish;
 
-import com.example.restaurantbackendapplication1.dto.request.dishlocale.DishLocaleRequest;
+import com.example.restaurantbackendapplication1.dto.request.dishlocale.CreateDishLocaleRequest;
+import com.example.restaurantbackendapplication1.dto.request.dishvariant.CreateDishVariantRequest;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import tools.jackson.databind.PropertyNamingStrategies;
@@ -13,7 +16,13 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = false)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class CreateDishRequest extends DishRequest {
+    @NotBlank
+    @Size(max = 50)
+    private String code;
 
     @Valid
-    private List<DishLocaleRequest> locales;
+    private List<CreateDishLocaleRequest> locales;
+
+    @Valid
+    private List<CreateDishVariantRequest> variants;
 }

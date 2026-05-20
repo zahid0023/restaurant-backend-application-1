@@ -48,8 +48,8 @@ public class ItemItemCategoryServiceImpl implements ItemItemCategoryService {
     }
 
     @Override
-    public PaginatedResponse<ItemSummary> getAllItems(ItemCategoryEntity itemCategoryEntity, PaginatedRequest request) {
-        Page<@NonNull ItemSummary> page = itemItemCategoryRepository.findAllByItemCategoryEntityAndIsActiveAndIsDeleted(itemCategoryEntity, true, false, request.toPageable(ALLOWED_SORT_FIELDS));
+    public PaginatedResponse<ItemSummary> getAllItems(Long itemCategoryId, PaginatedRequest request) {
+        Page<@NonNull ItemSummary> page = itemItemCategoryRepository.findAllItemsByItemCategoryId(itemCategoryId, true, false, request.toPageable(ALLOWED_SORT_FIELDS));
         return Pagination.buildPaginatedResponse(page);
     }
 

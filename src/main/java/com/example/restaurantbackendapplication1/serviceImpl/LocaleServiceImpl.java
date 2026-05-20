@@ -7,10 +7,10 @@ import com.example.restaurantbackendapplication1.dto.request.locale.CreateLocale
 import com.example.restaurantbackendapplication1.dto.request.locale.UpdateLocaleRequest;
 import com.example.restaurantbackendapplication1.dto.response.LocaleResponse;
 import com.example.restaurantbackendapplication1.model.dto.LocaleDto;
-import com.example.restaurantbackendapplication1.model.projection.LocaleSummary;
 import com.example.restaurantbackendapplication1.model.entity.LocaleEntity;
 import com.example.restaurantbackendapplication1.model.enums.LocaleSortField;
 import com.example.restaurantbackendapplication1.model.mapper.LocaleMapper;
+import com.example.restaurantbackendapplication1.model.projection.LocaleSummary;
 import com.example.restaurantbackendapplication1.repository.LocaleRepository;
 import com.example.restaurantbackendapplication1.service.LocaleService;
 import com.example.restaurantbackendapplication1.utils.EntityValidator;

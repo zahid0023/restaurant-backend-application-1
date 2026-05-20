@@ -29,4 +29,7 @@ public class MenuEntity extends AuditableEntity {
 
     @OneToMany(mappedBy = "menuEntity", cascade = CascadeType.ALL)
     private Set<MenuLocaleEntity> menuLocaleEntities = new LinkedHashSet<>();
+
+    @OneToMany(mappedBy = "menuEntity")
+    private Set<MenuMenuCategoryEntity> menuMenuCategoryEntities = new LinkedHashSet<>();
 }

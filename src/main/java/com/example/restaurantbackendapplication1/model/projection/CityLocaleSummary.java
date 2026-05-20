@@ -12,5 +12,8 @@ public interface CityLocaleSummary {
     Long getLocaleId();
 
     String getName();
+
+    String getDescription();
+
     Integer getSortOrder();
 }

@@ -3,7 +3,7 @@ package com.example.restaurantbackendapplication1.controller;
 import com.example.restaurantbackendapplication1.commons.dto.request.PaginatedRequest;
 import com.example.restaurantbackendapplication1.dto.request.menu.CreateMenuRequest;
 import com.example.restaurantbackendapplication1.dto.request.menu.UpdateMenuRequest;
-import com.example.restaurantbackendapplication1.dto.request.menulocale.MenuLocaleRequest;
+import com.example.restaurantbackendapplication1.dto.request.menulocale.CreateMenuLocaleRequest;
 import com.example.restaurantbackendapplication1.model.entity.LocaleEntity;
 import com.example.restaurantbackendapplication1.model.entity.MenuEntity;
 import com.example.restaurantbackendapplication1.service.LocaleService;
@@ -32,7 +32,7 @@ public class MenuController {
     @PostMapping
     public ResponseEntity<?> create(@Valid @RequestBody CreateMenuRequest request) {
         Map<Long, LocaleEntity> localeEntityMap = LocaleUtils.resolveLocaleMap(
-                request.getLocales(), MenuLocaleRequest::getLocaleId, localeService);
+                request.getLocales(), CreateMenuLocaleRequest::getLocaleId, localeService);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(menuService.create(request, localeEntityMap));
     }
@@ -57,6 +57,7 @@ public class MenuController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable Long id) {
-        return ResponseEntity.ok(menuService.delete(id));
+        MenuEntity entity = menuService.getEntityById(id);
+        return ResponseEntity.ok(menuService.delete(entity));
     }
 }

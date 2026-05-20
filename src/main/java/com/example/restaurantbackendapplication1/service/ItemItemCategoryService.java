@@ -11,7 +11,7 @@ import com.example.restaurantbackendapplication1.model.projection.ItemSummary;
 public interface ItemItemCategoryService {
     SuccessResponse assign(ItemCategoryEntity itemCategoryEntity, ItemEntity itemEntity);
 
-    PaginatedResponse<ItemSummary> getAllItems(ItemCategoryEntity itemCategoryEntity, PaginatedRequest request);
+    PaginatedResponse<ItemSummary> getAllItems(Long itemCategoryId, PaginatedRequest request);
 
     ItemItemCategoryEntity getAssignment(ItemCategoryEntity itemCategoryEntity, ItemEntity itemEntity);
 

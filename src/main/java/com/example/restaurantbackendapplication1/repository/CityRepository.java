@@ -7,14 +7,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 public interface CityRepository extends JpaRepository<@NonNull CityEntity, @NonNull Long> {
-    Optional<CityEntity> findByIdAndIsActiveAndIsDeleted(Long id, Boolean isActive, Boolean isDeleted);
+    Optional<CityEntity> findByCountryEntity_IdAndIdAndIsActiveAndIsDeleted(Long countryId, Long id, Boolean isActive, Boolean isDeleted);
 
-    Page<CitySummary> findAllByIsActiveAndIsDeleted(Boolean isActive, Boolean isDeleted, Pageable pageable);
-
-    List<CityEntity> findAllByIdInAndIsActiveAndIsDeleted(Set<Long> ids, Boolean isActive, Boolean isDeleted);
+    Page<@NonNull CitySummary> findAllByCountryEntity_IdAndIsActiveAndIsDeleted(Long countryId, Boolean isActive, Boolean isDeleted, Pageable pageable);
 }

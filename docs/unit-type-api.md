@@ -79,7 +79,16 @@ Creates a new unit type with optional embedded locales.
   "unit_type": {
     "id": 1,
     "code": "WEIGHT",
-    "sort_order": 1
+    "sort_order": 1,
+    "locales": [
+      {
+        "id": 1,
+        "locale_id": 1,
+        "name": "Weight",
+        "description": "Units that measure mass",
+        "sort_order": 1
+      }
+    ]
   }
 }
 ```
@@ -149,14 +158,12 @@ Updates the fields of an existing unit type. Locale translations are managed sep
 
 ```json
 {
-  "code": "VOLUME",
   "sort_order": 2
 }
 ```
 
 | Field | Type | Required | Constraints |
 |---|---|---|---|
-| `code` | string | yes | max 50 chars |
 | `sort_order` | integer | yes | |
 
 #### Response `200 OK`
@@ -238,85 +245,6 @@ Manage locale-specific translations for a unit type. The `{unit-type-id}` in all
 
 ---
 
-### Get Unit Type Locale by ID
-
-**`GET /api/v1/unit-types/{unit-type-id}/locales/{id}`**
-
-#### Path Parameters
-
-| Parameter | Type | Description |
-|---|---|---|
-| `unit-type-id` | long | Unit type ID |
-| `id` | long | Unit type locale ID |
-
-#### Response `200 OK`
-
-```json
-{
-  "unit_type_locale": {
-    "id": 1,
-    "locale_id": 1,
-    "name": "Weight",
-    "description": "Units that measure mass",
-    "sort_order": 1
-  }
-}
-```
-
----
-
-### List Unit Type Locales
-
-Returns a paginated list of all active locales for a given unit type.
-
-**`GET /api/v1/unit-types/{unit-type-id}/locales`**
-
-#### Path Parameters
-
-| Parameter | Type | Description |
-|---|---|---|
-| `unit-type-id` | long | Unit type ID |
-
-#### Query Parameters
-
-| Parameter | Type | Default | Constraints | Description |
-|---|---|---|---|---|
-| `page` | integer | `0` | min 0 | Page index (zero-based) |
-| `size` | integer | `10` | 1–50 | Items per page |
-| `sort_by` | string | `id` | `id`, `name`, `sortOrder`, `createdAt` | Field to sort by |
-| `sort_dir` | string | `ASC` | `ASC`, `DESC` | Sort direction |
-
-#### Response `200 OK`
-
-```json
-{
-  "data": [
-    {
-      "id": 1,
-      "locale_id": 1,
-      "name": "Weight",
-      "sort_order": 1
-    },
-    {
-      "id": 2,
-      "locale_id": 2,
-      "name": "Ağırlık",
-      "sort_order": 1
-    }
-  ],
-  "current_page": 0,
-  "total_pages": 1,
-  "total_elements": 1,
-  "page_size": 10,
-  "has_next": false,
-  "has_previous": false
-}
-```
-
-> Note: The list response returns a summary shape (`id`, `locale_id`, `name`, `sort_order`). Use the Get by ID endpoint to retrieve `description`.
-
----
-
 ### Update Unit Type Locale
 
 **`PUT /api/v1/unit-types/{unit-type-id}/locales/{id}`**
@@ -332,7 +260,6 @@ Returns a paginated list of all active locales for a given unit type.
 
 ```json
 {
-  "locale_id": 1,
   "name": "Weight",
   "description": "Units that measure mass or weight",
   "sort_order": 1
@@ -341,7 +268,6 @@ Returns a paginated list of all active locales for a given unit type.
 
 | Field | Type | Required | Constraints |
 |---|---|---|---|
-| `locale_id` | long | yes | must be an existing active locale |
 | `name` | string | yes | max 255 chars |
 | `description` | string | no | defaults to `""` |
 | `sort_order` | integer | yes | |

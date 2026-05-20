@@ -1,5 +1,6 @@
 package com.example.restaurantbackendapplication1.model.mapper;
 
+import com.example.restaurantbackendapplication1.dto.request.unittypelocale.CreateUnitTypeLocaleRequest;
 import com.example.restaurantbackendapplication1.dto.request.unittypelocale.UnitTypeLocaleRequest;
 import com.example.restaurantbackendapplication1.dto.request.unittypelocale.UpdateUnitTypeLocaleRequest;
 import com.example.restaurantbackendapplication1.model.dto.UnitTypeLocaleDto;
@@ -11,36 +12,33 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class UnitTypeLocaleMapper {
 
-    public static UnitTypeLocaleEntity fromRequest(
-            UnitTypeLocaleRequest request,
-            UnitTypeEntity unitTypeEntity,
-            LocaleEntity localeEntity) {
+    public UnitTypeLocaleEntity create(CreateUnitTypeLocaleRequest request,
+                                       UnitTypeEntity unitTypeEntity,
+                                       LocaleEntity localeEntity) {
         UnitTypeLocaleEntity entity = new UnitTypeLocaleEntity();
         entity.setUnitTypeEntity(unitTypeEntity);
         entity.setLocaleEntity(localeEntity);
-        entity.setName(request.getName());
-        entity.setDescription(request.getDescription() != null ? request.getDescription() : "");
-        entity.setSortOrder(request.getSortOrder());
+        applyCommonFields(entity, request);
         return entity;
     }
 
-    public static void update(
-            UnitTypeLocaleEntity entity,
-            UpdateUnitTypeLocaleRequest request,
-            LocaleEntity locale) {
-        entity.setLocaleEntity(locale);
+    public void update(UnitTypeLocaleEntity entity, UpdateUnitTypeLocaleRequest request) {
+        applyCommonFields(entity, request);
+    }
+
+    private void applyCommonFields(UnitTypeLocaleEntity entity, UnitTypeLocaleRequest request) {
         entity.setName(request.getName());
         entity.setDescription(request.getDescription() != null ? request.getDescription() : "");
         entity.setSortOrder(request.getSortOrder());
     }
 
-    public static UnitTypeLocaleDto toDto(UnitTypeLocaleEntity entity) {
-        UnitTypeLocaleDto dto = new UnitTypeLocaleDto();
-        dto.setId(entity.getId());
-        dto.setLocaleId(entity.getLocaleEntity().getId());
-        dto.setName(entity.getName());
-        dto.setDescription(entity.getDescription());
-        dto.setSortOrder(entity.getSortOrder());
-        return dto;
+    public UnitTypeLocaleDto toDto(UnitTypeLocaleEntity entity) {
+        return UnitTypeLocaleDto.builder()
+                .id(entity.getId())
+                .localeId(entity.getLocaleEntity().getId())
+                .name(entity.getName())
+                .description(entity.getDescription())
+                .sortOrder(entity.getSortOrder())
+                .build();
     }
 }

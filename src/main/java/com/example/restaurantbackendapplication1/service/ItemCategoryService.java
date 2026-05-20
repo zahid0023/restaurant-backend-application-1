@@ -21,6 +21,8 @@ public interface ItemCategoryService {
 
     ItemCategoryEntity getEntityById(Long itemTypeId, Long id);
 
+    ItemCategoryEntity getEntityById(Long id);
+
     ItemCategoryResponse getById(Long itemTypeId, Long id);
 
     PaginatedResponse<ItemCategorySummary> getAll(Long itemTypeId, PaginatedRequest request);
@@ -32,5 +34,5 @@ public interface ItemCategoryService {
     SuccessResponse update(ItemCategoryEntity entity,
                            UpdateItemCategoryRequest request);
 
-    SuccessResponse delete(Long itemTypeId, Long id);
+    SuccessResponse delete(ItemCategoryEntity entity);
 }

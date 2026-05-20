@@ -23,5 +23,5 @@ public interface MenuService {
 
     SuccessResponse update(MenuEntity entity, UpdateMenuRequest request);
 
-    SuccessResponse delete(Long id);
+    SuccessResponse delete(MenuEntity entity);
 }

@@ -1,6 +1,5 @@
 package com.example.restaurantbackendapplication1.controller;
 
-import com.example.restaurantbackendapplication1.commons.dto.request.PaginatedRequest;
 import com.example.restaurantbackendapplication1.dto.request.dishlocale.CreateDishLocaleRequest;
 import com.example.restaurantbackendapplication1.dto.request.dishlocale.UpdateDishLocaleRequest;
 import com.example.restaurantbackendapplication1.model.entity.DishEntity;
@@ -12,7 +11,6 @@ import com.example.restaurantbackendapplication1.service.LocaleService;
 import com.example.restaurantbackendapplication1.service.MenuCategoryService;
 import com.example.restaurantbackendapplication1.service.MenuService;
 import jakarta.validation.Valid;
-import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -46,33 +44,11 @@ public class DishLocaleController {
             @PathVariable("dish-id") Long dishId,
             @Valid @RequestBody CreateDishLocaleRequest request) {
         menuService.getEntityById(menuId);
-        menuCategoryService.getEntityById(menuId, menuCategoryId);
+        menuCategoryService.getEntityById(menuCategoryId);
         DishEntity dishEntity = dishService.getEntityById(menuCategoryId, dishId);
         LocaleEntity localeEntity = localeService.getEntityById(request.getLocaleId());
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(dishLocaleService.create(dishEntity, localeEntity, request));
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<?> getById(
-            @PathVariable("menu-id") Long menuId,
-            @PathVariable("menu-category-id") Long menuCategoryId,
-            @PathVariable("dish-id") Long dishId,
-            @PathVariable Long id) {
-        menuService.getEntityById(menuId);
-        menuCategoryService.getEntityById(menuId, menuCategoryId);
-        return ResponseEntity.ok(dishLocaleService.getById(dishId, id));
-    }
-
-    @GetMapping
-    public ResponseEntity<?> getAll(
-            @PathVariable("menu-id") Long menuId,
-            @PathVariable("menu-category-id") Long menuCategoryId,
-            @PathVariable("dish-id") Long dishId,
-            @Valid @ParameterObject PaginatedRequest request) {
-        menuService.getEntityById(menuId);
-        menuCategoryService.getEntityById(menuId, menuCategoryId);
-        return ResponseEntity.ok(dishLocaleService.getAll(dishId, request));
     }
 
     @PutMapping("/{id}")
@@ -83,10 +59,9 @@ public class DishLocaleController {
             @PathVariable Long id,
             @Valid @RequestBody UpdateDishLocaleRequest request) {
         menuService.getEntityById(menuId);
-        menuCategoryService.getEntityById(menuId, menuCategoryId);
+        menuCategoryService.getEntityById(menuCategoryId);
         DishesLocaleEntity entity = dishLocaleService.getEntityById(dishId, id);
-        LocaleEntity localeEntity = localeService.getEntityById(request.getLocaleId());
-        return ResponseEntity.ok(dishLocaleService.update(entity, localeEntity, request));
+        return ResponseEntity.ok(dishLocaleService.update(entity, request));
     }
 
     @DeleteMapping("/{id}")
@@ -96,7 +71,7 @@ public class DishLocaleController {
             @PathVariable("dish-id") Long dishId,
             @PathVariable Long id) {
         menuService.getEntityById(menuId);
-        menuCategoryService.getEntityById(menuId, menuCategoryId);
+        menuCategoryService.getEntityById(menuCategoryId);
         DishesLocaleEntity entity = dishLocaleService.getEntityById(dishId, id);
         return ResponseEntity.ok(dishLocaleService.delete(entity));
     }

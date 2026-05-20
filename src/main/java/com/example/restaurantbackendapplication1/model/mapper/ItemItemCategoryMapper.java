@@ -17,10 +17,10 @@ public class ItemItemCategoryMapper {
     }
 
     public static ItemItemCategoryDto toDto(ItemItemCategoryEntity entity) {
-        ItemItemCategoryDto dto = new ItemItemCategoryDto();
-        dto.setId(entity.getId());
-        dto.setItemId(entity.getItemEntity().getId());
-        dto.setItemCategoryId(entity.getItemCategoryEntity().getId());
-        return dto;
+        return ItemItemCategoryDto.builder()
+                .id(entity.getId())
+                .itemId(entity.getItemEntity().getId())
+                .itemCategoryId(entity.getItemCategoryEntity().getId())
+                .build();
     }
 }

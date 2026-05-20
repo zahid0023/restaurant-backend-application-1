@@ -40,7 +40,7 @@ public class UnitTypeServiceImpl implements UnitTypeService {
     @Transactional
     @Override
     public SuccessResponse create(CreateUnitTypeRequest request, Map<Long, LocaleEntity> localeEntityMap) {
-        UnitTypeEntity entity = UnitTypeMapper.fromRequest(request, localeEntityMap);
+        UnitTypeEntity entity = UnitTypeMapper.create(request, localeEntityMap);
         unitTypeRepository.save(entity);
         log.info("UnitType created with id: {}", entity.getId());
         return new SuccessResponse(true, entity.getId());

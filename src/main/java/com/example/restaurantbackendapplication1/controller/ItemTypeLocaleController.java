@@ -1,6 +1,5 @@
 package com.example.restaurantbackendapplication1.controller;
 
-import com.example.restaurantbackendapplication1.commons.dto.request.PaginatedRequest;
 import com.example.restaurantbackendapplication1.dto.request.itemtypelocale.CreateItemTypeLocaleRequest;
 import com.example.restaurantbackendapplication1.dto.request.itemtypelocale.UpdateItemTypeLocaleRequest;
 import com.example.restaurantbackendapplication1.model.entity.ItemTypeEntity;
@@ -10,7 +9,6 @@ import com.example.restaurantbackendapplication1.service.ItemTypeLocaleService;
 import com.example.restaurantbackendapplication1.service.ItemTypeService;
 import com.example.restaurantbackendapplication1.service.LocaleService;
 import jakarta.validation.Valid;
-import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,16 +17,15 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/item-types/{item-type-id}/locales")
 public class ItemTypeLocaleController {
 
-    private final ItemTypeLocaleService itemTypeLocaleService;
     private final ItemTypeService itemTypeService;
+    private final ItemTypeLocaleService itemTypeLocaleService;
     private final LocaleService localeService;
 
-    public ItemTypeLocaleController(
-            ItemTypeLocaleService itemTypeLocaleService,
-            ItemTypeService itemTypeService,
-            LocaleService localeService) {
-        this.itemTypeLocaleService = itemTypeLocaleService;
+    public ItemTypeLocaleController(ItemTypeService itemTypeService,
+                                    ItemTypeLocaleService itemTypeLocaleService,
+                                    LocaleService localeService) {
         this.itemTypeService = itemTypeService;
+        this.itemTypeLocaleService = itemTypeLocaleService;
         this.localeService = localeService;
     }
 
@@ -42,39 +39,20 @@ public class ItemTypeLocaleController {
                 .body(itemTypeLocaleService.create(itemTypeEntity, localeEntity, request));
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<?> getById(
-            @PathVariable("item-type-id") Long itemTypeId,
-            @PathVariable Long id) {
-        ItemTypeEntity itemTypeEntity = itemTypeService.getEntityById(itemTypeId);
-        return ResponseEntity.ok(itemTypeLocaleService.getById(id, itemTypeEntity));
-    }
-
-    @GetMapping
-    public ResponseEntity<?> getAll(
-            @PathVariable("item-type-id") Long itemTypeId,
-            @Valid @ParameterObject PaginatedRequest request) {
-        ItemTypeEntity itemTypeEntity = itemTypeService.getEntityById(itemTypeId);
-        return ResponseEntity.ok(itemTypeLocaleService.getAll(itemTypeEntity, request));
-    }
-
     @PutMapping("/{id}")
     public ResponseEntity<?> update(
             @PathVariable("item-type-id") Long itemTypeId,
             @PathVariable Long id,
             @Valid @RequestBody UpdateItemTypeLocaleRequest request) {
-        ItemTypeEntity itemTypeEntity = itemTypeService.getEntityById(itemTypeId);
-        ItemTypeLocaleEntity entity = itemTypeLocaleService.getEntityById(id, itemTypeEntity);
-        LocaleEntity locale = localeService.getEntityById(request.getLocaleId());
-        return ResponseEntity.ok(itemTypeLocaleService.update(entity, locale, request));
+        ItemTypeLocaleEntity entity = itemTypeLocaleService.getEntityById(itemTypeId, id);
+        return ResponseEntity.ok(itemTypeLocaleService.update(entity, request));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(
             @PathVariable("item-type-id") Long itemTypeId,
             @PathVariable Long id) {
-        ItemTypeEntity itemTypeEntity = itemTypeService.getEntityById(itemTypeId);
-        ItemTypeLocaleEntity entity = itemTypeLocaleService.getEntityById(id, itemTypeEntity);
+        ItemTypeLocaleEntity entity = itemTypeLocaleService.getEntityById(itemTypeId, id);
         return ResponseEntity.ok(itemTypeLocaleService.delete(entity));
     }
 }

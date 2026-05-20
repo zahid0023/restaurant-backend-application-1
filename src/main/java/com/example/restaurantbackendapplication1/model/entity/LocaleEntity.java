@@ -28,11 +28,6 @@ public class LocaleEntity extends AuditableEntity {
     private String name;
 
     @NotNull
-    @ColumnDefault("false")
-    @Column(name = "is_default", nullable = false)
-    private Boolean isDefault = false;
-
-    @NotNull
     @ColumnDefault("0")
     @Column(name = "sort_order", nullable = false)
     private Integer sortOrder = 0;

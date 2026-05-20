@@ -3,11 +3,13 @@ package com.example.restaurantbackendapplication1.model.mapper;
 import com.example.restaurantbackendapplication1.dto.request.menu.CreateMenuRequest;
 import com.example.restaurantbackendapplication1.dto.request.menu.UpdateMenuRequest;
 import com.example.restaurantbackendapplication1.model.dto.MenuDto;
+import com.example.restaurantbackendapplication1.model.dto.MenuLocaleDto;
 import com.example.restaurantbackendapplication1.model.entity.LocaleEntity;
 import com.example.restaurantbackendapplication1.model.entity.MenuEntity;
 import com.example.restaurantbackendapplication1.model.entity.MenuLocaleEntity;
 import lombok.experimental.UtilityClass;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -30,15 +32,19 @@ public class MenuMapper {
     }
 
     public static void update(MenuEntity entity, UpdateMenuRequest request) {
-        entity.setCode(request.getCode());
         entity.setSortOrder(request.getSortOrder());
     }
 
     public static MenuDto toDto(MenuEntity entity) {
-        MenuDto dto = new MenuDto();
-        dto.setId(entity.getId());
-        dto.setCode(entity.getCode());
-        dto.setSortOrder(entity.getSortOrder());
-        return dto;
+        List<MenuLocaleDto> locales = entity.getMenuLocaleEntities().stream()
+                .map(MenuLocaleMapper::toDto)
+                .collect(Collectors.toList());
+
+        return MenuDto.builder()
+                .id(entity.getId())
+                .code(entity.getCode())
+                .sortOrder(entity.getSortOrder())
+                .locales(locales)
+                .build();
     }
 }

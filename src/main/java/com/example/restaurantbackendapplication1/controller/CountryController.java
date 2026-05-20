@@ -3,7 +3,7 @@ package com.example.restaurantbackendapplication1.controller;
 import com.example.restaurantbackendapplication1.commons.dto.request.PaginatedRequest;
 import com.example.restaurantbackendapplication1.dto.request.country.CreateCountryRequest;
 import com.example.restaurantbackendapplication1.dto.request.country.UpdateCountryRequest;
-import com.example.restaurantbackendapplication1.dto.request.countrylocale.CountryLocaleRequest;
+import com.example.restaurantbackendapplication1.dto.request.country.countrylocale.CreateCountryLocaleRequest;
 import com.example.restaurantbackendapplication1.model.entity.CountryEntity;
 import com.example.restaurantbackendapplication1.model.entity.LocaleEntity;
 import com.example.restaurantbackendapplication1.service.CountryService;
@@ -33,7 +33,7 @@ public class CountryController {
     @PostMapping
     public ResponseEntity<?> create(@Valid @RequestBody CreateCountryRequest request) {
         Map<Long, LocaleEntity> localeEntityMap = LocaleUtils.resolveLocaleMap(
-                request.getLocales(), CountryLocaleRequest::getLocaleId, localeService);
+                request.getLocales(), CreateCountryLocaleRequest::getLocaleId, localeService);
         return ResponseEntity.status(HttpStatus.CREATED).body(countryService.create(request, localeEntityMap));
     }
 

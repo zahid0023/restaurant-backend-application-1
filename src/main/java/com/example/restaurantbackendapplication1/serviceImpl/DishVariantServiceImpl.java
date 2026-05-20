@@ -9,7 +9,9 @@ import com.example.restaurantbackendapplication1.dto.response.DishVariantRespons
 import com.example.restaurantbackendapplication1.model.dto.DishVariantDto;
 import com.example.restaurantbackendapplication1.model.entity.DishEntity;
 import com.example.restaurantbackendapplication1.model.entity.DishVariantEntity;
+import com.example.restaurantbackendapplication1.model.entity.ItemEntity;
 import com.example.restaurantbackendapplication1.model.entity.LocaleEntity;
+import com.example.restaurantbackendapplication1.model.entity.UnitEntity;
 import com.example.restaurantbackendapplication1.model.enums.DishVariantSortField;
 import com.example.restaurantbackendapplication1.model.mapper.DishVariantMapper;
 import com.example.restaurantbackendapplication1.model.projection.DishVariantSummary;
@@ -42,8 +44,10 @@ public class DishVariantServiceImpl implements DishVariantService {
     @Override
     public SuccessResponse create(CreateDishVariantRequest request,
                                   DishEntity dishEntity,
-                                  Map<Long, LocaleEntity> localeEntityMap) {
-        DishVariantEntity entity = DishVariantMapper.fromRequest(request, dishEntity, localeEntityMap);
+                                  Map<Long, LocaleEntity> localeEntityMap,
+                                  Map<Long, ItemEntity> itemEntityMap,
+                                  Map<Long, UnitEntity> unitEntityMap) {
+        DishVariantEntity entity = DishVariantMapper.create(request, dishEntity, localeEntityMap, itemEntityMap, unitEntityMap);
         dishVariantRepository.save(entity);
         log.info("DishVariant created with id: {}", entity.getId());
         return new SuccessResponse(true, entity.getId());

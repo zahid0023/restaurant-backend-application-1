@@ -14,7 +14,7 @@ Authorization: Bearer <token>
 
 ### Create Item
 
-Creates a new menu item with optional embedded locale translations.
+Creates a new item with optional embedded locale translations.
 
 **`POST /api/v1/items`**
 
@@ -34,8 +34,8 @@ Creates a new menu item with optional embedded locale translations.
     },
     {
       "locale_id": 2,
-      "name": "Domates",
-      "description": "Taze kırmızı domates",
+      "name": "টমেটো",
+      "description": "তাজা লাল টমেটো",
       "sort_order": 1
     }
   ]
@@ -44,7 +44,7 @@ Creates a new menu item with optional embedded locale translations.
 
 | Field | Type | Required | Constraints |
 |---|---|---|---|
-| `code` | string | no | max 20 chars |
+| `code` | string | yes | max 20 chars, immutable after creation |
 | `unit_id` | long | yes | must be an existing active unit |
 | `sort_order` | integer | yes | |
 | `locales` | array | no | see locale fields below |
@@ -80,8 +80,25 @@ Creates a new menu item with optional embedded locale translations.
 {
   "item": {
     "id": 1,
+    "code": "TOMATO",
     "unit_id": 1,
-    "sort_order": 1
+    "sort_order": 1,
+    "locales": [
+      {
+        "id": 1,
+        "locale_id": 1,
+        "name": "Tomato",
+        "description": "Fresh red tomato",
+        "sort_order": 1
+      },
+      {
+        "id": 2,
+        "locale_id": 2,
+        "name": "টমেটো",
+        "description": "তাজা লাল টমেটো",
+        "sort_order": 1
+      }
+    ]
   }
 }
 ```
@@ -110,29 +127,47 @@ Returns a paginated list of all active items.
   "data": [
     {
       "id": 1,
-      "unit_id": 1,
-      "sort_order": 1
-    },
-    {
-      "id": 2,
-      "unit_id": 2,
-      "sort_order": 2
+      "code": "TOMATO",
+      "unit": {
+        "id": 1,
+        "unit_type": {
+          "id": 1,
+          "code": "WEIGHT",
+          "sort_order": 1,
+          "locales": [
+            { "id": 1, "locale_id": 1, "name": "Weight", "description": "Weight unit type", "sort_order": 1 }
+          ]
+        },
+        "code": "KG",
+        "is_base": false,
+        "sort_order": 1,
+        "locales": [
+          { "id": 1, "locale_code": "en", "name": "Kilogram", "description": "Kilogram unit", "sort_order": 1 }
+        ]
+      },
+      "sort_order": 1,
+      "locales": [
+        { "id": 1, "locale_code": "en", "name": "Tomato", "description": "Fresh red tomato", "sort_order": 1 },
+        { "id": 2, "locale_code": "bn", "name": "টমেটো", "description": "তাজা লাল টমেটো", "sort_order": 1 }
+      ]
     }
   ],
   "current_page": 0,
   "total_pages": 1,
-  "total_elements": 2,
+  "total_elements": 1,
   "page_size": 10,
   "has_next": false,
   "has_previous": false
 }
 ```
 
+> Note: The list response returns a summary projection. Item locales use `locale_code`; unit type locales use `locale_id`. Use the Get by ID endpoint to retrieve full locale detail with `locale_id` for item locales.
+
 ---
 
 ### Update Item
 
-Updates the fields of an existing item. Locale translations are managed separately via the Item Locales API.
+Updates mutable fields of an existing item. `code` is immutable and cannot be changed. Locale translations are managed separately via the Item Locales API.
 
 **`PUT /api/v1/items/{id}`**
 
@@ -146,7 +181,6 @@ Updates the fields of an existing item. Locale translations are managed separate
 
 ```json
 {
-  "code": "TOMATO",
   "unit_id": 2,
   "sort_order": 1
 }
@@ -154,7 +188,6 @@ Updates the fields of an existing item. Locale translations are managed separate
 
 | Field | Type | Required | Constraints |
 |---|---|---|---|
-| `code` | string | no | max 20 chars |
 | `unit_id` | long | yes | must be an existing active unit |
 | `sort_order` | integer | yes | |
 
@@ -237,86 +270,9 @@ Manage locale-specific translations for an item. The `{item-id}` in all paths mu
 
 ---
 
-### Get Item Locale by ID
-
-**`GET /api/v1/items/{item-id}/locales/{id}`**
-
-#### Path Parameters
-
-| Parameter | Type | Description |
-|---|---|---|
-| `item-id` | long | Item ID |
-| `id` | long | Item locale ID |
-
-#### Response `200 OK`
-
-```json
-{
-  "item_locale": {
-    "id": 1,
-    "locale_id": 1,
-    "name": "Tomato",
-    "description": "Fresh red tomato",
-    "sort_order": 1
-  }
-}
-```
-
----
-
-### List Item Locales
-
-Returns a paginated list of all active locales for a given item.
-
-**`GET /api/v1/items/{item-id}/locales`**
-
-#### Path Parameters
-
-| Parameter | Type | Description |
-|---|---|---|
-| `item-id` | long | Item ID |
-
-#### Query Parameters
-
-| Parameter | Type | Default | Constraints | Description |
-|---|---|---|---|---|
-| `page` | integer | `0` | min 0 | Page index (zero-based) |
-| `size` | integer | `10` | 1–50 | Items per page |
-| `sort_by` | string | `id` | `id`, `name`, `sortOrder`, `createdAt` | Field to sort by |
-| `sort_dir` | string | `ASC` | `ASC`, `DESC` | Sort direction |
-
-#### Response `200 OK`
-
-```json
-{
-  "data": [
-    {
-      "id": 1,
-      "locale_id": 1,
-      "name": "Tomato",
-      "sort_order": 1
-    },
-    {
-      "id": 2,
-      "locale_id": 2,
-      "name": "Domates",
-      "sort_order": 1
-    }
-  ],
-  "current_page": 0,
-  "total_pages": 1,
-  "total_elements": 2,
-  "page_size": 10,
-  "has_next": false,
-  "has_previous": false
-}
-```
-
-> Note: The list response returns a summary shape (`id`, `locale_id`, `name`, `sort_order`). Use the Get by ID endpoint to retrieve `description`.
-
----
-
 ### Update Item Locale
+
+Updates the translation fields of an existing item locale. The locale assignment (`locale_id`) cannot be changed.
 
 **`PUT /api/v1/items/{item-id}/locales/{id}`**
 
@@ -331,7 +287,6 @@ Returns a paginated list of all active locales for a given item.
 
 ```json
 {
-  "locale_id": 1,
   "name": "Tomato",
   "description": "Fresh ripe tomato",
   "sort_order": 1
@@ -340,7 +295,6 @@ Returns a paginated list of all active locales for a given item.
 
 | Field | Type | Required | Constraints |
 |---|---|---|---|
-| `locale_id` | long | yes | must be an existing active locale |
 | `name` | string | yes | max 255 chars |
 | `description` | string | no | defaults to `""` |
 | `sort_order` | integer | yes | |

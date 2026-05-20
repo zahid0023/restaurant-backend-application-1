@@ -3,8 +3,13 @@
   <component name="DataSourcePerFileMappings">
     <file url="file://$APPLICATION_CONFIG_DIR$/consoles/db/df868be2-4be8-40be-8783-6fe8faae42b8/console.sql" value="df868be2-4be8-40be-8783-6fe8faae42b8" />
     <file url="file://$APPLICATION_CONFIG_DIR$/consoles/db/df868be2-4be8-40be-8783-6fe8faae42b8/console_1.sql" value="df868be2-4be8-40be-8783-6fe8faae42b8" />
-    <file url="file://$PROJECT_DIR$/src/main/resources/db/migration/V16__create_items_table.sql" value="df868be2-4be8-40be-8783-6fe8faae42b8" />
-    <file url="file://$PROJECT_DIR$/src/main/resources/db/migration/V20__create_item_item_categories_table.sql" value="df868be2-4be8-40be-8783-6fe8faae42b8" />
-    <file url="file://$PROJECT_DIR$/src/main/resources/db/migration/V21__alter_items_rename_unit_to_unit_id.sql" value="df868be2-4be8-40be-8783-6fe8faae42b8" />
+    <file url="file://$APPLICATION_CONFIG_DIR$/consoles/db/df868be2-4be8-40be-8783-6fe8faae42b8/console_2.sql" value="df868be2-4be8-40be-8783-6fe8faae42b8" />
+    <file url="file://$PROJECT_DIR$/docs/db/V16__create_items_table.sql" value="df868be2-4be8-40be-8783-6fe8faae42b8" />
+    <file url="file://$PROJECT_DIR$/docs/db/V20__create_item_item_categories_table.sql" value="df868be2-4be8-40be-8783-6fe8faae42b8" />
+    <file url="file://$PROJECT_DIR$/docs/db/V21__alter_items_rename_unit_to_unit_id.sql" value="df868be2-4be8-40be-8783-6fe8faae42b8" />
+    <file url="file://$PROJECT_DIR$/docs/db/V41__create_menu_menu_categories_table.sql" value="df868be2-4be8-40be-8783-6fe8faae42b8" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/db/migration/V16__create_dish_variants_table.sql" value="df868be2-4be8-40be-8783-6fe8faae42b8" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/db/migration/V7__create_cities_table.sql" value="df868be2-4be8-40be-8783-6fe8faae42b8" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/db/migration/V8__create_item_types_table.sql" value="df868be2-4be8-40be-8783-6fe8faae42b8" />
   </component>
 </project>

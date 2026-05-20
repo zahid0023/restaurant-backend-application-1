@@ -4,6 +4,8 @@ import org.springframework.beans.factory.annotation.Value;
 import tools.jackson.databind.PropertyNamingStrategies;
 import tools.jackson.databind.annotation.JsonNaming;
 
+import java.util.List;
+
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public interface DiningSpaceSummary {
     Long getId();
@@ -18,4 +20,19 @@ public interface DiningSpaceSummary {
     Integer getSortOrder();
     Integer getCapacity();
     Boolean getIsBookable();
+
+    @Value("#{target.diningSpaceLocaleEntities}")
+    List<LocaleSummary> getLocales();
+
+    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    interface LocaleSummary {
+        Long getId();
+
+        @Value("#{target.localeEntity.id}")
+        Long getLocaleId();
+
+        String getName();
+        String getDescription();
+        Integer getSortOrder();
+    }
 }

@@ -35,12 +35,12 @@ public class InventoryLocationLocaleMapper {
     }
 
     public static InventoryLocationLocaleDto toDto(InventoryLocationLocaleEntity entity) {
-        InventoryLocationLocaleDto dto = new InventoryLocationLocaleDto();
-        dto.setId(entity.getId());
-        dto.setLocaleId(entity.getLocaleEntity().getId());
-        dto.setName(entity.getName());
-        dto.setDescription(entity.getDescription());
-        dto.setSortOrder(entity.getSortOrder());
-        return dto;
+        return InventoryLocationLocaleDto.builder()
+                .id(entity.getId())
+                .localeId(entity.getLocaleEntity().getId())
+                .name(entity.getName())
+                .description(entity.getDescription())
+                .sortOrder(entity.getSortOrder())
+                .build();
     }
 }

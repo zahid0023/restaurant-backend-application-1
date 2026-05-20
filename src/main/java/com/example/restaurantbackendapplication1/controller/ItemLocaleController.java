@@ -1,6 +1,5 @@
 package com.example.restaurantbackendapplication1.controller;
 
-import com.example.restaurantbackendapplication1.commons.dto.request.PaginatedRequest;
 import com.example.restaurantbackendapplication1.dto.request.itemlocale.CreateItemLocaleRequest;
 import com.example.restaurantbackendapplication1.dto.request.itemlocale.UpdateItemLocaleRequest;
 import com.example.restaurantbackendapplication1.model.entity.ItemEntity;
@@ -10,7 +9,6 @@ import com.example.restaurantbackendapplication1.service.ItemLocaleService;
 import com.example.restaurantbackendapplication1.service.ItemService;
 import com.example.restaurantbackendapplication1.service.LocaleService;
 import jakarta.validation.Valid;
-import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,10 +21,9 @@ public class ItemLocaleController {
     private final ItemService itemService;
     private final LocaleService localeService;
 
-    public ItemLocaleController(
-            ItemLocaleService itemLocaleService,
-            ItemService itemService,
-            LocaleService localeService) {
+    public ItemLocaleController(ItemLocaleService itemLocaleService,
+                                ItemService itemService,
+                                LocaleService localeService) {
         this.itemLocaleService = itemLocaleService;
         this.itemService = itemService;
         this.localeService = localeService;
@@ -42,22 +39,6 @@ public class ItemLocaleController {
                 .body(itemLocaleService.create(itemEntity, localeEntity, request));
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<?> getById(
-            @PathVariable("item-id") Long itemId,
-            @PathVariable Long id) {
-        ItemEntity itemEntity = itemService.getEntityById(itemId);
-        return ResponseEntity.ok(itemLocaleService.getById(id, itemEntity));
-    }
-
-    @GetMapping
-    public ResponseEntity<?> getAll(
-            @PathVariable("item-id") Long itemId,
-            @Valid @ParameterObject PaginatedRequest request) {
-        ItemEntity itemEntity = itemService.getEntityById(itemId);
-        return ResponseEntity.ok(itemLocaleService.getAll(itemEntity, request));
-    }
-
     @PutMapping("/{id}")
     public ResponseEntity<?> update(
             @PathVariable("item-id") Long itemId,
@@ -65,8 +46,7 @@ public class ItemLocaleController {
             @Valid @RequestBody UpdateItemLocaleRequest request) {
         ItemEntity itemEntity = itemService.getEntityById(itemId);
         ItemLocaleEntity entity = itemLocaleService.getEntityById(id, itemEntity);
-        LocaleEntity locale = localeService.getEntityById(request.getLocaleId());
-        return ResponseEntity.ok(itemLocaleService.update(entity, locale, request));
+        return ResponseEntity.ok(itemLocaleService.update(entity, request));
     }
 
     @DeleteMapping("/{id}")

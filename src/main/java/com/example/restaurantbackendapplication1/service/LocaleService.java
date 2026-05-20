@@ -6,8 +6,8 @@ import com.example.restaurantbackendapplication1.commons.dto.response.SuccessRes
 import com.example.restaurantbackendapplication1.dto.request.locale.CreateLocaleRequest;
 import com.example.restaurantbackendapplication1.dto.request.locale.UpdateLocaleRequest;
 import com.example.restaurantbackendapplication1.dto.response.LocaleResponse;
-import com.example.restaurantbackendapplication1.model.projection.LocaleSummary;
 import com.example.restaurantbackendapplication1.model.entity.LocaleEntity;
+import com.example.restaurantbackendapplication1.model.projection.LocaleSummary;
 
 import java.util.List;
 import java.util.Set;

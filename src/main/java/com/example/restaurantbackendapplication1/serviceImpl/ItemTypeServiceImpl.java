@@ -40,7 +40,7 @@ public class ItemTypeServiceImpl implements ItemTypeService {
     @Transactional
     @Override
     public SuccessResponse create(CreateItemTypeRequest request, Map<Long, LocaleEntity> localeEntityMap) {
-        ItemTypeEntity entity = ItemTypeMapper.fromRequest(request, localeEntityMap);
+        ItemTypeEntity entity = ItemTypeMapper.create(request, localeEntityMap);
         itemTypeRepository.save(entity);
         log.info("ItemType created with id: {}", entity.getId());
         return new SuccessResponse(true, entity.getId());

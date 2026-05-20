@@ -11,14 +11,18 @@ import com.example.restaurantbackendapplication1.model.entity.UnitEntity;
 import com.example.restaurantbackendapplication1.model.entity.UnitTypeEntity;
 import com.example.restaurantbackendapplication1.model.projection.UnitSummary;
 
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public interface UnitService {
     SuccessResponse create(CreateUnitRequest request,
                            UnitTypeEntity unitTypeEntity,
                            Map<Long, LocaleEntity> localeEntityMap);
 
-    UnitEntity getEntityById(Long unitId);
+    UnitEntity getEntityById(Long id);
+
+    List<UnitEntity> getAll(Set<Long> ids);
 
     UnitEntity getEntityById(Long unitTypeId, Long id);
 
@@ -26,8 +30,7 @@ public interface UnitService {
 
     PaginatedResponse<UnitSummary> getAll(Long unitTypeId, PaginatedRequest request);
 
-    SuccessResponse update(UnitEntity entity,
-                           UpdateUnitRequest request);
+    SuccessResponse update(UnitEntity entity, UpdateUnitRequest request);
 
-    SuccessResponse delete(Long unitTypeId, Long id);
+    SuccessResponse delete(UnitEntity entity);
 }

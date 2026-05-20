@@ -1,5 +1,6 @@
 package com.example.restaurantbackendapplication1.dto.request.dishvariantlocale;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import tools.jackson.databind.PropertyNamingStrategies;
@@ -9,4 +10,8 @@ import tools.jackson.databind.annotation.JsonNaming;
 @EqualsAndHashCode(callSuper = false)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class CreateDishVariantLocaleRequest extends DishVariantLocaleRequest {
+
+    @NotNull
+    private Long localeId;
+
 }

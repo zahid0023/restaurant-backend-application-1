@@ -9,6 +9,8 @@ import com.example.restaurantbackendapplication1.dto.response.DishRecipeResponse
 import com.example.restaurantbackendapplication1.model.dto.DishRecipeDto;
 import com.example.restaurantbackendapplication1.model.entity.DishRecipeEntity;
 import com.example.restaurantbackendapplication1.model.entity.DishVariantEntity;
+import com.example.restaurantbackendapplication1.model.entity.ItemEntity;
+import com.example.restaurantbackendapplication1.model.entity.UnitEntity;
 import com.example.restaurantbackendapplication1.model.enums.DishRecipeSortField;
 import com.example.restaurantbackendapplication1.model.mapper.DishRecipeMapper;
 import com.example.restaurantbackendapplication1.model.projection.DishRecipeSummary;
@@ -22,6 +24,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Map;
 import java.util.Set;
 
 @Service
@@ -38,8 +41,11 @@ public class DishRecipeServiceImpl implements DishRecipeService {
 
     @Transactional
     @Override
-    public SuccessResponse create(CreateDishRecipeRequest request, DishVariantEntity dishVariantEntity) {
-        DishRecipeEntity entity = DishRecipeMapper.fromRequest(request, dishVariantEntity);
+    public SuccessResponse create(CreateDishRecipeRequest request,
+                                  DishVariantEntity dishVariantEntity,
+                                  Map<Long, ItemEntity> itemEntityMap,
+                                  Map<Long, UnitEntity> unitEntityMap) {
+        DishRecipeEntity entity = DishRecipeMapper.create(request, dishVariantEntity, itemEntityMap, unitEntityMap);
         dishRecipeRepository.save(entity);
         log.info("DishRecipe created with id: {}", entity.getId());
         return new SuccessResponse(true, entity.getId());

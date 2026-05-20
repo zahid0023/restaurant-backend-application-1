@@ -37,5 +37,9 @@ public class CountryEntity extends AuditableEntity {
     private Integer sortOrder = 0;
 
     @OneToMany(mappedBy = "countryEntity", cascade = CascadeType.ALL)
-    private Set<CountryLocaleEntity> countryLocales = new LinkedHashSet<>();
+    private Set<CountryLocaleEntity> countryLocaleEntities = new LinkedHashSet<>();
+
+    @OneToMany(mappedBy = "countryEntity")
+    private Set<CityEntity> cityEntities = new LinkedHashSet<>();
+
 }

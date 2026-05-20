@@ -3,11 +3,12 @@ package com.example.restaurantbackendapplication1.controller;
 import com.example.restaurantbackendapplication1.commons.dto.request.PaginatedRequest;
 import com.example.restaurantbackendapplication1.dto.request.unittype.CreateUnitTypeRequest;
 import com.example.restaurantbackendapplication1.dto.request.unittype.UpdateUnitTypeRequest;
-import com.example.restaurantbackendapplication1.dto.request.unittypelocale.UnitTypeLocaleRequest;
+import com.example.restaurantbackendapplication1.dto.request.unittypelocale.CreateUnitTypeLocaleRequest;
 import com.example.restaurantbackendapplication1.model.entity.LocaleEntity;
 import com.example.restaurantbackendapplication1.model.entity.UnitTypeEntity;
 import com.example.restaurantbackendapplication1.service.LocaleService;
 import com.example.restaurantbackendapplication1.service.UnitTypeService;
+import com.example.restaurantbackendapplication1.utils.LocaleUtils;
 import jakarta.validation.Valid;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.HttpStatus;
@@ -15,8 +16,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/unit-types")
@@ -32,13 +31,8 @@ public class UnitTypeController {
 
     @PostMapping
     public ResponseEntity<?> create(@Valid @RequestBody CreateUnitTypeRequest request) {
-
-        Set<Long> localeIds = request.getLocales().stream()
-                .map(UnitTypeLocaleRequest::getLocaleId)
-                .collect(Collectors.toSet());
-        Map<Long, LocaleEntity> localeEntityMap = localeService.getAll(localeIds).stream()
-                .collect(Collectors.toMap(LocaleEntity::getId, e -> e));
-
+        Map<Long, LocaleEntity> localeEntityMap = LocaleUtils.resolveLocaleMap(
+                request.getLocales(), CreateUnitTypeLocaleRequest::getLocaleId, localeService);
         return ResponseEntity.status(HttpStatus.CREATED).body(unitTypeService.create(request, localeEntityMap));
     }
 

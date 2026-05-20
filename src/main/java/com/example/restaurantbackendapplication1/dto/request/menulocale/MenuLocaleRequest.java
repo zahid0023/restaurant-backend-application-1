@@ -11,9 +11,6 @@ import tools.jackson.databind.annotation.JsonNaming;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class MenuLocaleRequest {
 
-    @NotNull
-    private Long localeId;
-
     @NotBlank
     @Size(max = 255)
     private String name;

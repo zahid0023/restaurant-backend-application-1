@@ -3,7 +3,7 @@ package com.example.restaurantbackendapplication1.controller;
 import com.example.restaurantbackendapplication1.commons.dto.request.PaginatedRequest;
 import com.example.restaurantbackendapplication1.dto.request.itemcategory.CreateItemCategoryRequest;
 import com.example.restaurantbackendapplication1.dto.request.itemcategory.UpdateItemCategoryRequest;
-import com.example.restaurantbackendapplication1.dto.request.itemcategorylocale.ItemCategoryLocaleRequest;
+import com.example.restaurantbackendapplication1.dto.request.itemcategorylocale.CreateItemCategoryLocaleRequest;
 import com.example.restaurantbackendapplication1.model.entity.ItemCategoryEntity;
 import com.example.restaurantbackendapplication1.model.entity.ItemTypeEntity;
 import com.example.restaurantbackendapplication1.model.entity.LocaleEntity;
@@ -43,7 +43,7 @@ public class ItemCategoryController {
         ItemCategoryEntity itemCategoryEntity = request.getParentId() != null ? itemCategoryService.getEntityById(itemTypeId, request.getParentId()) : null;
 
         Map<Long, LocaleEntity> localeEntityMap = LocaleUtils.resolveLocaleMap(
-                request.getLocales(), ItemCategoryLocaleRequest::getLocaleId, localeService);
+                request.getLocales(), CreateItemCategoryLocaleRequest::getLocaleId, localeService);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(itemCategoryService.create(request, itemTypeEntity, itemCategoryEntity, localeEntityMap));
     }
@@ -92,6 +92,7 @@ public class ItemCategoryController {
     public ResponseEntity<?> delete(
             @PathVariable("item-type-id") Long itemTypeId,
             @PathVariable Long id) {
-        return ResponseEntity.ok(itemCategoryService.delete(itemTypeId, id));
+        ItemCategoryEntity entity = itemCategoryService.getEntityById(itemTypeId, id);
+        return ResponseEntity.ok(itemCategoryService.delete(entity));
     }
 }

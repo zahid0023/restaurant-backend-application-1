@@ -77,8 +77,7 @@ public class MenuServiceImpl implements MenuService {
 
     @Transactional
     @Override
-    public SuccessResponse delete(Long id) {
-        MenuEntity entity = getEntityById(id);
+    public SuccessResponse delete(MenuEntity entity) {
         entity.setIsDeleted(true);
         entity.setIsActive(false);
         menuRepository.save(entity);

@@ -11,9 +11,9 @@ import java.util.Optional;
 
 public interface MenuCategoryRepository extends JpaRepository<@NonNull MenuCategoryEntity, @NonNull Long> {
 
-    Optional<MenuCategoryEntity> findByMenuEntity_IdAndIdAndIsActiveAndIsDeleted(
-            Long menuId, Long id, Boolean isActive, Boolean isDeleted);
+    Optional<MenuCategoryEntity> findByIdAndIsActiveAndIsDeleted(
+            Long id, Boolean isActive, Boolean isDeleted);
 
-    Page<@NonNull MenuCategorySummary> findAllByMenuEntityIdAndIsActiveAndIsDeleted(
-            Long menuId, Boolean isActive, Boolean isDeleted, Pageable pageable);
+    Page<@NonNull MenuCategorySummary> findAllByIsActiveAndIsDeleted(
+            Boolean isActive, Boolean isDeleted, Pageable pageable);
 }

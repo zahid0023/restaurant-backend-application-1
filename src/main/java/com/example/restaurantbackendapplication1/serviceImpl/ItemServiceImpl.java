@@ -15,6 +15,7 @@ import com.example.restaurantbackendapplication1.model.mapper.ItemMapper;
 import com.example.restaurantbackendapplication1.model.projection.ItemSummary;
 import com.example.restaurantbackendapplication1.repository.ItemRepository;
 import com.example.restaurantbackendapplication1.service.ItemService;
+import com.example.restaurantbackendapplication1.utils.EntityValidator;
 import com.example.restaurantbackendapplication1.utils.Pagination;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +24,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -53,6 +55,13 @@ public class ItemServiceImpl implements ItemService {
     public ItemEntity getEntityById(Long id) {
         return itemRepository.findByIdAndIsActiveAndIsDeleted(id, true, false)
                 .orElseThrow(() -> new EntityNotFoundException("Item not found with id: " + id));
+    }
+
+    @Override
+    public List<ItemEntity> getAll(Set<Long> ids) {
+        List<ItemEntity> entities = itemRepository.findAllByIdInAndIsActiveAndIsDeleted(ids, true, false);
+        EntityValidator.validateAllFound(ids, entities, ItemEntity::getId, "Item");
+        return entities;
     }
 
     @Override

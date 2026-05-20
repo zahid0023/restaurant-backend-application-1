@@ -7,9 +7,6 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
-
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -18,12 +15,6 @@ import java.util.Set;
 @Entity
 @Table(name = "menu_categories")
 public class MenuCategoryEntity extends AuditableEntity {
-
-    @NotNull
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "menu_id", nullable = false)
-    private MenuEntity menuEntity;
 
     @Size(max = 50)
     @NotNull

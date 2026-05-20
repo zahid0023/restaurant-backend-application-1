@@ -36,10 +36,10 @@ public class InventoryLocationMapper {
     }
 
     public static InventoryLocationDto toDto(InventoryLocationEntity entity) {
-        InventoryLocationDto dto = new InventoryLocationDto();
-        dto.setId(entity.getId());
-        dto.setCode(entity.getCode());
-        dto.setSortOrder(entity.getSortOrder());
-        return dto;
+        return InventoryLocationDto.builder()
+                .id(entity.getId())
+                .code(entity.getCode())
+                .sortOrder(entity.getSortOrder())
+                .build();
     }
 }

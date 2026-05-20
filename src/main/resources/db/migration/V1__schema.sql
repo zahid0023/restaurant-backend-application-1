@@ -142,5 +142,17 @@ create table if not exists reset_tokens
 );
 
 insert into roles(name, created_by, updated_by)
+values ('SYSTEM', 1, 1)
+on conflict do nothing;
+
+insert into roles(name, created_by, updated_by)
 values ('USER', 1, 1)
 on conflict do nothing;
+
+-- Seed system user for audit columns in subsequent migrations
+INSERT INTO users (username, password, role_id, created_by, updated_by)
+SELECT 'system', 'N/A', r.id, 0, 0
+FROM roles r
+WHERE r.name = 'SYSTEM'
+ON CONFLICT (username) DO NOTHING;
+

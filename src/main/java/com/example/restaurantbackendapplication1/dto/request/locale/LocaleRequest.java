@@ -19,8 +19,6 @@ public class LocaleRequest {
     @Size(max = 255)
     private String name;
 
-    private Boolean isDefault;
-
     @NotNull
     private Integer sortOrder;
 }

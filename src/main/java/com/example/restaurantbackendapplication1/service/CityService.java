@@ -5,24 +5,27 @@ import com.example.restaurantbackendapplication1.commons.dto.response.PaginatedR
 import com.example.restaurantbackendapplication1.commons.dto.response.SuccessResponse;
 import com.example.restaurantbackendapplication1.dto.request.city.CreateCityRequest;
 import com.example.restaurantbackendapplication1.dto.request.city.UpdateCityRequest;
-import com.example.restaurantbackendapplication1.dto.response.CityResponse;
-import com.example.restaurantbackendapplication1.model.projection.CitySummary;
+import com.example.restaurantbackendapplication1.dto.response.cities.CityResponse;
 import com.example.restaurantbackendapplication1.model.entity.CityEntity;
 import com.example.restaurantbackendapplication1.model.entity.CountryEntity;
 import com.example.restaurantbackendapplication1.model.entity.LocaleEntity;
+import com.example.restaurantbackendapplication1.model.projection.CitySummary;
 
 import java.util.Map;
 
 public interface CityService {
-    SuccessResponse create(CreateCityRequest request, CountryEntity countryEntity, Map<Long, LocaleEntity> localeEntityMap);
+    SuccessResponse create(CreateCityRequest request,
+                           CountryEntity countryEntity,
+                           Map<Long, LocaleEntity> localeEntityMap);
 
-    CityEntity getEntityById(Long id);
+    CityEntity getEntityById(Long countryId, Long id);
 
-    CityResponse getById(Long id);
+    CityResponse getById(Long countryId, Long id);
 
-    PaginatedResponse<CitySummary> getAll(PaginatedRequest request);
+    PaginatedResponse<CitySummary> getAll(Long countryId, PaginatedRequest request);
 
-    SuccessResponse update(CityEntity entity, UpdateCityRequest request);
+    SuccessResponse update(CityEntity entity,
+                           UpdateCityRequest request);
 
-    SuccessResponse delete(Long id);
+    SuccessResponse delete(CityEntity entity);
 }

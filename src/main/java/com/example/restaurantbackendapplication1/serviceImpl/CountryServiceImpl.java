@@ -5,17 +5,15 @@ import com.example.restaurantbackendapplication1.commons.dto.response.PaginatedR
 import com.example.restaurantbackendapplication1.commons.dto.response.SuccessResponse;
 import com.example.restaurantbackendapplication1.dto.request.country.CreateCountryRequest;
 import com.example.restaurantbackendapplication1.dto.request.country.UpdateCountryRequest;
-import com.example.restaurantbackendapplication1.dto.request.countrylocale.CountryLocaleRequest;
-import com.example.restaurantbackendapplication1.dto.response.CountryResponse;
+import com.example.restaurantbackendapplication1.dto.response.countries.CountryResponse;
 import com.example.restaurantbackendapplication1.model.dto.CountryDto;
-import com.example.restaurantbackendapplication1.model.projection.CountrySummary;
 import com.example.restaurantbackendapplication1.model.entity.CountryEntity;
 import com.example.restaurantbackendapplication1.model.entity.LocaleEntity;
 import com.example.restaurantbackendapplication1.model.enums.CountrySortField;
 import com.example.restaurantbackendapplication1.model.mapper.CountryMapper;
+import com.example.restaurantbackendapplication1.model.projection.CountrySummary;
 import com.example.restaurantbackendapplication1.repository.CountryRepository;
 import com.example.restaurantbackendapplication1.service.CountryService;
-import com.example.restaurantbackendapplication1.service.LocaleService;
 import com.example.restaurantbackendapplication1.utils.EntityValidator;
 import com.example.restaurantbackendapplication1.utils.Pagination;
 import jakarta.persistence.EntityNotFoundException;
@@ -28,7 +26,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -45,7 +42,7 @@ public class CountryServiceImpl implements CountryService {
     @Transactional
     @Override
     public SuccessResponse create(CreateCountryRequest request, Map<Long, LocaleEntity> localeEntityMap) {
-        CountryEntity entity = CountryMapper.fromRequest(request, localeEntityMap);
+        CountryEntity entity = CountryMapper.create(request, localeEntityMap);
         countryRepository.save(entity);
         log.info("Country created with id: {}", entity.getId());
         return new SuccessResponse(true, entity.getId());

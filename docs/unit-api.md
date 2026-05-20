@@ -54,7 +54,6 @@ Creates a new unit with optional embedded locale translations.
 
 | Field | Type | Required | Constraints |
 |---|---|---|---|
-| `unit_type_id` | long | yes | must be an existing active unit type |
 | `code` | string | yes | max 20 chars |
 | `is_base` | boolean | yes | |
 | `sort_order` | integer | yes | |
@@ -95,7 +94,16 @@ Creates a new unit with optional embedded locale translations.
     "unit_type_id": 1,
     "code": "KG",
     "is_base": true,
-    "sort_order": 1
+    "sort_order": 1,
+    "locales": [
+      {
+        "id": 1,
+        "locale_id": 1,
+        "name": "Kilogram",
+        "description": "Base unit of mass",
+        "sort_order": 1
+      }
+    ]
   }
 }
 ```
@@ -133,14 +141,18 @@ Returns a paginated list of all active units for the specified unit type.
       "unit_type_id": 1,
       "code": "KG",
       "is_base": true,
-      "sort_order": 1
+      "sort_order": 1,
+      "locales": [
+        { "id": 1, "locale_id": 1, "name": "Kilogram", "description": "Base unit of mass", "sort_order": 1 }
+      ]
     },
     {
       "id": 2,
       "unit_type_id": 1,
       "code": "G",
       "is_base": false,
-      "sort_order": 2
+      "sort_order": 2,
+      "locales": []
     }
   ],
   "current_page": 0,
@@ -156,7 +168,7 @@ Returns a paginated list of all active units for the specified unit type.
 
 ### Update Unit
 
-Updates the fields of an existing unit. Locale translations are managed separately via the Unit Locales API.
+Updates the mutable fields of an existing unit. `code` is immutable after creation. Locale translations are managed separately via the Unit Locales API.
 
 **`PUT /api/v1/unit-types/{unit-type-id}/units/{id}`**
 
@@ -171,8 +183,6 @@ Updates the fields of an existing unit. Locale translations are managed separate
 
 ```json
 {
-  "unit_type_id": 1,
-  "code": "KG",
   "is_base": true,
   "sort_order": 1
 }
@@ -180,8 +190,6 @@ Updates the fields of an existing unit. Locale translations are managed separate
 
 | Field | Type | Required | Constraints |
 |---|---|---|---|
-| `unit_type_id` | long | yes | must be an existing active unit type |
-| `code` | string | yes | max 20 chars |
 | `is_base` | boolean | yes | |
 | `sort_order` | integer | yes | |
 
@@ -266,87 +274,6 @@ Manage locale-specific translations for a unit. Both `{unit-type-id}` and `{unit
 
 ---
 
-### Get Unit Locale by ID
-
-**`GET /api/v1/unit-types/{unit-type-id}/units/{unit-id}/locales/{id}`**
-
-#### Path Parameters
-
-| Parameter | Type | Description |
-|---|---|---|
-| `unit-type-id` | long | Unit type ID |
-| `unit-id` | long | Unit ID |
-| `id` | long | Unit locale ID |
-
-#### Response `200 OK`
-
-```json
-{
-  "unit_locale": {
-    "id": 1,
-    "locale_id": 1,
-    "name": "Kilogram",
-    "description": "Base unit of mass",
-    "sort_order": 1
-  }
-}
-```
-
----
-
-### List Unit Locales
-
-Returns a paginated list of all active locales for a given unit.
-
-**`GET /api/v1/unit-types/{unit-type-id}/units/{unit-id}/locales`**
-
-#### Path Parameters
-
-| Parameter | Type | Description |
-|---|---|---|
-| `unit-type-id` | long | Unit type ID |
-| `unit-id` | long | Unit ID |
-
-#### Query Parameters
-
-| Parameter | Type | Default | Constraints | Description |
-|---|---|---|---|---|
-| `page` | integer | `0` | min 0 | Page index (zero-based) |
-| `size` | integer | `10` | 1–50 | Items per page |
-| `sort_by` | string | `id` | `id`, `name`, `sortOrder`, `createdAt` | Field to sort by |
-| `sort_dir` | string | `ASC` | `ASC`, `DESC` | Sort direction |
-
-#### Response `200 OK`
-
-```json
-{
-  "data": [
-    {
-      "id": 1,
-      "locale_id": 1,
-      "name": "Kilogram",
-      "sort_order": 1
-    },
-    {
-      "id": 2,
-      "locale_id": 2,
-      "name": "Kilogram",
-      "sort_order": 1
-    }
-  ],
-  "current_page": 0,
-  "total_pages": 1,
-  "total_elements": 2,
-  "page_size": 10,
-  "has_next": false,
-  "has_previous": false
-}
-```
-
-> Note: The list response returns a summary shape (`id`, `locale_id`, `name`, `sort_order`). Use the Get by ID endpoint to retrieve `description`.
-
----
-
 ### Update Unit Locale
 
 **`PUT /api/v1/unit-types/{unit-type-id}/units/{unit-id}/locales/{id}`**
@@ -363,7 +290,6 @@ Returns a paginated list of all active locales for a given unit.
 
 ```json
 {
-  "locale_id": 1,
   "name": "Kilogram",
   "description": "Base unit of mass in the metric system",
   "sort_order": 1
@@ -372,7 +298,6 @@ Returns a paginated list of all active locales for a given unit.
 
 | Field | Type | Required | Constraints |
 |---|---|---|---|
-| `locale_id` | long | yes | must be an existing active locale |
 | `name` | string | yes | max 255 chars |
 | `description` | string | no | defaults to `""` |
 | `sort_order` | integer | yes | |
@@ -435,8 +360,8 @@ Returned when request validation fails.
   "status": 400,
   "message": "Validation failed",
   "errors": {
-    "code": "must not be blank",
-    "unit_type_id": "must not be null"
+    "is_base": "must not be null",
+    "sort_order": "must not be null"
   }
 }
 ```

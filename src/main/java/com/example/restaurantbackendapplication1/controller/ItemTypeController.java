@@ -1,11 +1,9 @@
 package com.example.restaurantbackendapplication1.controller;
 
 import com.example.restaurantbackendapplication1.commons.dto.request.PaginatedRequest;
-import com.example.restaurantbackendapplication1.dto.request.citylocale.CityLocaleRequest;
 import com.example.restaurantbackendapplication1.dto.request.itemtype.CreateItemTypeRequest;
 import com.example.restaurantbackendapplication1.dto.request.itemtype.UpdateItemTypeRequest;
-import com.example.restaurantbackendapplication1.dto.request.itemtypelocale.ItemTypeLocaleRequest;
-import com.example.restaurantbackendapplication1.model.entity.CountryEntity;
+import com.example.restaurantbackendapplication1.dto.request.itemtypelocale.CreateItemTypeLocaleRequest;
 import com.example.restaurantbackendapplication1.model.entity.ItemTypeEntity;
 import com.example.restaurantbackendapplication1.model.entity.LocaleEntity;
 import com.example.restaurantbackendapplication1.service.ItemTypeService;
@@ -35,7 +33,7 @@ public class ItemTypeController {
     @PostMapping
     public ResponseEntity<?> create(@Valid @RequestBody CreateItemTypeRequest request) {
         Map<Long, LocaleEntity> localeEntityMap = LocaleUtils.resolveLocaleMap(
-                request.getLocales(), ItemTypeLocaleRequest::getLocaleId, localeService);
+                request.getLocales(), CreateItemTypeLocaleRequest::getLocaleId, localeService);
         return ResponseEntity.status(HttpStatus.CREATED).body(itemTypeService.create(request, localeEntityMap));
     }
 

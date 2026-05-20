@@ -1,6 +1,5 @@
 package com.example.restaurantbackendapplication1.controller;
 
-import com.example.restaurantbackendapplication1.commons.dto.request.PaginatedRequest;
 import com.example.restaurantbackendapplication1.dto.request.unittypelocale.CreateUnitTypeLocaleRequest;
 import com.example.restaurantbackendapplication1.dto.request.unittypelocale.UpdateUnitTypeLocaleRequest;
 import com.example.restaurantbackendapplication1.model.entity.LocaleEntity;
@@ -10,7 +9,6 @@ import com.example.restaurantbackendapplication1.service.LocaleService;
 import com.example.restaurantbackendapplication1.service.UnitTypeLocaleService;
 import com.example.restaurantbackendapplication1.service.UnitTypeService;
 import jakarta.validation.Valid;
-import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -42,39 +40,20 @@ public class UnitTypeLocaleController {
                 .body(unitTypeLocaleService.create(unitTypeEntity, localeEntity, request));
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<?> getById(
-            @PathVariable("unit-type-id") Long unitTypeId,
-            @PathVariable Long id) {
-        UnitTypeEntity unitTypeEntity = unitTypeService.getEntityById(unitTypeId);
-        return ResponseEntity.ok(unitTypeLocaleService.getById(id, unitTypeEntity));
-    }
-
-    @GetMapping
-    public ResponseEntity<?> getAll(
-            @PathVariable("unit-type-id") Long unitTypeId,
-            @Valid @ParameterObject PaginatedRequest request) {
-        UnitTypeEntity unitTypeEntity = unitTypeService.getEntityById(unitTypeId);
-        return ResponseEntity.ok(unitTypeLocaleService.getAll(unitTypeEntity, request));
-    }
-
     @PutMapping("/{id}")
     public ResponseEntity<?> update(
             @PathVariable("unit-type-id") Long unitTypeId,
             @PathVariable Long id,
             @Valid @RequestBody UpdateUnitTypeLocaleRequest request) {
-        UnitTypeEntity unitTypeEntity = unitTypeService.getEntityById(unitTypeId);
-        UnitTypeLocaleEntity entity = unitTypeLocaleService.getEntityById(id, unitTypeEntity);
-        LocaleEntity locale = localeService.getEntityById(request.getLocaleId());
-        return ResponseEntity.ok(unitTypeLocaleService.update(entity, locale, request));
+        UnitTypeLocaleEntity entity = unitTypeLocaleService.getEntityById(unitTypeId, id);
+        return ResponseEntity.ok(unitTypeLocaleService.update(entity, request));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(
             @PathVariable("unit-type-id") Long unitTypeId,
             @PathVariable Long id) {
-        UnitTypeEntity unitTypeEntity = unitTypeService.getEntityById(unitTypeId);
-        UnitTypeLocaleEntity entity = unitTypeLocaleService.getEntityById(id, unitTypeEntity);
+        UnitTypeLocaleEntity entity = unitTypeLocaleService.getEntityById(unitTypeId, id);
         return ResponseEntity.ok(unitTypeLocaleService.delete(entity));
     }
 }

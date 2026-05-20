@@ -1,7 +1,8 @@
 package com.example.restaurantbackendapplication1.model.mapper;
 
-import com.example.restaurantbackendapplication1.dto.request.countrylocale.CountryLocaleRequest;
-import com.example.restaurantbackendapplication1.dto.request.countrylocale.UpdateCountryLocaleRequest;
+import com.example.restaurantbackendapplication1.dto.request.country.countrylocale.CountryLocaleRequest;
+import com.example.restaurantbackendapplication1.dto.request.country.countrylocale.CreateCountryLocaleRequest;
+import com.example.restaurantbackendapplication1.dto.request.country.countrylocale.UpdateCountryLocaleRequest;
 import com.example.restaurantbackendapplication1.model.dto.CountryLocaleDto;
 import com.example.restaurantbackendapplication1.model.entity.CountryEntity;
 import com.example.restaurantbackendapplication1.model.entity.CountryLocaleEntity;
@@ -11,36 +12,33 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class CountryLocaleMapper {
 
-    public static CountryLocaleEntity fromRequest(
-            CountryLocaleRequest request,
-            CountryEntity countryEntity,
-            LocaleEntity localeEntity) {
+    public CountryLocaleEntity create(CreateCountryLocaleRequest request,
+                                      CountryEntity countryEntity,
+                                      LocaleEntity localeEntity) {
         CountryLocaleEntity entity = new CountryLocaleEntity();
         entity.setCountryEntity(countryEntity);
         entity.setLocaleEntity(localeEntity);
-        entity.setName(request.getName());
-        entity.setDescription(request.getDescription());
-        entity.setSortOrder(request.getSortOrder());
+        applyCommonFields(entity, request);
         return entity;
     }
 
-    public static void update(
-            CountryLocaleEntity entity,
-            UpdateCountryLocaleRequest request,
-            LocaleEntity locale) {
-        entity.setLocaleEntity(locale);
+    public void update(CountryLocaleEntity entity, UpdateCountryLocaleRequest request) {
+        applyCommonFields(entity, request);
+    }
+
+    private void applyCommonFields(CountryLocaleEntity entity, CountryLocaleRequest request) {
         entity.setName(request.getName());
         entity.setDescription(request.getDescription());
         entity.setSortOrder(request.getSortOrder());
     }
 
-    public static CountryLocaleDto toDto(CountryLocaleEntity entity) {
-        CountryLocaleDto dto = new CountryLocaleDto();
-        dto.setId(entity.getId());
-        dto.setLocaleId(entity.getLocaleEntity().getId());
-        dto.setName(entity.getName());
-        dto.setDescription(entity.getDescription());
-        dto.setSortOrder(entity.getSortOrder());
-        return dto;
+    public CountryLocaleDto toDto(CountryLocaleEntity entity) {
+        return CountryLocaleDto.builder()
+                .id(entity.getId())
+                .localeId(entity.getLocaleEntity().getId())
+                .name(entity.getName())
+                .description(entity.getDescription())
+                .sortOrder(entity.getSortOrder())
+                .build();
     }
 }

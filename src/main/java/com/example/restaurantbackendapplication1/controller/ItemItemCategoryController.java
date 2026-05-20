@@ -15,7 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/v1/item-types/{item-type-id}/item-categories/{item-category-id}/items")
+@RequestMapping("/api/v1/item-item-categories")
 public class ItemItemCategoryController {
 
     private final ItemItemCategoryService itemItemCategoryService;
@@ -33,30 +33,25 @@ public class ItemItemCategoryController {
 
     @PostMapping
     public ResponseEntity<?> assign(
-            @PathVariable("item-type-id") Long itemTypeId,
-            @PathVariable("item-category-id") Long itemCategoryId,
             @RequestBody AssignItemRequest request) {
-        ItemCategoryEntity itemCategoryEntity = itemCategoryService.getEntityById(itemTypeId, itemCategoryId);
+        ItemCategoryEntity itemCategoryEntity = itemCategoryService.getEntityById(request.getItemCategoryId());
         ItemEntity itemEntity = itemService.getEntityById(request.getItemId());
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(itemItemCategoryService.assign(itemCategoryEntity, itemEntity));
     }
 
-    @GetMapping
-    public ResponseEntity<?> getAll(
-            @PathVariable("item-type-id") Long itemTypeId,
-            @PathVariable("item-category-id") Long categoryId,
+    @GetMapping("/{item-category-id}/items")
+    public ResponseEntity<?> getAllItems(
+            @PathVariable("item-category-id") Long itemCategoryId,
             @Valid @ParameterObject PaginatedRequest request) {
-        ItemCategoryEntity itemCategoryEntity = itemCategoryService.getEntityById(itemTypeId, categoryId);
-        return ResponseEntity.ok(itemItemCategoryService.getAllItems(itemCategoryEntity, request));
+        return ResponseEntity.ok(itemItemCategoryService.getAllItems(itemCategoryId, request));
     }
 
-    @DeleteMapping("/{item-id}")
+    @DeleteMapping("/{item-id}/{item-category-id}")
     public ResponseEntity<?> unassign(
-            @PathVariable("item-type-id") Long itemTypeId,
             @PathVariable("item-category-id") Long categoryId,
             @PathVariable("item-id") Long itemId) {
-        ItemCategoryEntity itemCategoryEntity = itemCategoryService.getEntityById(itemTypeId, categoryId);
+        ItemCategoryEntity itemCategoryEntity = itemCategoryService.getEntityById(categoryId);
         ItemEntity itemEntity = itemService.getEntityById(itemId);
         ItemItemCategoryEntity itemItemCategoryEntity = itemItemCategoryService.getAssignment(itemCategoryEntity, itemEntity);
         return ResponseEntity.ok(itemItemCategoryService.unassign(itemItemCategoryEntity));

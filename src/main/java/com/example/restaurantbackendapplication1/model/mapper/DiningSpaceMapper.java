@@ -52,14 +52,14 @@ public class DiningSpaceMapper {
     }
 
     public static DiningSpaceDto toDto(DiningSpaceEntity entity) {
-        DiningSpaceDto dto = new DiningSpaceDto();
-        dto.setId(entity.getId());
-        dto.setDiningSpaceTypeId(entity.getDiningSpaceTypeEntity().getId());
-        dto.setFloorId(entity.getFloorEntity() != null ? entity.getFloorEntity().getId() : null);
-        dto.setCode(entity.getCode());
-        dto.setSortOrder(entity.getSortOrder());
-        dto.setCapacity(entity.getCapacity());
-        dto.setIsBookable(entity.getIsBookable());
-        return dto;
+        return DiningSpaceDto.builder()
+                .id(entity.getId())
+                .diningSpaceTypeId(entity.getDiningSpaceTypeEntity().getId())
+                .floorId(entity.getFloorEntity() != null ? entity.getFloorEntity().getId() : null)
+                .code(entity.getCode())
+                .sortOrder(entity.getSortOrder())
+                .capacity(entity.getCapacity())
+                .isBookable(entity.getIsBookable())
+                .build();
     }
 }

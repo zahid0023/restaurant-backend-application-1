@@ -1,14 +1,18 @@
 package com.example.restaurantbackendapplication1.model.mapper;
 
 import com.example.restaurantbackendapplication1.dto.request.unit.CreateUnitRequest;
+import com.example.restaurantbackendapplication1.dto.request.unit.UnitRequest;
 import com.example.restaurantbackendapplication1.dto.request.unit.UpdateUnitRequest;
+import com.example.restaurantbackendapplication1.dto.request.unitlocale.CreateUnitLocaleRequest;
 import com.example.restaurantbackendapplication1.model.dto.UnitDto;
+import com.example.restaurantbackendapplication1.model.dto.UnitLocaleDto;
 import com.example.restaurantbackendapplication1.model.entity.LocaleEntity;
 import com.example.restaurantbackendapplication1.model.entity.UnitEntity;
 import com.example.restaurantbackendapplication1.model.entity.UnitLocaleEntity;
 import com.example.restaurantbackendapplication1.model.entity.UnitTypeEntity;
 import lombok.experimental.UtilityClass;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -16,38 +20,48 @@ import java.util.stream.Collectors;
 @UtilityClass
 public class UnitMapper {
 
-    public static UnitEntity fromRequest(CreateUnitRequest request,
-                                         UnitTypeEntity unitTypeEntity,
-                                         Map<Long, LocaleEntity> localeEntityMap) {
+    public UnitEntity create(CreateUnitRequest request,
+                             UnitTypeEntity unitTypeEntity,
+                             Map<Long, LocaleEntity> localeEntityMap) {
         UnitEntity entity = new UnitEntity();
         entity.setUnitTypeEntity(unitTypeEntity);
         entity.setCode(request.getCode());
-        entity.setIsBase(request.getIsBase());
-        entity.setSortOrder(request.getSortOrder());
-
+        applyCommonFields(entity, request);
         if (request.getLocales() != null) {
-            Set<UnitLocaleEntity> localeEntities = request.getLocales().stream()
-                    .map(l -> UnitLocaleMapper.fromRequest(l, entity, localeEntityMap.get(l.getLocaleId())))
-                    .collect(Collectors.toSet());
-            entity.setUnitLocaleEntities(localeEntities);
+            entity.setUnitLocaleEntities(mapLocales(request.getLocales(), entity, localeEntityMap));
         }
         return entity;
     }
 
-    public static void update(UnitEntity entity,
-                              UpdateUnitRequest request) {
-        entity.setCode(request.getCode());
+    public void update(UnitEntity entity, UpdateUnitRequest request) {
+        applyCommonFields(entity, request);
+    }
+
+    private void applyCommonFields(UnitEntity entity, UnitRequest request) {
         entity.setIsBase(request.getIsBase());
         entity.setSortOrder(request.getSortOrder());
     }
 
-    public static UnitDto toDto(UnitEntity entity) {
-        UnitDto dto = new UnitDto();
-        dto.setId(entity.getId());
-        dto.setUnitTypeId(entity.getUnitTypeEntity().getId());
-        dto.setCode(entity.getCode());
-        dto.setIsBase(entity.getIsBase());
-        dto.setSortOrder(entity.getSortOrder());
-        return dto;
+    private Set<UnitLocaleEntity> mapLocales(List<CreateUnitLocaleRequest> locales,
+                                             UnitEntity entity,
+                                             Map<Long, LocaleEntity> localeEntityMap) {
+        return locales.stream()
+                .map(l -> UnitLocaleMapper.create(l, entity, localeEntityMap.get(l.getLocaleId())))
+                .collect(Collectors.toSet());
+    }
+
+    public UnitDto toDto(UnitEntity entity) {
+        List<UnitLocaleDto> localeDtos = entity.getUnitLocaleEntities().stream()
+                .map(UnitLocaleMapper::toDto)
+                .toList();
+
+        return UnitDto.builder()
+                .id(entity.getId())
+                .unitTypeId(entity.getUnitTypeEntity().getId())
+                .code(entity.getCode())
+                .isBase(entity.getIsBase())
+                .sortOrder(entity.getSortOrder())
+                .locales(localeDtos)
+                .build();
     }
 }

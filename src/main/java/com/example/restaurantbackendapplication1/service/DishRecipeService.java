@@ -8,11 +8,18 @@ import com.example.restaurantbackendapplication1.dto.request.dishrecipe.UpdateDi
 import com.example.restaurantbackendapplication1.dto.response.DishRecipeResponse;
 import com.example.restaurantbackendapplication1.model.entity.DishRecipeEntity;
 import com.example.restaurantbackendapplication1.model.entity.DishVariantEntity;
+import com.example.restaurantbackendapplication1.model.entity.ItemEntity;
+import com.example.restaurantbackendapplication1.model.entity.UnitEntity;
 import com.example.restaurantbackendapplication1.model.projection.DishRecipeSummary;
+
+import java.util.Map;
 
 public interface DishRecipeService {
 
-    SuccessResponse create(CreateDishRecipeRequest request, DishVariantEntity dishVariantEntity);
+    SuccessResponse create(CreateDishRecipeRequest request,
+                           DishVariantEntity dishVariantEntity,
+                           Map<Long, ItemEntity> itemEntityMap,
+                           Map<Long, UnitEntity> unitEntityMap);
 
     DishRecipeEntity getEntityById(Long dishVariantId, Long id);
 

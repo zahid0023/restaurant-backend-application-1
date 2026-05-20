@@ -11,4 +11,6 @@ public class AssignItemRequest {
 
     @NotNull
     private Long itemId;
+
+    private Long itemCategoryId;
 }

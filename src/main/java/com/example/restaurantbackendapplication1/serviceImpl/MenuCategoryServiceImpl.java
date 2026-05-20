@@ -9,7 +9,6 @@ import com.example.restaurantbackendapplication1.dto.response.MenuCategoryRespon
 import com.example.restaurantbackendapplication1.model.dto.MenuCategoryDto;
 import com.example.restaurantbackendapplication1.model.entity.LocaleEntity;
 import com.example.restaurantbackendapplication1.model.entity.MenuCategoryEntity;
-import com.example.restaurantbackendapplication1.model.entity.MenuEntity;
 import com.example.restaurantbackendapplication1.model.enums.MenuCategorySortField;
 import com.example.restaurantbackendapplication1.model.mapper.MenuCategoryMapper;
 import com.example.restaurantbackendapplication1.model.projection.MenuCategorySummary;
@@ -41,31 +40,30 @@ public class MenuCategoryServiceImpl implements MenuCategoryService {
     @Transactional
     @Override
     public SuccessResponse create(CreateMenuCategoryRequest request,
-                                  MenuEntity menuEntity,
                                   Map<Long, LocaleEntity> localeEntityMap) {
-        MenuCategoryEntity entity = MenuCategoryMapper.fromRequest(request, menuEntity, localeEntityMap);
+        MenuCategoryEntity entity = MenuCategoryMapper.create(request, localeEntityMap);
         menuCategoryRepository.save(entity);
         log.info("MenuCategory created with id: {}", entity.getId());
         return new SuccessResponse(true, entity.getId());
     }
 
     @Override
-    public MenuCategoryEntity getEntityById(Long menuId, Long id) {
-        return menuCategoryRepository.findByMenuEntity_IdAndIdAndIsActiveAndIsDeleted(menuId, id, true, false)
+    public MenuCategoryEntity getEntityById(Long id) {
+        return menuCategoryRepository.findByIdAndIsActiveAndIsDeleted(id, true, false)
                 .orElseThrow(() -> new EntityNotFoundException("MenuCategory not found with id: " + id));
     }
 
     @Override
-    public MenuCategoryResponse getById(Long menuId, Long id) {
-        MenuCategoryEntity entity = getEntityById(menuId, id);
+    public MenuCategoryResponse getById(Long id) {
+        MenuCategoryEntity entity = getEntityById(id);
         MenuCategoryDto dto = MenuCategoryMapper.toDto(entity);
         return new MenuCategoryResponse(dto);
     }
 
     @Override
-    public PaginatedResponse<MenuCategorySummary> getAll(Long menuId, PaginatedRequest request) {
+    public PaginatedResponse<MenuCategorySummary> getAll(PaginatedRequest request) {
         Page<@NonNull MenuCategorySummary> page = menuCategoryRepository
-                .findAllByMenuEntityIdAndIsActiveAndIsDeleted(menuId, true, false, request.toPageable(ALLOWED_SORT_FIELDS));
+                .findAllByIsActiveAndIsDeleted(true, false, request.toPageable(ALLOWED_SORT_FIELDS));
         return Pagination.buildPaginatedResponse(page);
     }
 
@@ -80,8 +78,8 @@ public class MenuCategoryServiceImpl implements MenuCategoryService {
 
     @Transactional
     @Override
-    public SuccessResponse delete(Long menuId, Long id) {
-        MenuCategoryEntity entity = getEntityById(menuId, id);
+    public SuccessResponse delete(Long id) {
+        MenuCategoryEntity entity = getEntityById(id);
         entity.setIsDeleted(true);
         entity.setIsActive(false);
         menuCategoryRepository.save(entity);

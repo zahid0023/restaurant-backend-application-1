@@ -8,7 +8,9 @@ import com.example.restaurantbackendapplication1.dto.request.dishvariant.UpdateD
 import com.example.restaurantbackendapplication1.dto.response.DishVariantResponse;
 import com.example.restaurantbackendapplication1.model.entity.DishEntity;
 import com.example.restaurantbackendapplication1.model.entity.DishVariantEntity;
+import com.example.restaurantbackendapplication1.model.entity.ItemEntity;
 import com.example.restaurantbackendapplication1.model.entity.LocaleEntity;
+import com.example.restaurantbackendapplication1.model.entity.UnitEntity;
 import com.example.restaurantbackendapplication1.model.projection.DishVariantSummary;
 
 import java.util.Map;
@@ -17,7 +19,9 @@ public interface DishVariantService {
 
     SuccessResponse create(CreateDishVariantRequest request,
                            DishEntity dishEntity,
-                           Map<Long, LocaleEntity> localeEntityMap);
+                           Map<Long, LocaleEntity> localeEntityMap,
+                           Map<Long, ItemEntity> itemEntityMap,
+                           Map<Long, UnitEntity> unitEntityMap);
 
     DishVariantEntity getEntityById(Long dishId, Long id);
 

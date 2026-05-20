@@ -15,4 +15,7 @@ public class DishRecipeIngredientRequest {
     private Long itemId;
 
     private BigDecimal quantity;
+
+    @NotNull
+    private Long unitId;
 }

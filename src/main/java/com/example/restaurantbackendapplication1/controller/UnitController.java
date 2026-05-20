@@ -3,7 +3,7 @@ package com.example.restaurantbackendapplication1.controller;
 import com.example.restaurantbackendapplication1.commons.dto.request.PaginatedRequest;
 import com.example.restaurantbackendapplication1.dto.request.unit.CreateUnitRequest;
 import com.example.restaurantbackendapplication1.dto.request.unit.UpdateUnitRequest;
-import com.example.restaurantbackendapplication1.dto.request.unitlocale.UnitLocaleRequest;
+import com.example.restaurantbackendapplication1.dto.request.unitlocale.CreateUnitLocaleRequest;
 import com.example.restaurantbackendapplication1.model.entity.LocaleEntity;
 import com.example.restaurantbackendapplication1.model.entity.UnitEntity;
 import com.example.restaurantbackendapplication1.model.entity.UnitTypeEntity;
@@ -40,9 +40,8 @@ public class UnitController {
             @PathVariable("unit-type-id") Long unitTypeId,
             @Valid @RequestBody CreateUnitRequest request) {
         UnitTypeEntity unitTypeEntity = unitTypeService.getEntityById(unitTypeId);
-
         Map<Long, LocaleEntity> localeEntityMap = LocaleUtils.resolveLocaleMap(
-                request.getLocales(), UnitLocaleRequest::getLocaleId, localeService);
+                request.getLocales(), CreateUnitLocaleRequest::getLocaleId, localeService);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(unitService.create(request, unitTypeEntity, localeEntityMap));
     }
@@ -74,6 +73,7 @@ public class UnitController {
     public ResponseEntity<?> delete(
             @PathVariable("unit-type-id") Long unitTypeId,
             @PathVariable Long id) {
-        return ResponseEntity.ok(unitService.delete(unitTypeId, id));
+        UnitEntity entity = unitService.getEntityById(unitTypeId, id);
+        return ResponseEntity.ok(unitService.delete(entity));
     }
 }
