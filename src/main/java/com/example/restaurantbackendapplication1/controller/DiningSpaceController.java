@@ -3,7 +3,7 @@ package com.example.restaurantbackendapplication1.controller;
 import com.example.restaurantbackendapplication1.commons.dto.request.PaginatedRequest;
 import com.example.restaurantbackendapplication1.dto.request.diningspace.CreateDiningSpaceRequest;
 import com.example.restaurantbackendapplication1.dto.request.diningspace.UpdateDiningSpaceRequest;
-import com.example.restaurantbackendapplication1.dto.request.diningspacelocale.DiningSpaceLocaleRequest;
+import com.example.restaurantbackendapplication1.dto.request.diningspacelocale.CreateDiningSpaceLocaleRequest;
 import com.example.restaurantbackendapplication1.model.entity.DiningSpaceEntity;
 import com.example.restaurantbackendapplication1.model.entity.DiningSpaceTypeEntity;
 import com.example.restaurantbackendapplication1.model.entity.FloorEntity;
@@ -45,7 +45,7 @@ public class DiningSpaceController {
         DiningSpaceTypeEntity diningSpaceTypeEntity = diningSpaceTypeService.getEntityById(request.getDiningSpaceTypeId());
         FloorEntity floorEntity = request.getFloorId() != null ? floorService.getEntityById(request.getFloorId()) : null;
         Map<Long, LocaleEntity> localeEntityMap = LocaleUtils.resolveLocaleMap(
-                request.getLocales(), DiningSpaceLocaleRequest::getLocaleId, localeService);
+                request.getLocales(), CreateDiningSpaceLocaleRequest::getLocaleId, localeService);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(diningSpaceService.create(request, diningSpaceTypeEntity, floorEntity, localeEntityMap));
     }
@@ -65,9 +65,7 @@ public class DiningSpaceController {
             @PathVariable Long id,
             @Valid @RequestBody UpdateDiningSpaceRequest request) {
         DiningSpaceEntity entity = diningSpaceService.getEntityById(id);
-        DiningSpaceTypeEntity diningSpaceTypeEntity = diningSpaceTypeService.getEntityById(request.getDiningSpaceTypeId());
-        FloorEntity floorEntity = request.getFloorId() != null ? floorService.getEntityById(request.getFloorId()) : null;
-        return ResponseEntity.ok(diningSpaceService.update(entity, request, diningSpaceTypeEntity, floorEntity));
+        return ResponseEntity.ok(diningSpaceService.update(entity, request));
     }
 
     @DeleteMapping("/{id}")

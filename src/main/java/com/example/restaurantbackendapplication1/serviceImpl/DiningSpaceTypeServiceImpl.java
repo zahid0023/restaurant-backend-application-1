@@ -40,7 +40,7 @@ public class DiningSpaceTypeServiceImpl implements DiningSpaceTypeService {
     @Transactional
     @Override
     public SuccessResponse create(CreateDiningSpaceTypeRequest request, Map<Long, LocaleEntity> localeEntityMap) {
-        DiningSpaceTypeEntity entity = DiningSpaceTypeMapper.fromRequest(request, localeEntityMap);
+        DiningSpaceTypeEntity entity = DiningSpaceTypeMapper.create(request, localeEntityMap);
         diningSpaceTypeRepository.save(entity);
         log.info("DiningSpaceType created with id: {}", entity.getId());
         return new SuccessResponse(true, entity.getId());

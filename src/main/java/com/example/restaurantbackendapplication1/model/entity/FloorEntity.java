@@ -29,5 +29,4 @@ public class FloorEntity extends AuditableEntity {
 
     @OneToMany(mappedBy = "floorEntity", cascade = CascadeType.ALL)
     private Set<FloorLocaleEntity> floorLocaleEntities = new LinkedHashSet<>();
-
 }

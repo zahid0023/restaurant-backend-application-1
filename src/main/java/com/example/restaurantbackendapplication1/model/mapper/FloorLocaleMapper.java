@@ -1,7 +1,8 @@
 package com.example.restaurantbackendapplication1.model.mapper;
 
-import com.example.restaurantbackendapplication1.dto.request.floorlocale.FloorLocaleRequest;
-import com.example.restaurantbackendapplication1.dto.request.floorlocale.UpdateFloorLocaleRequest;
+import com.example.restaurantbackendapplication1.dto.request.floor.floorlocale.CreateFloorLocaleRequest;
+import com.example.restaurantbackendapplication1.dto.request.floor.floorlocale.FloorLocaleRequest;
+import com.example.restaurantbackendapplication1.dto.request.floor.floorlocale.UpdateFloorLocaleRequest;
 import com.example.restaurantbackendapplication1.model.dto.FloorLocaleDto;
 import com.example.restaurantbackendapplication1.model.entity.FloorEntity;
 import com.example.restaurantbackendapplication1.model.entity.FloorLocaleEntity;
@@ -11,30 +12,27 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class FloorLocaleMapper {
 
-    public static FloorLocaleEntity fromRequest(
-            FloorLocaleRequest request,
-            FloorEntity floorEntity,
-            LocaleEntity localeEntity) {
+    public FloorLocaleEntity create(CreateFloorLocaleRequest request,
+                                    FloorEntity floorEntity,
+                                    LocaleEntity localeEntity) {
         FloorLocaleEntity entity = new FloorLocaleEntity();
         entity.setFloorEntity(floorEntity);
         entity.setLocaleEntity(localeEntity);
-        entity.setName(request.getName());
-        entity.setDescription(request.getDescription() != null ? request.getDescription() : "");
-        entity.setSortOrder(request.getSortOrder());
+        applyCommonFields(entity, request);
         return entity;
     }
 
-    public static void update(
-            FloorLocaleEntity entity,
-            UpdateFloorLocaleRequest request,
-            LocaleEntity localeEntity) {
-        entity.setLocaleEntity(localeEntity);
+    public void update(FloorLocaleEntity entity, UpdateFloorLocaleRequest request) {
+        applyCommonFields(entity, request);
+    }
+
+    private void applyCommonFields(FloorLocaleEntity entity, FloorLocaleRequest request) {
         entity.setName(request.getName());
-        entity.setDescription(request.getDescription() != null ? request.getDescription() : "");
+        entity.setDescription(request.getDescription());
         entity.setSortOrder(request.getSortOrder());
     }
 
-    public static FloorLocaleDto toDto(FloorLocaleEntity entity) {
+    public FloorLocaleDto toDto(FloorLocaleEntity entity) {
         return FloorLocaleDto.builder()
                 .id(entity.getId())
                 .localeId(entity.getLocaleEntity().getId())

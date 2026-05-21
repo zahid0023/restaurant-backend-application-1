@@ -5,7 +5,7 @@ import com.example.restaurantbackendapplication1.commons.dto.response.PaginatedR
 import com.example.restaurantbackendapplication1.commons.dto.response.SuccessResponse;
 import com.example.restaurantbackendapplication1.dto.request.floor.CreateFloorRequest;
 import com.example.restaurantbackendapplication1.dto.request.floor.UpdateFloorRequest;
-import com.example.restaurantbackendapplication1.dto.response.FloorResponse;
+import com.example.restaurantbackendapplication1.dto.response.floors.FloorResponse;
 import com.example.restaurantbackendapplication1.model.entity.FloorEntity;
 import com.example.restaurantbackendapplication1.model.entity.LocaleEntity;
 import com.example.restaurantbackendapplication1.model.projection.FloorSummary;

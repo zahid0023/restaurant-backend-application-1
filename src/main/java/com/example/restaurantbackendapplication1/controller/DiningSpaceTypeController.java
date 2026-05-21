@@ -3,7 +3,7 @@ package com.example.restaurantbackendapplication1.controller;
 import com.example.restaurantbackendapplication1.commons.dto.request.PaginatedRequest;
 import com.example.restaurantbackendapplication1.dto.request.diningspacetype.CreateDiningSpaceTypeRequest;
 import com.example.restaurantbackendapplication1.dto.request.diningspacetype.UpdateDiningSpaceTypeRequest;
-import com.example.restaurantbackendapplication1.dto.request.diningspacetypelocale.DiningSpaceTypeLocaleRequest;
+import com.example.restaurantbackendapplication1.dto.request.diningspacetypelocale.CreateDiningSpaceTypeLocaleRequest;
 import com.example.restaurantbackendapplication1.model.entity.DiningSpaceTypeEntity;
 import com.example.restaurantbackendapplication1.model.entity.LocaleEntity;
 import com.example.restaurantbackendapplication1.service.DiningSpaceTypeService;
@@ -33,7 +33,7 @@ public class DiningSpaceTypeController {
     @PostMapping
     public ResponseEntity<?> create(@Valid @RequestBody CreateDiningSpaceTypeRequest request) {
         Map<Long, LocaleEntity> localeEntityMap = LocaleUtils.resolveLocaleMap(
-                request.getLocales(), DiningSpaceTypeLocaleRequest::getLocaleId, localeService);
+                request.getLocales(), CreateDiningSpaceTypeLocaleRequest::getLocaleId, localeService);
         return ResponseEntity.status(HttpStatus.CREATED).body(diningSpaceTypeService.create(request, localeEntityMap));
     }
 

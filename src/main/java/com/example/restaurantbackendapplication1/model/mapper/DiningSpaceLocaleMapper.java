@@ -1,6 +1,6 @@
 package com.example.restaurantbackendapplication1.model.mapper;
 
-import com.example.restaurantbackendapplication1.dto.request.diningspacelocale.DiningSpaceLocaleRequest;
+import com.example.restaurantbackendapplication1.dto.request.diningspacelocale.CreateDiningSpaceLocaleRequest;
 import com.example.restaurantbackendapplication1.dto.request.diningspacelocale.UpdateDiningSpaceLocaleRequest;
 import com.example.restaurantbackendapplication1.model.dto.DiningSpaceLocaleDto;
 import com.example.restaurantbackendapplication1.model.entity.DiningSpaceEntity;
@@ -11,8 +11,8 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class DiningSpaceLocaleMapper {
 
-    public static DiningSpaceLocaleEntity fromRequest(
-            DiningSpaceLocaleRequest request,
+    public static DiningSpaceLocaleEntity create(
+            CreateDiningSpaceLocaleRequest request,
             DiningSpaceEntity diningSpaceEntity,
             LocaleEntity localeEntity) {
         DiningSpaceLocaleEntity entity = new DiningSpaceLocaleEntity();
@@ -24,11 +24,7 @@ public class DiningSpaceLocaleMapper {
         return entity;
     }
 
-    public static void update(
-            DiningSpaceLocaleEntity entity,
-            UpdateDiningSpaceLocaleRequest request,
-            LocaleEntity locale) {
-        entity.setLocaleEntity(locale);
+    public static void update(DiningSpaceLocaleEntity entity, UpdateDiningSpaceLocaleRequest request) {
         entity.setName(request.getName());
         entity.setDescription(request.getDescription() != null ? request.getDescription() : "");
         entity.setSortOrder(request.getSortOrder());

@@ -27,9 +27,7 @@ public interface DiningSpaceService {
     PaginatedResponse<DiningSpaceSummary> getAll(PaginatedRequest request);
 
     SuccessResponse update(DiningSpaceEntity entity,
-                           UpdateDiningSpaceRequest request,
-                           DiningSpaceTypeEntity diningSpaceTypeEntity,
-                           FloorEntity floorEntity);
+                           UpdateDiningSpaceRequest request);
 
     SuccessResponse delete(Long id);
 }

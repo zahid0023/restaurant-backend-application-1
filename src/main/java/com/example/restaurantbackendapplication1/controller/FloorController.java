@@ -3,7 +3,7 @@ package com.example.restaurantbackendapplication1.controller;
 import com.example.restaurantbackendapplication1.commons.dto.request.PaginatedRequest;
 import com.example.restaurantbackendapplication1.dto.request.floor.CreateFloorRequest;
 import com.example.restaurantbackendapplication1.dto.request.floor.UpdateFloorRequest;
-import com.example.restaurantbackendapplication1.dto.request.floorlocale.FloorLocaleRequest;
+import com.example.restaurantbackendapplication1.dto.request.floor.floorlocale.CreateFloorLocaleRequest;
 import com.example.restaurantbackendapplication1.model.entity.FloorEntity;
 import com.example.restaurantbackendapplication1.model.entity.LocaleEntity;
 import com.example.restaurantbackendapplication1.service.FloorService;
@@ -32,7 +32,7 @@ public class FloorController {
     @PostMapping
     public ResponseEntity<?> create(@Valid @RequestBody CreateFloorRequest request) {
         Map<Long, LocaleEntity> localeEntityMap = LocaleUtils.resolveLocaleMap(
-                request.getLocales(), FloorLocaleRequest::getLocaleId, localeService);
+                request.getLocales(), CreateFloorLocaleRequest::getLocaleId, localeService);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(floorService.create(request, localeEntityMap));
     }

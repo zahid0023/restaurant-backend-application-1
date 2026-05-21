@@ -1,6 +1,27 @@
-# Dining Space Type API Documentation
+# Dining Space Types API
 
-Base URL: `/api/v1`
+Base URL: `/api/v1/dining-space-types`
+
+Dining space types categorize the seating environment of a restaurant (e.g., Indoor, Outdoor, Terrace, VIP). Names and descriptions are locale-specific and are embedded in every response via the `locales` array. All records support soft-delete — deleted records are hidden from all responses.
+
+---
+
+## Endpoints
+
+| Method | Path                                                          | Description                       |
+|--------|---------------------------------------------------------------|-----------------------------------|
+| POST   | `/api/v1/dining-space-types`                                  | Create a dining space type        |
+| GET    | `/api/v1/dining-space-types`                                  | List all dining space types       |
+| GET    | `/api/v1/dining-space-types/{id}`                             | Get a dining space type           |
+| PUT    | `/api/v1/dining-space-types/{id}`                             | Update a dining space type        |
+| DELETE | `/api/v1/dining-space-types/{id}`                             | Delete a dining space type        |
+| POST   | `/api/v1/dining-space-types/{dining-space-type-id}/locales`   | Create a dining space type locale |
+| PUT    | `/api/v1/dining-space-types/{dining-space-type-id}/locales/{id}` | Update a dining space type locale |
+| DELETE | `/api/v1/dining-space-types/{dining-space-type-id}/locales/{id}` | Delete a dining space type locale |
+
+---
+
+## Authentication
 
 All endpoints require a valid JWT bearer token.
 
@@ -10,15 +31,36 @@ Authorization: Bearer <token>
 
 ---
 
-## Dining Space Types
+## Data Model
 
-### Create Dining Space Type
+### Dining Space Type
 
-Creates a new dining space type with optional embedded locale translations.
+| Field        | Type    | Required | Constraints            | Description                                              |
+|--------------|---------|----------|------------------------|----------------------------------------------------------|
+| `id`         | Long    | —        | read-only              | Auto-generated identifier                                |
+| `code`       | String  | Yes      | max 50 chars, unique   | Short identifier set at creation (e.g., `INDOOR`, `VIP`) |
+| `sort_order` | Integer | Yes      | not null, default `0`  | Display order                                            |
+| `locales`    | Array   | —        | read-only              | All locale translations for this dining space type       |
 
-**`POST /api/v1/dining-space-types`**
+### Dining Space Type Locale
 
-#### Request Body
+| Field         | Type    | Required | Constraints    | Description                             |
+|---------------|---------|----------|----------------|-----------------------------------------|
+| `id`          | Long    | —        | read-only      | Auto-generated identifier               |
+| `locale_id`   | Long    | Yes      | must exist     | ID of an existing active locale         |
+| `name`        | String  | Yes      | max 255 chars  | Localized name of the dining space type |
+| `description` | String  | No       | unlimited      | Localized description                   |
+| `sort_order`  | Integer | Yes      | not null       | Display order for this locale entry     |
+
+---
+
+## Create Dining Space Type
+
+`POST /api/v1/dining-space-types`
+
+Creates a dining space type along with its locale-specific translations in one request. All provided `locale_id` values must reference existing, active locales.
+
+### Request Body
 
 ```json
 {
@@ -28,30 +70,37 @@ Creates a new dining space type with optional embedded locale translations.
     {
       "locale_id": 1,
       "name": "Indoor",
-      "description": "Indoor seating area",
+      "description": "Enclosed dining area inside the restaurant.",
       "sort_order": 1
     },
     {
       "locale_id": 2,
-      "name": "İç Mekan",
-      "description": "İç mekan oturma alanı",
-      "sort_order": 1
+      "name": "ইনডোর",
+      "description": "রেস্তোরাঁর ভেতরে আবদ্ধ খাবার এলাকা।",
+      "sort_order": 2
     }
   ]
 }
 ```
 
-| Field | Type | Required | Constraints |
-|---|---|---|---|
-| `code` | string | yes | max 50 chars |
-| `sort_order` | integer | yes | |
-| `locales` | array | no | see locale fields below |
-| `locales[].locale_id` | long | yes | must be an existing active locale |
-| `locales[].name` | string | yes | max 255 chars |
-| `locales[].description` | string | no | defaults to `""` |
-| `locales[].sort_order` | integer | yes | |
+### Request Fields
 
-#### Response `201 Created`
+| Field        | Type    | Required | Validation              |
+|--------------|---------|----------|-------------------------|
+| `code`       | String  | Yes      | Not blank, max 50 chars |
+| `sort_order` | Integer | Yes      | Not null                |
+| `locales`    | Array   | No       | See locale fields below |
+
+**Locale fields (`locales[]`):**
+
+| Field         | Type    | Required | Validation               |
+|---------------|---------|----------|--------------------------|
+| `locale_id`   | Long    | Yes      | Not null, must exist     |
+| `name`        | String  | Yes      | Not blank, max 255 chars |
+| `description` | String  | No       | —                        |
+| `sort_order`  | Integer | Yes      | Not null                 |
+
+### Response `201 Created`
 
 ```json
 {
@@ -62,46 +111,64 @@ Creates a new dining space type with optional embedded locale translations.
 
 ---
 
-### Get Dining Space Type by ID
+## Get Dining Space Type
 
-**`GET /api/v1/dining-space-types/{id}`**
+`GET /api/v1/dining-space-types/{id}`
 
-#### Path Parameters
+Returns a single dining space type with all its locale translations.
 
-| Parameter | Type | Description |
-|---|---|---|
-| `id` | long | Dining space type ID |
+### Path Parameters
 
-#### Response `200 OK`
+| Parameter | Type | Description                  |
+|-----------|------|------------------------------|
+| `id`      | Long | ID of the dining space type  |
+
+### Response `200 OK`
 
 ```json
 {
   "dining_space_type": {
     "id": 1,
     "code": "INDOOR",
-    "sort_order": 1
+    "sort_order": 1,
+    "locales": [
+      {
+        "id": 1,
+        "locale_id": 1,
+        "name": "Indoor",
+        "description": "Enclosed dining area inside the restaurant.",
+        "sort_order": 1
+      },
+      {
+        "id": 2,
+        "locale_id": 2,
+        "name": "ইনডোর",
+        "description": "রেস্তোরাঁর ভেতরে আবদ্ধ খাবার এলাকা।",
+        "sort_order": 2
+      }
+    ]
   }
 }
 ```
 
 ---
 
-### List Dining Space Types
+## List All Dining Space Types
 
-Returns a paginated list of all active dining space types.
+`GET /api/v1/dining-space-types`
 
-**`GET /api/v1/dining-space-types`**
+Returns a paginated list of active (non-deleted) dining space types. Each item includes all locale translations.
 
-#### Query Parameters
+### Query Parameters
 
-| Parameter | Type | Default | Constraints | Description |
-|---|---|---|---|---|
-| `page` | integer | `0` | min 0 | Page index (zero-based) |
-| `size` | integer | `10` | 1–50 | Items per page |
-| `sort_by` | string | `id` | `id`, `code`, `sortOrder`, `createdAt` | Field to sort by |
-| `sort_dir` | string | `ASC` | `ASC`, `DESC` | Sort direction |
+| Parameter  | Type   | Default | Constraints                            | Description              |
+|------------|--------|---------|----------------------------------------|--------------------------|
+| `page`     | int    | `0`     | >= 0                                   | Zero-based page index    |
+| `size`     | int    | `10`    | 1 – 50                                 | Number of items per page |
+| `sort_by`  | String | `id`    | `id`, `code`, `sortOrder`, `createdAt` | Field to sort by         |
+| `sort_dir` | String | `ASC`   | `ASC`, `DESC`                          | Sort direction           |
 
-#### Response `200 OK`
+### Response `200 OK`
 
 ```json
 {
@@ -109,12 +176,37 @@ Returns a paginated list of all active dining space types.
     {
       "id": 1,
       "code": "INDOOR",
-      "sort_order": 1
+      "sort_order": 1,
+      "locales": [
+        {
+          "id": 1,
+          "locale_id": 1,
+          "name": "Indoor",
+          "description": "Enclosed dining area inside the restaurant.",
+          "sort_order": 1
+        },
+        {
+          "id": 2,
+          "locale_id": 2,
+          "name": "ইনডোর",
+          "description": "রেস্তোরাঁর ভেতরে আবদ্ধ খাবার এলাকা।",
+          "sort_order": 2
+        }
+      ]
     },
     {
       "id": 2,
       "code": "OUTDOOR",
-      "sort_order": 2
+      "sort_order": 2,
+      "locales": [
+        {
+          "id": 3,
+          "locale_id": 1,
+          "name": "Outdoor",
+          "description": "Open-air dining area outside the restaurant.",
+          "sort_order": 1
+        }
+      ]
     }
   ],
   "current_page": 0,
@@ -128,33 +220,33 @@ Returns a paginated list of all active dining space types.
 
 ---
 
-### Update Dining Space Type
+## Update Dining Space Type
 
-Updates the fields of an existing dining space type. Locale translations are managed separately via the Dining Space Type Locales API.
+`PUT /api/v1/dining-space-types/{id}`
 
-**`PUT /api/v1/dining-space-types/{id}`**
+Updates `sort_order`. The `code` field is set at creation time and cannot be changed. Locale translations are managed via the dining space type locale endpoints.
 
-#### Path Parameters
+### Path Parameters
 
-| Parameter | Type | Description |
-|---|---|---|
-| `id` | long | Dining space type ID |
+| Parameter | Type | Description                  |
+|-----------|------|------------------------------|
+| `id`      | Long | ID of the dining space type  |
 
-#### Request Body
+### Request Body
 
 ```json
 {
-  "code": "INDOOR",
   "sort_order": 2
 }
 ```
 
-| Field | Type | Required | Constraints |
-|---|---|---|---|
-| `code` | string | yes | max 50 chars |
-| `sort_order` | integer | yes | |
+### Request Fields
 
-#### Response `200 OK`
+| Field        | Type    | Required | Validation |
+|--------------|---------|----------|------------|
+| `sort_order` | Integer | Yes      | Not null   |
+
+### Response `200 OK`
 
 ```json
 {
@@ -165,19 +257,19 @@ Updates the fields of an existing dining space type. Locale translations are man
 
 ---
 
-### Delete Dining Space Type
+## Delete Dining Space Type
 
-Soft-deletes a dining space type (sets `is_active = false`, `is_deleted = true`).
+`DELETE /api/v1/dining-space-types/{id}`
 
-**`DELETE /api/v1/dining-space-types/{id}`**
+Soft-deletes the dining space type. The record is not removed from the database but will no longer appear in any response.
 
-#### Path Parameters
+### Path Parameters
 
-| Parameter | Type | Description |
-|---|---|---|
-| `id` | long | Dining space type ID |
+| Parameter | Type | Description                  |
+|-----------|------|------------------------------|
+| `id`      | Long | ID of the dining space type  |
 
-#### Response `200 OK`
+### Response `200 OK`
 
 ```json
 {
@@ -190,19 +282,21 @@ Soft-deletes a dining space type (sets `is_active = false`, `is_deleted = true`)
 
 ## Dining Space Type Locales
 
-Manage locale-specific translations for a dining space type. The `{dining-space-type-id}` in all paths must refer to an existing active dining space type.
+Dining space type locale endpoints manage per-locale translations. The `{dining-space-type-id}` path parameter must reference an existing, active dining space type.
 
 ---
 
 ### Create Dining Space Type Locale
 
-**`POST /api/v1/dining-space-types/{dining-space-type-id}/locales`**
+`POST /api/v1/dining-space-types/{dining-space-type-id}/locales`
+
+Adds a new locale translation to an existing dining space type.
 
 #### Path Parameters
 
-| Parameter | Type | Description |
-|---|---|---|
-| `dining-space-type-id` | long | Dining space type ID |
+| Parameter              | Type | Description                  |
+|------------------------|------|------------------------------|
+| `dining-space-type-id` | Long | ID of the dining space type  |
 
 #### Request Body
 
@@ -210,143 +304,68 @@ Manage locale-specific translations for a dining space type. The `{dining-space-
 {
   "locale_id": 1,
   "name": "Indoor",
-  "description": "Indoor seating area",
+  "description": "Enclosed dining area inside the restaurant.",
   "sort_order": 1
 }
 ```
 
-| Field | Type | Required | Constraints |
-|---|---|---|---|
-| `locale_id` | long | yes | must be an existing active locale |
-| `name` | string | yes | max 255 chars |
-| `description` | string | no | defaults to `""` |
-| `sort_order` | integer | yes | |
+#### Request Fields
+
+| Field         | Type    | Required | Validation               |
+|---------------|---------|----------|--------------------------|
+| `locale_id`   | Long    | Yes      | Not null, must exist     |
+| `name`        | String  | Yes      | Not blank, max 255 chars |
+| `description` | String  | No       | —                        |
+| `sort_order`  | Integer | Yes      | Not null                 |
 
 #### Response `201 Created`
 
 ```json
 {
   "success": true,
-  "id": 1
+  "id": 3
 }
 ```
-
----
-
-### Get Dining Space Type Locale by ID
-
-**`GET /api/v1/dining-space-types/{dining-space-type-id}/locales/{id}`**
-
-#### Path Parameters
-
-| Parameter | Type | Description |
-|---|---|---|
-| `dining-space-type-id` | long | Dining space type ID |
-| `id` | long | Dining space type locale ID |
-
-#### Response `200 OK`
-
-```json
-{
-  "dining_space_type_locale": {
-    "id": 1,
-    "locale_id": 1,
-    "name": "Indoor",
-    "description": "Indoor seating area",
-    "sort_order": 1
-  }
-}
-```
-
----
-
-### List Dining Space Type Locales
-
-Returns a paginated list of all active locales for a given dining space type.
-
-**`GET /api/v1/dining-space-types/{dining-space-type-id}/locales`**
-
-#### Path Parameters
-
-| Parameter | Type | Description |
-|---|---|---|
-| `dining-space-type-id` | long | Dining space type ID |
-
-#### Query Parameters
-
-| Parameter | Type | Default | Constraints | Description |
-|---|---|---|---|---|
-| `page` | integer | `0` | min 0 | Page index (zero-based) |
-| `size` | integer | `10` | 1–50 | Items per page |
-| `sort_by` | string | `id` | `id`, `name`, `sortOrder`, `createdAt` | Field to sort by |
-| `sort_dir` | string | `ASC` | `ASC`, `DESC` | Sort direction |
-
-#### Response `200 OK`
-
-```json
-{
-  "data": [
-    {
-      "id": 1,
-      "locale_id": 1,
-      "name": "Indoor",
-      "sort_order": 1
-    },
-    {
-      "id": 2,
-      "locale_id": 2,
-      "name": "İç Mekan",
-      "sort_order": 1
-    }
-  ],
-  "current_page": 0,
-  "total_pages": 1,
-  "total_elements": 2,
-  "page_size": 10,
-  "has_next": false,
-  "has_previous": false
-}
-```
-
-> Note: The list response returns a summary shape (`id`, `locale_id`, `name`, `sort_order`). Use the Get by ID endpoint to retrieve `description`.
 
 ---
 
 ### Update Dining Space Type Locale
 
-**`PUT /api/v1/dining-space-types/{dining-space-type-id}/locales/{id}`**
+`PUT /api/v1/dining-space-types/{dining-space-type-id}/locales/{id}`
+
+Updates the name, description, and sort order of an existing locale translation. The locale language cannot be changed — delete and recreate to change the locale.
 
 #### Path Parameters
 
-| Parameter | Type | Description |
-|---|---|---|
-| `dining-space-type-id` | long | Dining space type ID |
-| `id` | long | Dining space type locale ID |
+| Parameter              | Type | Description                          |
+|------------------------|------|--------------------------------------|
+| `dining-space-type-id` | Long | ID of the dining space type          |
+| `id`                   | Long | ID of the dining space type locale   |
 
 #### Request Body
 
 ```json
 {
-  "locale_id": 1,
   "name": "Indoor",
-  "description": "Indoor seating area - updated",
+  "description": "Updated description.",
   "sort_order": 1
 }
 ```
 
-| Field | Type | Required | Constraints |
-|---|---|---|---|
-| `locale_id` | long | yes | must be an existing active locale |
-| `name` | string | yes | max 255 chars |
-| `description` | string | no | defaults to `""` |
-| `sort_order` | integer | yes | |
+#### Request Fields
+
+| Field         | Type    | Required | Validation               |
+|---------------|---------|----------|--------------------------|
+| `name`        | String  | Yes      | Not blank, max 255 chars |
+| `description` | String  | No       | —                        |
+| `sort_order`  | Integer | Yes      | Not null                 |
 
 #### Response `200 OK`
 
 ```json
 {
   "success": true,
-  "id": 1
+  "id": 3
 }
 ```
 
@@ -354,23 +373,23 @@ Returns a paginated list of all active locales for a given dining space type.
 
 ### Delete Dining Space Type Locale
 
-Soft-deletes a locale translation.
+`DELETE /api/v1/dining-space-types/{dining-space-type-id}/locales/{id}`
 
-**`DELETE /api/v1/dining-space-types/{dining-space-type-id}/locales/{id}`**
+Soft-deletes a dining space type locale. The record is not removed from the database but will no longer appear in any response.
 
 #### Path Parameters
 
-| Parameter | Type | Description |
-|---|---|---|
-| `dining-space-type-id` | long | Dining space type ID |
-| `id` | long | Dining space type locale ID |
+| Parameter              | Type | Description                          |
+|------------------------|------|--------------------------------------|
+| `dining-space-type-id` | Long | ID of the dining space type          |
+| `id`                   | Long | ID of the dining space type locale   |
 
 #### Response `200 OK`
 
 ```json
 {
   "success": true,
-  "id": 1
+  "id": 3
 }
 ```
 
@@ -378,36 +397,21 @@ Soft-deletes a locale translation.
 
 ## Error Responses
 
-### 404 Not Found
-
-Returned when the requested resource does not exist or has been soft-deleted.
+All errors follow a common structure:
 
 ```json
 {
+  "request_id": "abc-123",
   "status": 404,
+  "error": "ENTITY_NOT_FOUND",
   "message": "DiningSpaceType not found with id: 99"
 }
 ```
 
-### 400 Bad Request
-
-Returned when request validation fails.
-
-```json
-{
-  "status": 400,
-  "message": "Validation failed",
-  "errors": {
-    "code": "must not be blank",
-    "sort_order": "must not be null"
-  }
-}
-```
-
-### 401 Unauthorized
-
-Returned when the JWT token is missing or invalid.
-
-### 403 Forbidden
-
-Returned when the authenticated user lacks permission.
+| HTTP Status | Error Code                 | Cause                                                                         |
+|-------------|----------------------------|-------------------------------------------------------------------------------|
+| 400         | `INVALID_ARGUMENT`         | Missing required fields or invalid sort field                                 |
+| 401         | `UNAUTHORIZED`             | JWT token is missing or invalid                                               |
+| 403         | `FORBIDDEN`                | Authenticated user lacks permission                                           |
+| 404         | `ENTITY_NOT_FOUND`         | Dining space type or locale not found, or already deleted                     |
+| 409         | `DATA_INTEGRITY_VIOLATION` | Constraint violation (e.g. duplicate code)                                    |

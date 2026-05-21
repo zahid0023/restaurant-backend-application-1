@@ -1,6 +1,27 @@
-# Floor API Documentation
+# Floors API
 
-Base URL: `/api/v1`
+Base URL: `/api/v1/floors`
+
+Floors represent physical levels or sections of a restaurant (e.g., Ground Floor, Rooftop, VIP Lounge). Floor names and descriptions are locale-specific and are embedded in every response via the `locales` array. All records support soft-delete — deleted records are hidden from all responses.
+
+---
+
+## Endpoints
+
+| Method | Path                                        | Description              |
+|--------|---------------------------------------------|--------------------------|
+| POST   | `/api/v1/floors`                            | Create a floor           |
+| GET    | `/api/v1/floors`                            | List all floors          |
+| GET    | `/api/v1/floors/{id}`                       | Get a floor              |
+| PUT    | `/api/v1/floors/{id}`                       | Update a floor           |
+| DELETE | `/api/v1/floors/{id}`                       | Delete a floor           |
+| POST   | `/api/v1/floors/{floor-id}/locales`         | Create a floor locale    |
+| PUT    | `/api/v1/floors/{floor-id}/locales/{id}`    | Update a floor locale    |
+| DELETE | `/api/v1/floors/{floor-id}/locales/{id}`    | Delete a floor locale    |
+
+---
+
+## Authentication
 
 All endpoints require a valid JWT bearer token.
 
@@ -10,48 +31,76 @@ Authorization: Bearer <token>
 
 ---
 
-## Floors
+## Data Model
 
-### Create Floor
+### Floor
 
-Creates a new floor with optional embedded locale translations.
+| Field        | Type    | Required | Constraints            | Description                                    |
+|--------------|---------|----------|------------------------|------------------------------------------------|
+| `id`         | Long    | —        | read-only              | Auto-generated identifier                      |
+| `code`       | String  | Yes      | max 50 chars, unique   | Short identifier set at creation (e.g., `GF`, `FF`, `VIP`) |
+| `sort_order` | Integer | Yes      | not null, default `0`  | Display order                                  |
+| `locales`    | Array   | —        | read-only              | All locale translations for this floor         |
 
-**`POST /api/v1/floors`**
+### Floor Locale
 
-#### Request Body
+| Field         | Type    | Required | Constraints            | Description                              |
+|---------------|---------|----------|------------------------|------------------------------------------|
+| `id`          | Long    | —        | read-only              | Auto-generated identifier                |
+| `locale_id`   | Long    | Yes      | must exist             | ID of an existing active locale          |
+| `name`        | String  | Yes      | max 255 chars          | Localized name of the floor              |
+| `description` | String  | No       | unlimited              | Localized description                    |
+| `sort_order`  | Integer | Yes      | not null               | Display order for this locale entry      |
+
+---
+
+## Create Floor
+
+`POST /api/v1/floors`
+
+Creates a floor along with its locale-specific translations in one request. All provided `locale_id` values must reference existing, active locales.
+
+### Request Body
 
 ```json
 {
-  "code": "FLOOR_1",
+  "code": "GF",
   "sort_order": 1,
   "locales": [
     {
       "locale_id": 1,
-      "name": "First Floor",
-      "description": "Main dining area",
+      "name": "Ground Floor",
+      "description": "Main dining area on the ground level.",
       "sort_order": 1
     },
     {
       "locale_id": 2,
-      "name": "Birinci Kat",
-      "description": "Ana yemek alanı",
-      "sort_order": 1
+      "name": "গ্রাউন্ড ফ্লোর",
+      "description": "মূল খাবার এলাকা।",
+      "sort_order": 2
     }
   ]
 }
 ```
 
-| Field | Type | Required | Constraints |
-|---|---|---|---|
-| `code` | string | yes | max 50 chars |
-| `sort_order` | integer | yes | |
-| `locales` | array | no | see locale fields below |
-| `locales[].locale_id` | long | yes | must be an existing active locale |
-| `locales[].name` | string | yes | max 255 chars |
-| `locales[].description` | string | no | defaults to `""` |
-| `locales[].sort_order` | integer | yes | |
+### Request Fields
 
-#### Response `201 Created`
+| Field        | Type    | Required | Validation              |
+|--------------|---------|----------|-------------------------|
+| `code`       | String  | Yes      | Not blank, max 50 chars |
+| `sort_order` | Integer | Yes      | Not null                |
+| `locales`    | Array   | No       | See locale fields below |
+
+**Locale fields (`locales[]`):**
+
+| Field         | Type    | Required | Validation               |
+|---------------|---------|----------|--------------------------|
+| `locale_id`   | Long    | Yes      | Not null, must exist     |
+| `name`        | String  | Yes      | Not blank, max 255 chars |
+| `description` | String  | No       | —                        |
+| `sort_order`  | Integer | Yes      | Not null                 |
+
+### Response `201 Created`
 
 ```json
 {
@@ -62,59 +111,102 @@ Creates a new floor with optional embedded locale translations.
 
 ---
 
-### Get Floor by ID
+## Get Floor
 
-**`GET /api/v1/floors/{id}`**
+`GET /api/v1/floors/{id}`
 
-#### Path Parameters
+Returns a single floor with all its locale translations.
 
-| Parameter | Type | Description |
-|---|---|---|
-| `id` | long | Floor ID |
+### Path Parameters
 
-#### Response `200 OK`
+| Parameter | Type | Description      |
+|-----------|------|------------------|
+| `id`      | Long | ID of the floor  |
+
+### Response `200 OK`
 
 ```json
 {
   "floor": {
     "id": 1,
-    "code": "FLOOR_1",
-    "sort_order": 1
+    "code": "GF",
+    "sort_order": 1,
+    "locales": [
+      {
+        "id": 1,
+        "locale_id": 1,
+        "name": "Ground Floor",
+        "description": "Main dining area on the ground level.",
+        "sort_order": 1
+      },
+      {
+        "id": 2,
+        "locale_id": 2,
+        "name": "গ্রাউন্ড ফ্লোর",
+        "description": "মূল খাবার এলাকা।",
+        "sort_order": 2
+      }
+    ]
   }
 }
 ```
 
 ---
 
-### List Floors
+## List All Floors
 
-Returns a paginated list of all active floors.
+`GET /api/v1/floors`
 
-**`GET /api/v1/floors`**
+Returns a paginated list of active (non-deleted) floors. Each item includes all locale translations.
 
-#### Query Parameters
+### Query Parameters
 
-| Parameter | Type | Default | Constraints | Description |
-|---|---|---|---|---|
-| `page` | integer | `0` | min 0 | Page index (zero-based) |
-| `size` | integer | `10` | 1–50 | Items per page |
-| `sort_by` | string | `id` | `id`, `code`, `sortOrder`, `createdAt` | Field to sort by |
-| `sort_dir` | string | `ASC` | `ASC`, `DESC` | Sort direction |
+| Parameter  | Type   | Default | Constraints                            | Description              |
+|------------|--------|---------|----------------------------------------|--------------------------|
+| `page`     | int    | `0`     | >= 0                                   | Zero-based page index    |
+| `size`     | int    | `10`    | 1 – 50                                 | Number of items per page |
+| `sort_by`  | String | `id`    | `id`, `code`, `sortOrder`, `createdAt` | Field to sort by         |
+| `sort_dir` | String | `ASC`   | `ASC`, `DESC`                          | Sort direction           |
 
-#### Response `200 OK`
+### Response `200 OK`
 
 ```json
 {
   "data": [
     {
       "id": 1,
-      "code": "FLOOR_1",
-      "sort_order": 1
+      "code": "GF",
+      "sort_order": 1,
+      "locales": [
+        {
+          "id": 1,
+          "locale_id": 1,
+          "name": "Ground Floor",
+          "description": "Main dining area on the ground level.",
+          "sort_order": 1
+        },
+        {
+          "id": 2,
+          "locale_id": 2,
+          "name": "গ্রাউন্ড ফ্লোর",
+          "description": "মূল খাবার এলাকা।",
+          "sort_order": 2
+        }
+      ]
     },
     {
       "id": 2,
-      "code": "FLOOR_2",
-      "sort_order": 2
+      "code": "FF",
+      "sort_order": 2,
+      "locales": [
+        {
+          "id": 3,
+          "locale_id": 1,
+          "name": "First Floor",
+          "description": "Dining area on the first level.",
+          "sort_order": 1
+        }
+      ]
     }
   ],
   "current_page": 0,
@@ -128,33 +220,33 @@ Returns a paginated list of all active floors.
 
 ---
 
-### Update Floor
+## Update Floor
 
-Updates the fields of an existing floor. Locale translations are managed separately via the Floor Locales API.
+`PUT /api/v1/floors/{id}`
 
-**`PUT /api/v1/floors/{id}`**
+Updates `sort_order`. The `code` field is set at creation time and cannot be changed. Locale translations are managed via the floor locale endpoints.
 
-#### Path Parameters
+### Path Parameters
 
-| Parameter | Type | Description |
-|---|---|---|
-| `id` | long | Floor ID |
+| Parameter | Type | Description      |
+|-----------|------|------------------|
+| `id`      | Long | ID of the floor  |
 
-#### Request Body
+### Request Body
 
 ```json
 {
-  "code": "FLOOR_1",
   "sort_order": 2
 }
 ```
 
-| Field | Type | Required | Constraints |
-|---|---|---|---|
-| `code` | string | yes | max 50 chars |
-| `sort_order` | integer | yes | |
+### Request Fields
 
-#### Response `200 OK`
+| Field        | Type    | Required | Validation |
+|--------------|---------|----------|------------|
+| `sort_order` | Integer | Yes      | Not null   |
+
+### Response `200 OK`
 
 ```json
 {
@@ -165,19 +257,19 @@ Updates the fields of an existing floor. Locale translations are managed separat
 
 ---
 
-### Delete Floor
+## Delete Floor
 
-Soft-deletes a floor (sets `is_active = false`, `is_deleted = true`).
+`DELETE /api/v1/floors/{id}`
 
-**`DELETE /api/v1/floors/{id}`**
+Soft-deletes the floor. The record is not removed from the database but will no longer appear in any response.
 
-#### Path Parameters
+### Path Parameters
 
-| Parameter | Type | Description |
-|---|---|---|
-| `id` | long | Floor ID |
+| Parameter | Type | Description      |
+|-----------|------|------------------|
+| `id`      | Long | ID of the floor  |
 
-#### Response `200 OK`
+### Response `200 OK`
 
 ```json
 {
@@ -190,163 +282,90 @@ Soft-deletes a floor (sets `is_active = false`, `is_deleted = true`).
 
 ## Floor Locales
 
-Manage locale-specific translations for a floor. The `{floor-id}` in all paths must refer to an existing active floor.
+Floor locale endpoints manage per-locale translations for a floor. The `{floor-id}` path parameter must reference an existing, active floor.
 
 ---
 
 ### Create Floor Locale
 
-**`POST /api/v1/floors/{floor-id}/locales`**
+`POST /api/v1/floors/{floor-id}/locales`
+
+Adds a new locale translation to an existing floor.
 
 #### Path Parameters
 
-| Parameter | Type | Description |
-|---|---|---|
-| `floor-id` | long | Floor ID |
+| Parameter  | Type | Description      |
+|------------|------|------------------|
+| `floor-id` | Long | ID of the floor  |
 
 #### Request Body
 
 ```json
 {
   "locale_id": 1,
-  "name": "First Floor",
-  "description": "Main dining area",
+  "name": "Ground Floor",
+  "description": "Main dining area on the ground level.",
   "sort_order": 1
 }
 ```
 
-| Field | Type | Required | Constraints |
-|---|---|---|---|
-| `locale_id` | long | yes | must be an existing active locale |
-| `name` | string | yes | max 255 chars |
-| `description` | string | no | defaults to `""` |
-| `sort_order` | integer | yes | |
+#### Request Fields
+
+| Field         | Type    | Required | Validation               |
+|---------------|---------|----------|--------------------------|
+| `locale_id`   | Long    | Yes      | Not null, must exist     |
+| `name`        | String  | Yes      | Not blank, max 255 chars |
+| `description` | String  | No       | —                        |
+| `sort_order`  | Integer | Yes      | Not null                 |
 
 #### Response `201 Created`
 
 ```json
 {
   "success": true,
-  "id": 1
+  "id": 3
 }
 ```
-
----
-
-### Get Floor Locale by ID
-
-**`GET /api/v1/floors/{floor-id}/locales/{id}`**
-
-#### Path Parameters
-
-| Parameter | Type | Description |
-|---|---|---|
-| `floor-id` | long | Floor ID |
-| `id` | long | Floor locale ID |
-
-#### Response `200 OK`
-
-```json
-{
-  "floor_locale": {
-    "id": 1,
-    "locale_id": 1,
-    "name": "First Floor",
-    "description": "Main dining area",
-    "sort_order": 1
-  }
-}
-```
-
----
-
-### List Floor Locales
-
-Returns a paginated list of all active locales for a given floor.
-
-**`GET /api/v1/floors/{floor-id}/locales`**
-
-#### Path Parameters
-
-| Parameter | Type | Description |
-|---|---|---|
-| `floor-id` | long | Floor ID |
-
-#### Query Parameters
-
-| Parameter | Type | Default | Constraints | Description |
-|---|---|---|---|---|
-| `page` | integer | `0` | min 0 | Page index (zero-based) |
-| `size` | integer | `10` | 1–50 | Items per page |
-| `sort_by` | string | `id` | `id`, `name`, `sortOrder`, `createdAt` | Field to sort by |
-| `sort_dir` | string | `ASC` | `ASC`, `DESC` | Sort direction |
-
-#### Response `200 OK`
-
-```json
-{
-  "data": [
-    {
-      "id": 1,
-      "locale_id": 1,
-      "name": "First Floor",
-      "sort_order": 1
-    },
-    {
-      "id": 2,
-      "locale_id": 2,
-      "name": "Birinci Kat",
-      "sort_order": 1
-    }
-  ],
-  "current_page": 0,
-  "total_pages": 1,
-  "total_elements": 2,
-  "page_size": 10,
-  "has_next": false,
-  "has_previous": false
-}
-```
-
-> Note: The list response returns a summary shape (`id`, `locale_id`, `name`, `sort_order`). Use the Get by ID endpoint to retrieve `description`.
 
 ---
 
 ### Update Floor Locale
 
-**`PUT /api/v1/floors/{floor-id}/locales/{id}`**
+`PUT /api/v1/floors/{floor-id}/locales/{id}`
+
+Updates the name, description, and sort order of an existing floor locale. The locale language cannot be changed — delete and recreate to change the locale.
 
 #### Path Parameters
 
-| Parameter | Type | Description |
-|---|---|---|
-| `floor-id` | long | Floor ID |
-| `id` | long | Floor locale ID |
+| Parameter  | Type | Description             |
+|------------|------|-------------------------|
+| `floor-id` | Long | ID of the floor         |
+| `id`       | Long | ID of the floor locale  |
 
 #### Request Body
 
 ```json
 {
-  "locale_id": 1,
-  "name": "First Floor",
-  "description": "Main dining area - updated",
+  "name": "Ground Floor",
+  "description": "Updated description.",
   "sort_order": 1
 }
 ```
 
-| Field | Type | Required | Constraints |
-|---|---|---|---|
-| `locale_id` | long | yes | must be an existing active locale |
-| `name` | string | yes | max 255 chars |
-| `description` | string | no | defaults to `""` |
-| `sort_order` | integer | yes | |
+#### Request Fields
+
+| Field         | Type    | Required | Validation               |
+|---------------|---------|----------|--------------------------|
+| `name`        | String  | Yes      | Not blank, max 255 chars |
+| `description` | String  | No       | —                        |
+| `sort_order`  | Integer | Yes      | Not null                 |
 
 #### Response `200 OK`
 
 ```json
 {
   "success": true,
-  "id": 1
+  "id": 3
 }
 ```
 
@@ -354,23 +373,23 @@ Returns a paginated list of all active locales for a given floor.
 
 ### Delete Floor Locale
 
-Soft-deletes a locale translation.
+`DELETE /api/v1/floors/{floor-id}/locales/{id}`
 
-**`DELETE /api/v1/floors/{floor-id}/locales/{id}`**
+Soft-deletes a floor locale. The record is not removed from the database but will no longer appear in any response.
 
 #### Path Parameters
 
-| Parameter | Type | Description |
-|---|---|---|
-| `floor-id` | long | Floor ID |
-| `id` | long | Floor locale ID |
+| Parameter  | Type | Description             |
+|------------|------|-------------------------|
+| `floor-id` | Long | ID of the floor         |
+| `id`       | Long | ID of the floor locale  |
 
 #### Response `200 OK`
 
 ```json
 {
   "success": true,
-  "id": 1
+  "id": 3
 }
 ```
 
@@ -378,36 +397,21 @@ Soft-deletes a locale translation.
 
 ## Error Responses
 
-### 404 Not Found
-
-Returned when the requested resource does not exist or has been soft-deleted.
+All errors follow a common structure:
 
 ```json
 {
+  "request_id": "abc-123",
   "status": 404,
+  "error": "ENTITY_NOT_FOUND",
   "message": "Floor not found with id: 99"
 }
 ```
 
-### 400 Bad Request
-
-Returned when request validation fails.
-
-```json
-{
-  "status": 400,
-  "message": "Validation failed",
-  "errors": {
-    "code": "must not be blank",
-    "sort_order": "must not be null"
-  }
-}
-```
-
-### 401 Unauthorized
-
-Returned when the JWT token is missing or invalid.
-
-### 403 Forbidden
-
-Returned when the authenticated user lacks permission.
+| HTTP Status | Error Code                 | Cause                                                                    |
+|-------------|----------------------------|--------------------------------------------------------------------------|
+| 400         | `INVALID_ARGUMENT`         | Missing required fields or invalid sort field                            |
+| 401         | `UNAUTHORIZED`             | JWT token is missing or invalid                                          |
+| 403         | `FORBIDDEN`                | Authenticated user lacks permission                                      |
+| 404         | `ENTITY_NOT_FOUND`         | Floor or floor locale not found, or already deleted                      |
+| 409         | `DATA_INTEGRITY_VIOLATION` | Constraint violation (e.g. duplicate code)                               |

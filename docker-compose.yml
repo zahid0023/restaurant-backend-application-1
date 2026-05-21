@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   restaurant-backend-1:
-    image: root00023/restaurant-backend:1.0.0
+    image: root00023/restaurant-backend:2.0.1
     build:
       context: .
       dockerfile: Dockerfile

@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 import tools.jackson.databind.PropertyNamingStrategies;
 import tools.jackson.databind.annotation.JsonNaming;
 
+import java.util.List;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -20,4 +22,5 @@ public class DiningSpaceDto {
     private Integer sortOrder;
     private Integer capacity;
     private Boolean isBookable;
+    private List<DiningSpaceLocaleDto> locales;
 }

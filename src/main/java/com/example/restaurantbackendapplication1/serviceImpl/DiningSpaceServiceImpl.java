@@ -45,7 +45,7 @@ public class DiningSpaceServiceImpl implements DiningSpaceService {
                                   DiningSpaceTypeEntity diningSpaceTypeEntity,
                                   FloorEntity floorEntity,
                                   Map<Long, LocaleEntity> localeEntityMap) {
-        DiningSpaceEntity entity = DiningSpaceMapper.fromRequest(request, diningSpaceTypeEntity, floorEntity, localeEntityMap);
+        DiningSpaceEntity entity = DiningSpaceMapper.create(request, diningSpaceTypeEntity, floorEntity, localeEntityMap);
         diningSpaceRepository.save(entity);
         log.info("DiningSpace created with id: {}", entity.getId());
         return new SuccessResponse(true, entity.getId());
@@ -75,10 +75,8 @@ public class DiningSpaceServiceImpl implements DiningSpaceService {
     @Transactional
     @Override
     public SuccessResponse update(DiningSpaceEntity entity,
-                                  UpdateDiningSpaceRequest request,
-                                  DiningSpaceTypeEntity diningSpaceTypeEntity,
-                                  FloorEntity floorEntity) {
-        DiningSpaceMapper.update(entity, request, diningSpaceTypeEntity, floorEntity);
+                                  UpdateDiningSpaceRequest request) {
+        DiningSpaceMapper.update(entity, request);
         diningSpaceRepository.save(entity);
         log.info("DiningSpace updated with id: {}", entity.getId());
         return new SuccessResponse(true, entity.getId());

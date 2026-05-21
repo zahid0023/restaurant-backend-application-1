@@ -5,7 +5,7 @@ import com.example.restaurantbackendapplication1.commons.dto.response.PaginatedR
 import com.example.restaurantbackendapplication1.commons.dto.response.SuccessResponse;
 import com.example.restaurantbackendapplication1.dto.request.floor.CreateFloorRequest;
 import com.example.restaurantbackendapplication1.dto.request.floor.UpdateFloorRequest;
-import com.example.restaurantbackendapplication1.dto.response.FloorResponse;
+import com.example.restaurantbackendapplication1.dto.response.floors.FloorResponse;
 import com.example.restaurantbackendapplication1.model.dto.FloorDto;
 import com.example.restaurantbackendapplication1.model.entity.FloorEntity;
 import com.example.restaurantbackendapplication1.model.entity.LocaleEntity;
@@ -40,7 +40,7 @@ public class FloorServiceImpl implements FloorService {
     @Transactional
     @Override
     public SuccessResponse create(CreateFloorRequest request, Map<Long, LocaleEntity> localeEntityMap) {
-        FloorEntity entity = FloorMapper.fromRequest(request, localeEntityMap);
+        FloorEntity entity = FloorMapper.create(request, localeEntityMap);
         floorRepository.save(entity);
         log.info("Floor created with id: {}", entity.getId());
         return new SuccessResponse(true, entity.getId());

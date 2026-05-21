@@ -1,28 +1,13 @@
 package com.example.restaurantbackendapplication1.dto.request.diningspace;
 
-import com.example.restaurantbackendapplication1.dto.request.diningspacelocale.DiningSpaceLocaleRequest;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import lombok.Data;
 import tools.jackson.databind.PropertyNamingStrategies;
 import tools.jackson.databind.annotation.JsonNaming;
 
-import java.util.List;
-
 @Data
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class DiningSpaceRequest {
-
-    @NotNull
-    private Long diningSpaceTypeId;
-
-    private Long floorId;
-
-    @NotBlank
-    @Size(max = 50)
-    private String code;
-
     @NotNull
     private Integer sortOrder;
 
@@ -31,6 +16,4 @@ public class DiningSpaceRequest {
 
     @NotNull
     private Boolean isBookable;
-
-    private List<DiningSpaceLocaleRequest> locales;
 }
