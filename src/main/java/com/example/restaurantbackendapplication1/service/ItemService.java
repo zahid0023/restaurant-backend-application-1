@@ -6,9 +6,7 @@ import com.example.restaurantbackendapplication1.commons.dto.response.SuccessRes
 import com.example.restaurantbackendapplication1.dto.request.item.CreateItemRequest;
 import com.example.restaurantbackendapplication1.dto.request.item.UpdateItemRequest;
 import com.example.restaurantbackendapplication1.dto.response.ItemResponse;
-import com.example.restaurantbackendapplication1.model.entity.ItemEntity;
-import com.example.restaurantbackendapplication1.model.entity.LocaleEntity;
-import com.example.restaurantbackendapplication1.model.entity.UnitEntity;
+import com.example.restaurantbackendapplication1.model.entity.*;
 import com.example.restaurantbackendapplication1.model.projection.ItemSummary;
 
 import java.util.List;
@@ -17,7 +15,8 @@ import java.util.Set;
 
 public interface ItemService {
     SuccessResponse create(CreateItemRequest request,
-                           UnitEntity unitEntity,
+                           ItemTypeEntity itemTypeEntity,
+                           UnitTypeEntity unitTypeEntity,
                            Map<Long, LocaleEntity> localeEntityMap);
 
     ItemEntity getEntityById(Long id);
@@ -29,8 +28,7 @@ public interface ItemService {
     PaginatedResponse<ItemSummary> getAll(PaginatedRequest request);
 
     SuccessResponse update(ItemEntity entity,
-                           UpdateItemRequest request,
-                           UnitEntity unitEntity);
+                           UpdateItemRequest request);
 
     SuccessResponse delete(Long id);
 }

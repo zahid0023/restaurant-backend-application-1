@@ -20,10 +20,11 @@ Creates a new item with optional embedded locale translations.
 
 #### Request Body
 
-```json
+```json 
 {
+  "item_type_id": 1,
+  "unit_type_id": 2,
   "code": "TOMATO",
-  "unit_id": 1,
   "sort_order": 1,
   "locales": [
     {
@@ -44,8 +45,9 @@ Creates a new item with optional embedded locale translations.
 
 | Field | Type | Required | Constraints |
 |---|---|---|---|
+| `item_type_id` | long | yes | must be an existing active item type |
+| `unit_type_id` | long | yes | must be an existing active unit type |
 | `code` | string | yes | max 20 chars, immutable after creation |
-| `unit_id` | long | yes | must be an existing active unit |
 | `sort_order` | integer | yes | |
 | `locales` | array | no | see locale fields below |
 | `locales[].locale_id` | long | yes | must be an existing active locale |
@@ -81,7 +83,6 @@ Creates a new item with optional embedded locale translations.
   "item": {
     "id": 1,
     "code": "TOMATO",
-    "unit_id": 1,
     "sort_order": 1,
     "locales": [
       {
@@ -128,23 +129,6 @@ Returns a paginated list of all active items.
     {
       "id": 1,
       "code": "TOMATO",
-      "unit": {
-        "id": 1,
-        "unit_type": {
-          "id": 1,
-          "code": "WEIGHT",
-          "sort_order": 1,
-          "locales": [
-            { "id": 1, "locale_id": 1, "name": "Weight", "description": "Weight unit type", "sort_order": 1 }
-          ]
-        },
-        "code": "KG",
-        "is_base": false,
-        "sort_order": 1,
-        "locales": [
-          { "id": 1, "locale_code": "en", "name": "Kilogram", "description": "Kilogram unit", "sort_order": 1 }
-        ]
-      },
       "sort_order": 1,
       "locales": [
         { "id": 1, "locale_code": "en", "name": "Tomato", "description": "Fresh red tomato", "sort_order": 1 },
@@ -161,13 +145,13 @@ Returns a paginated list of all active items.
 }
 ```
 
-> Note: The list response returns a summary projection. Item locales use `locale_code`; unit type locales use `locale_id`. Use the Get by ID endpoint to retrieve full locale detail with `locale_id` for item locales.
+> Note: The list response returns a summary projection. Item locales use `locale_code`. Use the Get by ID endpoint to retrieve full locale detail with `locale_id`.
 
 ---
 
 ### Update Item
 
-Updates mutable fields of an existing item. `code` is immutable and cannot be changed. Locale translations are managed separately via the Item Locales API.
+Updates mutable fields of an existing item. `code`, `item_type_id`, and `unit_type_id` are immutable and cannot be changed. Locale translations are managed separately via the Item Locales API.
 
 **`PUT /api/v1/items/{id}`**
 
@@ -181,14 +165,12 @@ Updates mutable fields of an existing item. `code` is immutable and cannot be ch
 
 ```json
 {
-  "unit_id": 2,
-  "sort_order": 1
+  "sort_order": 2
 }
 ```
 
 | Field | Type | Required | Constraints |
 |---|---|---|---|
-| `unit_id` | long | yes | must be an existing active unit |
 | `sort_order` | integer | yes | |
 
 #### Response `200 OK`
@@ -356,7 +338,8 @@ Returned when request validation fails.
   "status": 400,
   "message": "Validation failed",
   "errors": {
-    "unit_id": "must not be null",
+    "item_type_id": "must not be null",
+    "unit_type_id": "must not be null",
     "sort_order": "must not be null"
   }
 }

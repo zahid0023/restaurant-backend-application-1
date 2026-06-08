@@ -7,9 +7,7 @@ import com.example.restaurantbackendapplication1.dto.request.item.CreateItemRequ
 import com.example.restaurantbackendapplication1.dto.request.item.UpdateItemRequest;
 import com.example.restaurantbackendapplication1.dto.response.ItemResponse;
 import com.example.restaurantbackendapplication1.model.dto.ItemDto;
-import com.example.restaurantbackendapplication1.model.entity.ItemEntity;
-import com.example.restaurantbackendapplication1.model.entity.LocaleEntity;
-import com.example.restaurantbackendapplication1.model.entity.UnitEntity;
+import com.example.restaurantbackendapplication1.model.entity.*;
 import com.example.restaurantbackendapplication1.model.enums.ItemSortField;
 import com.example.restaurantbackendapplication1.model.mapper.ItemMapper;
 import com.example.restaurantbackendapplication1.model.projection.ItemSummary;
@@ -43,9 +41,10 @@ public class ItemServiceImpl implements ItemService {
     @Transactional
     @Override
     public SuccessResponse create(CreateItemRequest request,
-                                  UnitEntity unitEntity,
+                                  ItemTypeEntity itemTypeEntity,
+                                  UnitTypeEntity unitTypeEntity,
                                   Map<Long, LocaleEntity> localeEntityMap) {
-        ItemEntity entity = ItemMapper.fromRequest(request, unitEntity, localeEntityMap);
+        ItemEntity entity = ItemMapper.fromRequest(request, itemTypeEntity, unitTypeEntity, localeEntityMap);
         itemRepository.save(entity);
         log.info("Item created with id: {}", entity.getId());
         return new SuccessResponse(true, entity.getId());
@@ -82,9 +81,8 @@ public class ItemServiceImpl implements ItemService {
     @Transactional
     @Override
     public SuccessResponse update(ItemEntity entity,
-                                  UpdateItemRequest request,
-                                  UnitEntity unitEntity) {
-        ItemMapper.update(entity, request, unitEntity);
+                                  UpdateItemRequest request) {
+        ItemMapper.update(entity, request);
         itemRepository.save(entity);
         log.info("Item updated with id: {}", entity.getId());
         return new SuccessResponse(true, entity.getId());

@@ -35,7 +35,7 @@ public enum ImageHostingProvider {
         if (!missing.isEmpty()) {
             throw new IllegalArgumentException(
                     "Missing or blank required config keys for provider " + name() + ": " + missing
-                    + ". Required keys: " + requiredKeys);
+                            + ". Required keys: " + requiredKeys);
         }
     }
 }

@@ -7,6 +7,8 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -18,8 +20,14 @@ import java.util.Set;
 public class ItemEntity extends AuditableEntity {
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "unit_id", nullable = false)
-    private UnitEntity unitEntity;
+    @JoinColumn(name = "item_type_id", nullable = false)
+    private ItemTypeEntity itemTypeEntity;
+
+    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @OnDelete(action = OnDeleteAction.RESTRICT)
+    @JoinColumn(name = "unit_type_id", nullable = false)
+    private UnitTypeEntity unitTypeEntity;
 
     @NotNull
     @ColumnDefault("0")

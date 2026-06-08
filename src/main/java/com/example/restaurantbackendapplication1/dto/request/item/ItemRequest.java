@@ -8,10 +8,6 @@ import tools.jackson.databind.annotation.JsonNaming;
 @Data
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class ItemRequest {
-
-    @NotNull
-    private Long unitId;
-
     @NotNull
     private Integer sortOrder;
 }

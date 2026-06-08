@@ -12,8 +12,8 @@ public interface ItemSummary {
 
     String getCode();
 
-    @Value("#{target.unitEntity}")
-    UnitSummary getUnit();
+    @Value("#{target.unitTypeEntity}")
+    UnitTypeSummary getUnitType();
 
     Integer getSortOrder();
 

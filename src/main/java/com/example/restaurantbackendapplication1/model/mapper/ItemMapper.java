@@ -6,10 +6,7 @@ import com.example.restaurantbackendapplication1.dto.request.item.UpdateItemRequ
 import com.example.restaurantbackendapplication1.dto.request.itemlocale.CreateItemLocaleRequest;
 import com.example.restaurantbackendapplication1.model.dto.ItemDto;
 import com.example.restaurantbackendapplication1.model.dto.ItemLocaleDto;
-import com.example.restaurantbackendapplication1.model.entity.ItemEntity;
-import com.example.restaurantbackendapplication1.model.entity.ItemLocaleEntity;
-import com.example.restaurantbackendapplication1.model.entity.LocaleEntity;
-import com.example.restaurantbackendapplication1.model.entity.UnitEntity;
+import com.example.restaurantbackendapplication1.model.entity.*;
 import lombok.experimental.UtilityClass;
 
 import java.util.List;
@@ -21,11 +18,13 @@ import java.util.stream.Collectors;
 public class ItemMapper {
 
     public static ItemEntity fromRequest(CreateItemRequest request,
-                                         UnitEntity unitEntity,
+                                         ItemTypeEntity itemTypeEntity,
+                                         UnitTypeEntity unitTypeEntity,
                                          Map<Long, LocaleEntity> localeEntityMap) {
         ItemEntity entity = new ItemEntity();
         entity.setCode(request.getCode());
-        entity.setUnitEntity(unitEntity);
+        entity.setItemTypeEntity(itemTypeEntity);
+        entity.setUnitTypeEntity(unitTypeEntity);
         entity.setSortOrder(request.getSortOrder());
         if (request.getLocales() != null) {
             entity.setItemLocaleEntities(mapLocales(request.getLocales(), entity, localeEntityMap));
@@ -33,18 +32,17 @@ public class ItemMapper {
         return entity;
     }
 
-    public static void update(ItemEntity entity, UpdateItemRequest request, UnitEntity unitEntity) {
-        applyCommonFields(entity, request, unitEntity);
+    public static void update(ItemEntity entity, UpdateItemRequest request) {
+        applyCommonFields(entity, request);
     }
 
-    private static void applyCommonFields(ItemEntity entity, ItemRequest request, UnitEntity unitEntity) {
-        entity.setUnitEntity(unitEntity);
+    private static void applyCommonFields(ItemEntity entity, ItemRequest request) {
         entity.setSortOrder(request.getSortOrder());
     }
 
     private static Set<ItemLocaleEntity> mapLocales(List<CreateItemLocaleRequest> locales,
-                                                     ItemEntity entity,
-                                                     Map<Long, LocaleEntity> localeEntityMap) {
+                                                    ItemEntity entity,
+                                                    Map<Long, LocaleEntity> localeEntityMap) {
         return locales.stream()
                 .map(l -> ItemLocaleMapper.fromRequest(l, entity, localeEntityMap.get(l.getLocaleId())))
                 .collect(Collectors.toSet());
@@ -58,7 +56,6 @@ public class ItemMapper {
         return ItemDto.builder()
                 .id(entity.getId())
                 .code(entity.getCode())
-                .unitId(entity.getUnitEntity().getId())
                 .sortOrder(entity.getSortOrder())
                 .locales(localeDtos)
                 .build();
