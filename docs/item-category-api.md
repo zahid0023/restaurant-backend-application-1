@@ -1,71 +1,100 @@
-# Item Category API Documentation
+# Item Category API
 
-Base URL: `/api/v1`
+Base URL: `/api/v1/item-categories`
 
-All endpoints require a valid JWT bearer token.
+Item categories form a self-referential tree. A category can optionally reference another category as its parent. Categories are standalone — they are not tied to any item type. Items are assigned to categories via the Item-Category Assignment API.
 
-```
-Authorization: Bearer <token>
-```
+`code` is immutable after creation.
 
 ---
 
-## Item Categories
+## Endpoints
 
-Item categories are nested under item types. All paths include `{item-type-id}` which must refer to an existing active item type.
+| Method | Path                                                        | Description                        |
+|--------|-------------------------------------------------------------|------------------------------------|
+| POST   | `/api/v1/item-categories`                                   | Create an item category            |
+| GET    | `/api/v1/item-categories/{id}`                              | Get an item category               |
+| GET    | `/api/v1/item-categories/root`                              | List root item categories          |
+| GET    | `/api/v1/item-categories/{item-category-id}/sub-categories` | List sub-categories                |
+| PUT    | `/api/v1/item-categories/{id}`                              | Update an item category            |
+| DELETE | `/api/v1/item-categories/{id}`                              | Delete an item category            |
+| POST   | `/api/v1/item-categories/{item-category-id}/locales`        | Create an item category locale     |
+| PUT    | `/api/v1/item-categories/{item-category-id}/locales/{id}`   | Update an item category locale     |
+| DELETE | `/api/v1/item-categories/{item-category-id}/locales/{id}`   | Delete an item category locale     |
+| POST   | `/api/v1/item-item-categories`                              | Assign an item to a category       |
+| DELETE | `/api/v1/item-item-categories/{item-id}/{item-category-id}` | Unassign an item from a category   |
 
-Categories support a parent–child hierarchy. A category can optionally have a `parent_id` pointing to another category within the same item type. `code` is immutable after creation.
+---
+    
+## Data Model
+
+### Item Category
+
+| Field           | Type    | Required | Constraints                         | Description                                      |
+|-----------------|---------|----------|-------------------------------------|--------------------------------------------------|
+| `id`            | Long    | —        | read-only                           | Auto-generated identifier                        |
+| `code`          | String  | Yes      | max 50 chars, unique, immutable     | Unique category code                             |
+| `sort_order`    | Integer | Yes      | not null                            | Display order                                    |
+| `parent_id`     | Long    | No       | must exist, immutable after create  | Parent category ID; null for root categories     |
+| `locales`       | Array   | —        | read-only                           | Locale translations                              |
+| `sub_categories`| Array   | —        | read-only, getById only             | Immediate child categories (one level)           |
+| `items`         | Array   | —        | read-only, getById only             | Items assigned to this category                  |
+
+### Item Category Locale
+
+| Field         | Type    | Required | Constraints              | Description                        |
+|---------------|---------|----------|--------------------------|------------------------------------|
+| `id`          | Long    | —        | read-only                | Auto-generated identifier          |
+| `locale_id`   | Long    | Yes      | must exist               | ID of an existing active locale    |
+| `name`        | String  | Yes      | max 255 chars, not blank | Localized name                     |
+| `description` | String  | No       | defaults to `""`         | Localized description              |
+| `sort_order`  | Integer | Yes      | not null                 | Display order for this locale      |
 
 ---
 
-### Create Item Category
+## Create Item Category
 
-Creates a new item category with optional parent and optional embedded locale translations.
+`POST /api/v1/item-categories`
 
-**`POST /api/v1/item-types/{item-type-id}/item-categories`**
+Creates a new item category with optional parent and optional locale translations.
 
-#### Path Parameters
-
-| Parameter | Type | Description |
-|---|---|---|
-| `item-type-id` | long | Item type ID |
-
-#### Request Body
+### Request Body
 
 ```json
 {
-  "code": "APPETIZER",
+  "code": "MEAT",
   "sort_order": 1,
   "parent_id": null,
   "locales": [
     {
       "locale_id": 1,
-      "name": "Appetizer",
-      "description": "Starters and small dishes",
-      "sort_order": 1
-    },
-    {
-      "locale_id": 2,
-      "name": "Başlangıç",
-      "description": "Başlangıç yemekleri",
+      "name": "Meat",
+      "description": "Animal meat ingredients",
       "sort_order": 1
     }
   ]
 }
 ```
 
-| Field | Type | Required | Constraints |
-|---|---|---|---|
-| `code` | string | yes | max 50 chars, immutable after creation |
-| `sort_order` | integer | yes | |
-| `parent_id` | long | no | must be an existing active item category within the same item type |
-| `locales` | array | no | see locale fields below |
-| `locales[].locale_id` | long | yes | must be an existing active locale |
-| `locales[].name` | string | yes | max 255 chars |
-| `locales[].description` | string | no | defaults to `""` |
-| `locales[].sort_order` | integer | yes | |
+### Request Fields
 
-#### Response `201 Created`
+| Field         | Type    | Required | Validation                                         |
+|---------------|---------|----------|----------------------------------------------------|
+| `code`        | String  | Yes      | Not blank, max 50 chars, unique                    |
+| `sort_order`  | Integer | Yes      | Not null                                           |
+| `parent_id`   | Long    | No       | Must reference an existing active item category    |
+| `locales`     | Array   | No       | See locale fields below                            |
+
+**Locale fields (`locales[]`):**
+
+| Field         | Type    | Required | Validation               |
+|---------------|---------|----------|--------------------------|
+| `locale_id`   | Long    | Yes      | Not null, must exist     |
+| `name`        | String  | Yes      | Not blank, max 255 chars |
+| `description` | String  | No       | —                        |
+| `sort_order`  | Integer | Yes      | Not null                 |
+
+### Response `201 Created`
 
 ```json
 {
@@ -76,56 +105,46 @@ Creates a new item category with optional parent and optional embedded locale tr
 
 ---
 
-### Get Item Category by ID
+## Get Item Category
 
-Returns the full category including locale translations, immediate sub-categories, and assigned items.
+`GET /api/v1/item-categories/{id}`
 
-**`GET /api/v1/item-types/{item-type-id}/item-categories/{id}`**
+Returns a single item category with locale translations, immediate sub-categories, and assigned items.
 
-#### Path Parameters
+### Path Parameters
 
-| Parameter | Type | Description |
-|---|---|---|
-| `item-type-id` | long | Item type ID |
-| `id` | long | Item category ID |
+| Parameter | Type | Description          |
+|-----------|------|----------------------|
+| `id`      | Long | ID of the item category |
 
-#### Response `200 OK`
+### Response `200 OK`
 
 ```json
 {
   "item_category": {
     "id": 1,
-    "item_type_id": 1,
-    "code": "APPETIZER",
+    "code": "MEAT",
     "sort_order": 1,
     "locales": [
       {
         "id": 1,
         "locale_id": 1,
-        "name": "Appetizer",
-        "description": "Starters and small dishes",
-        "sort_order": 1
-      },
-      {
-        "id": 2,
-        "locale_id": 2,
-        "name": "Başlangıç",
-        "description": "Başlangıç yemekleri",
+        "name": "Meat",
+        "description": "Animal meat ingredients",
         "sort_order": 1
       }
     ],
     "sub_categories": [
       {
         "id": 3,
-        "item_type_id": 1,
-        "code": "COLD_APPETIZER",
+        "code": "BEEF",
         "sort_order": 1,
         "locales": [
           {
             "id": 5,
             "locale_id": 1,
-            "name": "Cold Appetizer",
-            "description": "Chilled starters",
+            "name": "Beef",
+            "description": "Cattle meat",
             "sort_order": 1
           }
         ]
@@ -134,15 +153,22 @@ Returns the full category including locale translations, immediate sub-categorie
     "items": [
       {
         "id": 1,
-        "item_type_id": 2,
-        "unit_id": 1,
+        "code": "CHICKEN_BREAST",
+        "unit_type": {
+          "id": 2,
+          "code": "WEIGHT",
+          "sort_order": 1,
+          "locales": [
+            { "id": 3, "locale_id": 1, "name": "Weight", "description": "", "sort_order": 1 }
+          ]
+        },
         "sort_order": 1,
         "locales": [
           {
             "id": 1,
             "locale_id": 1,
-            "name": "Tomato",
-            "description": "Fresh red tomato",
+            "name": "Chicken Breast",
+            "description": "Boneless chicken breast",
             "sort_order": 1
           }
         ]
@@ -152,60 +178,49 @@ Returns the full category including locale translations, immediate sub-categorie
 }
 ```
 
-> `sub_categories` contains only immediate children (one level deep). `items` lists all items assigned to this category.
+> `sub_categories` contains only immediate children (one level deep). `items` lists all active items assigned to this category.
 
 ---
 
-### List Item Categories
+## List Root Item Categories
 
-Returns a paginated flat list of all active item categories for the specified item type (roots and children together).
+`GET /api/v1/item-categories/root`
 
-**`GET /api/v1/item-types/{item-type-id}/item-categories`**
+Returns a paginated list of top-level (parentless) active item categories.
 
-#### Path Parameters
+### Query Parameters
 
-| Parameter | Type | Description |
-|---|---|---|
-| `item-type-id` | long | Item type ID |
+| Parameter  | Type   | Default | Constraints                            | Description              |
+|------------|--------|---------|----------------------------------------|--------------------------|
+| `page`     | int    | `0`     | >= 0                                   | Zero-based page index    |
+| `size`     | int    | `10`    | 1 – 50                                 | Number of items per page |
+| `sort_by`  | String | `id`    | `id`, `code`, `sortOrder`, `createdAt` | Field to sort by         |
+| `sort_dir` | String | `ASC`   | `ASC`, `DESC`                          | Sort direction           |
 
-#### Query Parameters
-
-| Parameter | Type | Default | Constraints | Description |
-|---|---|---|---|---|
-| `page` | integer | `0` | min 0 | Page index (zero-based) |
-| `size` | integer | `10` | 1–50 | Items per page |
-| `sort_by` | string | `id` | `id`, `code`, `sortOrder`, `createdAt` | Field to sort by |
-| `sort_dir` | string | `ASC` | `ASC`, `DESC` | Sort direction |
-
-#### Response `200 OK`
+### Response `200 OK`
 
 ```json
 {
   "data": [
     {
       "id": 1,
-      "item_type_id": 1,
       "parent_id": null,
-      "code": "APPETIZER",
+      "code": "MEAT",
       "sort_order": 1,
       "locales": [
-        { "id": 1, "locale_id": 1, "name": "Appetizer", "description": "Starters and small dishes", "sort_order": 1 }
-      ]
-    },
-    {
-      "id": 3,
-      "item_type_id": 1,
-      "parent_id": 1,
-      "code": "COLD_APPETIZER",
-      "sort_order": 1,
-      "locales": [
-        { "id": 5, "locale_id": 1, "name": "Cold Appetizer", "description": "Chilled starters", "sort_order": 1 }
+        {
+          "id": 1,
+          "locale_id": 1,
+          "name": "Meat",
+          "description": "Animal meat ingredients",
+          "sort_order": 1
+        }
       ]
     }
   ],
   "current_page": 0,
   "total_pages": 1,
-  "total_elements": 2,
+  "total_elements": 1,
   "page_size": 10,
   "has_next": false,
   "has_previous": false
@@ -214,75 +229,46 @@ Returns a paginated flat list of all active item categories for the specified it
 
 ---
 
-### List Root Item Categories
+## List Sub-Categories
 
-Returns a paginated list of only top-level (parentless) active item categories for the specified item type.
-
-**`GET /api/v1/item-types/{item-type-id}/item-categories/root`**
-
-#### Path Parameters
-
-| Parameter | Type | Description |
-|---|---|---|
-| `item-type-id` | long | Item type ID |
-
-#### Query Parameters
-
-| Parameter | Type | Default | Constraints | Description |
-|---|---|---|---|---|
-| `page` | integer | `0` | min 0 | Page index (zero-based) |
-| `size` | integer | `10` | 1–50 | Items per page |
-| `sort_by` | string | `id` | `id`, `code`, `sortOrder`, `createdAt` | Field to sort by |
-| `sort_dir` | string | `ASC` | `ASC`, `DESC` | Sort direction |
-
-#### Response `200 OK`
-
-Same shape as [List Item Categories](#list-item-categories). All entries will have `parent_id: null`.
-
----
-
-### List Sub-Categories
+`GET /api/v1/item-categories/{item-category-id}/sub-categories`
 
 Returns a paginated list of direct children of a given item category.
 
-**`GET /api/v1/item-types/{item-type-id}/item-categories/{item-category-id}/sub-categories`**
+### Path Parameters
 
-#### Path Parameters
+| Parameter          | Type | Description             |
+|--------------------|------|-------------------------|
+| `item-category-id` | Long | Parent item category ID |
 
-| Parameter | Type | Description |
-|---|---|---|
-| `item-type-id` | long | Item type ID |
-| `item-category-id` | long | Parent item category ID |
+### Query Parameters
 
-#### Query Parameters
+| Parameter  | Type   | Default | Constraints                            | Description              |
+|------------|--------|---------|----------------------------------------|--------------------------|
+| `page`     | int    | `0`     | >= 0                                   | Zero-based page index    |
+| `size`     | int    | `10`    | 1 – 50                                 | Number of items per page |
+| `sort_by`  | String | `id`    | `id`, `code`, `sortOrder`, `createdAt` | Field to sort by         |
+| `sort_dir` | String | `ASC`   | `ASC`, `DESC`                          | Sort direction           |
 
-| Parameter | Type | Default | Constraints | Description |
-|---|---|---|---|---|
-| `page` | integer | `0` | min 0 | Page index (zero-based) |
-| `size` | integer | `10` | 1–50 | Items per page |
-| `sort_by` | string | `id` | `id`, `code`, `sortOrder`, `createdAt` | Field to sort by |
-| `sort_dir` | string | `ASC` | `ASC`, `DESC` | Sort direction |
+### Response `200 OK`
 
-#### Response `200 OK`
-
-Same shape as [List Item Categories](#list-item-categories). All entries will have `parent_id` equal to `{item-category-id}`.
+Same shape as [List Root Item Categories](#list-root-item-categories). All entries will have `parent_id` equal to `{item-category-id}`.
 
 ---
 
-### Update Item Category
+## Update Item Category
 
-Updates `sort_order` of an existing item category. `code` and `parent_id` are immutable after creation. Locale translations are managed separately via the Item Category Locales API.
+`PUT /api/v1/item-categories/{id}`
 
-**`PUT /api/v1/item-types/{item-type-id}/item-categories/{id}`**
+Updates `sort_order`. `code` and `parent_id` are immutable after creation. Locale translations are managed via the item category locale endpoints.
 
-#### Path Parameters
+### Path Parameters
 
-| Parameter | Type | Description |
-|---|---|---|
-| `item-type-id` | long | Item type ID |
-| `id` | long | Item category ID |
+| Parameter | Type | Description             |
+|-----------|------|-------------------------|
+| `id`      | Long | ID of the item category |
 
-#### Request Body
+### Request Body
 
 ```json
 {
@@ -290,11 +276,13 @@ Updates `sort_order` of an existing item category. `code` and `parent_id` are im
 }
 ```
 
-| Field | Type | Required | Constraints |
-|---|---|---|---|
-| `sort_order` | integer | yes | |
+### Request Fields
 
-#### Response `200 OK`
+| Field        | Type    | Required | Validation |
+|--------------|---------|----------|------------|
+| `sort_order` | Integer | Yes      | Not null   |
+
+### Response `200 OK`
 
 ```json
 {
@@ -305,20 +293,19 @@ Updates `sort_order` of an existing item category. `code` and `parent_id` are im
 
 ---
 
-### Delete Item Category
+## Delete Item Category
 
-Soft-deletes an item category (sets `is_active = false`, `is_deleted = true`).
+`DELETE /api/v1/item-categories/{id}`
 
-**`DELETE /api/v1/item-types/{item-type-id}/item-categories/{id}`**
+Soft-deletes the item category. The record is not removed from the database but will no longer appear in any response.
 
-#### Path Parameters
+### Path Parameters
 
-| Parameter | Type | Description |
-|---|---|---|
-| `item-type-id` | long | Item type ID |
-| `id` | long | Item category ID |
+| Parameter | Type | Description             |
+|-----------|------|-------------------------|
+| `id`      | Long | ID of the item category |
 
-#### Response `200 OK`
+### Response `200 OK`
 
 ```json
 {
@@ -331,45 +318,46 @@ Soft-deletes an item category (sets `is_active = false`, `is_deleted = true`).
 
 ## Item Category Locales
 
-Manage locale-specific translations for an item category. Both `{item-type-id}` and `{item-category-id}` must refer to existing active records.
+Manage locale-specific translations for an item category. `{item-category-id}` must reference an existing active item category.
 
 ---
 
 ### Create Item Category Locale
 
-**`POST /api/v1/item-types/{item-type-id}/item-categories/{item-category-id}/locales`**
+`POST /api/v1/item-categories/{item-category-id}/locales`
 
 #### Path Parameters
 
-| Parameter | Type | Description |
-|---|---|---|
-| `item-type-id` | long | Item type ID |
-| `item-category-id` | long | Item category ID |
+| Parameter          | Type | Description             |
+|--------------------|------|-------------------------|
+| `item-category-id` | Long | ID of the item category |
 
 #### Request Body
 
 ```json
 {
   "locale_id": 1,
-  "name": "Appetizer",
-  "description": "Starters and small dishes",
+  "name": "Meat",
+  "description": "Animal meat ingredients",
   "sort_order": 1
 }
 ```
 
-| Field | Type | Required | Constraints |
-|---|---|---|---|
-| `locale_id` | long | yes | must be an existing active locale |
-| `name` | string | yes | max 255 chars |
-| `description` | string | no | defaults to `""` |
-| `sort_order` | integer | yes | |
+#### Request Fields
+
+| Field         | Type    | Required | Validation               |
+|---------------|---------|----------|--------------------------|
+| `locale_id`   | Long    | Yes      | Not null, must exist     |
+| `name`        | String  | Yes      | Not blank, max 255 chars |
+| `description` | String  | No       | —                        |
+| `sort_order`  | Integer | Yes      | Not null                 |
 
 #### Response `201 Created`
 
 ```json
 {
   "success": true,
-  "id": 1
+  "id": 3
 }
 ```
 
@@ -377,40 +365,41 @@ Manage locale-specific translations for an item category. Both `{item-type-id}` 
 
 ### Update Item Category Locale
 
-Updates the translation fields of an existing locale. `locale_id` is immutable after creation.
+`PUT /api/v1/item-categories/{item-category-id}/locales/{id}`
 
-**`PUT /api/v1/item-types/{item-type-id}/item-categories/{item-category-id}/locales/{id}`**
+Updates translation fields. The locale itself cannot be changed.
 
 #### Path Parameters
 
-| Parameter | Type | Description |
-|---|---|---|
-| `item-type-id` | long | Item type ID |
-| `item-category-id` | long | Item category ID |
-| `id` | long | Item category locale ID |
+| Parameter          | Type | Description                    |
+|--------------------|------|--------------------------------|
+| `item-category-id` | Long | ID of the item category        |
+| `id`               | Long | ID of the item category locale |
 
 #### Request Body
 
 ```json
 {
-  "name": "Appetizer",
-  "description": "Starters, small bites and sharing plates",
+  "name": "Meat",
+  "description": "Fresh and frozen animal meat",
   "sort_order": 1
 }
 ```
 
-| Field | Type | Required | Constraints |
-|---|---|---|---|
-| `name` | string | yes | max 255 chars |
-| `description` | string | no | defaults to `""` |
-| `sort_order` | integer | yes | |
+#### Request Fields
+
+| Field         | Type    | Required | Validation               |
+|---------------|---------|----------|--------------------------|
+| `name`        | String  | Yes      | Not blank, max 255 chars |
+| `description` | String  | No       | —                        |
+| `sort_order`  | Integer | Yes      | Not null                 |
 
 #### Response `200 OK`
 
 ```json
 {
   "success": true,
-  "id": 1
+  "id": 3
 }
 ```
 
@@ -418,24 +407,23 @@ Updates the translation fields of an existing locale. `locale_id` is immutable a
 
 ### Delete Item Category Locale
 
-Soft-deletes a locale translation.
+`DELETE /api/v1/item-categories/{item-category-id}/locales/{id}`
 
-**`DELETE /api/v1/item-types/{item-type-id}/item-categories/{item-category-id}/locales/{id}`**
+Soft-deletes a locale translation.
 
 #### Path Parameters
 
-| Parameter | Type | Description |
-|---|---|---|
-| `item-type-id` | long | Item type ID |
-| `item-category-id` | long | Item category ID |
-| `id` | long | Item category locale ID |
+| Parameter          | Type | Description                    |
+|--------------------|------|--------------------------------|
+| `item-category-id` | Long | ID of the item category        |
+| `id`               | Long | ID of the item category locale |
 
 #### Response `200 OK`
 
 ```json
 {
   "success": true,
-  "id": 1
+  "id": 3
 }
 ```
 
@@ -443,13 +431,13 @@ Soft-deletes a locale translation.
 
 ## Item-Category Assignments
 
-Assign and unassign items to/from item categories.
+Assign and unassign items to/from item categories. Uses the `/api/v1/item-item-categories` base path.
 
 ---
 
 ### Assign Item to Category
 
-**`POST /api/v1/item-item-categories`**
+`POST /api/v1/item-item-categories`
 
 #### Request Body
 
@@ -460,10 +448,12 @@ Assign and unassign items to/from item categories.
 }
 ```
 
-| Field | Type | Required | Constraints |
-|---|---|---|---|
-| `item_id` | long | yes | must be an existing active item |
-| `item_category_id` | long | yes | must be an existing active item category |
+#### Request Fields
+
+| Field              | Type | Required | Validation                                      |
+|--------------------|------|----------|-------------------------------------------------|
+| `item_id`          | Long | Yes      | Not null, must reference an existing active item |
+| `item_category_id` | Long | Yes      | Not null, must reference an existing active item category |
 
 #### Response `201 Created`
 
@@ -476,66 +466,18 @@ Assign and unassign items to/from item categories.
 
 ---
 
-### List Items in Category
-
-Returns a paginated list of item-category assignment records for the specified category.
-
-**`GET /api/v1/item-item-categories/{item-category-id}/items`**
-
-#### Path Parameters
-
-| Parameter | Type | Description |
-|---|---|---|
-| `item-category-id` | long | Item category ID |
-
-#### Query Parameters
-
-| Parameter | Type | Default | Constraints | Description |
-|---|---|---|---|---|
-| `page` | integer | `0` | min 0 | Page index (zero-based) |
-| `size` | integer | `10` | 1–50 | Items per page |
-| `sort_by` | string | `id` | `id`, `createdAt` | Field to sort by |
-| `sort_dir` | string | `ASC` | `ASC`, `DESC` | Sort direction |
-
-#### Response `200 OK`
-
-```json
-{
-  "data": [
-    {
-      "id": 1,
-      "item_id": 3,
-      "item_category_id": 1
-    },
-    {
-      "id": 2,
-      "item_id": 5,
-      "item_category_id": 1
-    }
-  ],
-  "current_page": 0,
-  "total_pages": 1,
-  "total_elements": 2,
-  "page_size": 10,
-  "has_next": false,
-  "has_previous": false
-}
-```
-
----
-
 ### Unassign Item from Category
+
+`DELETE /api/v1/item-item-categories/{item-id}/{item-category-id}`
 
 Soft-deletes the assignment between an item and a category.
 
-**`DELETE /api/v1/item-item-categories/{item-id}/{item-category-id}`**
-
 #### Path Parameters
 
-| Parameter | Type | Description |
-|---|---|---|
-| `item-id` | long | Item ID to unassign |
-| `item-category-id` | long | Item category ID |
+| Parameter          | Type | Description      |
+|--------------------|------|------------------|
+| `item-id`          | Long | ID of the item   |
+| `item-category-id` | Long | ID of the category |
 
 #### Response `200 OK`
 
@@ -550,36 +492,19 @@ Soft-deletes the assignment between an item and a category.
 
 ## Error Responses
 
-### 404 Not Found
-
-Returned when the requested resource does not exist or has been soft-deleted.
+All errors follow a common structure:
 
 ```json
 {
+  "request_id": "abc-123",
   "status": 404,
+  "error": "ENTITY_NOT_FOUND",
   "message": "ItemCategory not found with id: 99"
 }
 ```
 
-### 400 Bad Request
-
-Returned when request validation fails.
-
-```json
-{
-  "status": 400,
-  "message": "Validation failed",
-  "errors": {
-    "code": "must not be blank",
-    "sort_order": "must not be null"
-  }
-}
-```
-
-### 401 Unauthorized
-
-Returned when the JWT token is missing or invalid.
-
-### 403 Forbidden
-
-Returned when the authenticated user lacks permission.
+| HTTP Status | Error Code                 | Cause                                                                |
+|-------------|----------------------------|----------------------------------------------------------------------|
+| 400         | `INVALID_ARGUMENT`         | Missing required fields or invalid sort field                        |
+| 404         | `ENTITY_NOT_FOUND`         | Item category or locale not found, or already deleted                |
+| 409         | `DATA_INTEGRITY_VIOLATION` | Constraint violation (e.g. duplicate code or duplicate locale)       |

@@ -4,8 +4,7 @@ import com.example.restaurantbackendapplication1.dto.request.item.CreateItemRequ
 import com.example.restaurantbackendapplication1.dto.request.item.ItemRequest;
 import com.example.restaurantbackendapplication1.dto.request.item.UpdateItemRequest;
 import com.example.restaurantbackendapplication1.dto.request.itemlocale.CreateItemLocaleRequest;
-import com.example.restaurantbackendapplication1.model.dto.ItemDto;
-import com.example.restaurantbackendapplication1.model.dto.ItemLocaleDto;
+import com.example.restaurantbackendapplication1.model.dto.*;
 import com.example.restaurantbackendapplication1.model.entity.*;
 import lombok.experimental.UtilityClass;
 
@@ -46,6 +45,22 @@ public class ItemMapper {
         return locales.stream()
                 .map(l -> ItemLocaleMapper.fromRequest(l, entity, localeEntityMap.get(l.getLocaleId())))
                 .collect(Collectors.toSet());
+    }
+
+    public static ItemSummaryDto toSummaryDto(ItemEntity entity) {
+        List<ItemLocaleDto> localeDtos = entity.getItemLocaleEntities().stream()
+                .map(ItemLocaleMapper::toDto)
+                .toList();
+
+        UnitTypeSummaryDto unitTypeSummaryDto = UnitTypeMapper.toSummaryDto(entity.getUnitTypeEntity());
+
+        return ItemSummaryDto.builder()
+                .id(entity.getId())
+                .code(entity.getCode())
+                .sortOrder(entity.getSortOrder())
+                .locales(localeDtos)
+                .unitType(unitTypeSummaryDto)
+                .build();
     }
 
     public static ItemDto toDto(ItemEntity entity) {

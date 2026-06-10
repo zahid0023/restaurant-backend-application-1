@@ -14,11 +14,9 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class ItemCategoryDto {
+public class UnitTypeSummaryDto {
     private Long id;
     private String code;
     private Integer sortOrder;
-    private List<ItemCategoryLocaleDto> locales;
-    private List<ItemCategoryDto> subCategories;
-    private List<ItemSummaryDto> items;
+    private List<UnitTypeLocaleDto> locales;
 }

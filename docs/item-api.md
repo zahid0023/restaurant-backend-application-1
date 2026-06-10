@@ -108,7 +108,7 @@ Creates a new item with optional embedded locale translations.
 
 ### List Items
 
-Returns a paginated list of all active items.
+Returns a paginated list of all active items. Optionally filter by a search query matched against item `code` or any locale `name` (case-insensitive).
 
 **`GET /api/v1/items`**
 
@@ -116,10 +116,19 @@ Returns a paginated list of all active items.
 
 | Parameter | Type | Default | Constraints | Description |
 |---|---|---|---|---|
+| `query` | string | — | optional | Search term matched against `code` or any locale `name` (case-insensitive, partial match) |
 | `page` | integer | `0` | min 0 | Page index (zero-based) |
 | `size` | integer | `10` | 1–50 | Items per page |
 | `sort_by` | string | `id` | `id`, `sortOrder`, `createdAt` | Field to sort by |
 | `sort_dir` | string | `ASC` | `ASC`, `DESC` | Sort direction |
+
+#### Examples
+
+```
+GET /api/v1/items                     → all items (paginated)
+GET /api/v1/items?query=tomato        → items whose code or any locale name contains "tomato"
+GET /api/v1/items?query=TOM&size=5   → same, with custom page size
+```
 
 #### Response `200 OK`
 

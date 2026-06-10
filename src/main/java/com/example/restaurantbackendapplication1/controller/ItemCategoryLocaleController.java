@@ -14,7 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/v1/item-types/{item-type-id}/item-categories/{item-category-id}/locales")
+@RequestMapping("/api/v1/item-categories/{item-category-id}/locales")
 public class ItemCategoryLocaleController {
 
     private final ItemCategoryLocaleService itemCategoryLocaleService;
@@ -32,10 +32,9 @@ public class ItemCategoryLocaleController {
 
     @PostMapping
     public ResponseEntity<?> create(
-            @PathVariable("item-type-id") Long itemTypeId,
             @PathVariable("item-category-id") Long itemCategoryId,
             @Valid @RequestBody CreateItemCategoryLocaleRequest request) {
-        ItemCategoryEntity itemCategoryEntity = itemCategoryService.getEntityById(itemTypeId, itemCategoryId);
+        ItemCategoryEntity itemCategoryEntity = itemCategoryService.getEntityById(itemCategoryId);
         LocaleEntity localeEntity = localeService.getEntityById(request.getLocaleId());
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(itemCategoryLocaleService.create(itemCategoryEntity, localeEntity, request));
@@ -43,21 +42,19 @@ public class ItemCategoryLocaleController {
 
     @PutMapping("/{id}")
     public ResponseEntity<?> update(
-            @PathVariable("item-type-id") Long itemTypeId,
             @PathVariable("item-category-id") Long itemCategoryId,
             @PathVariable Long id,
             @Valid @RequestBody UpdateItemCategoryLocaleRequest request) {
-        ItemCategoryEntity itemCategoryEntity = itemCategoryService.getEntityById(itemTypeId, itemCategoryId);
+        ItemCategoryEntity itemCategoryEntity = itemCategoryService.getEntityById(itemCategoryId);
         ItemCategoryLocaleEntity entity = itemCategoryLocaleService.getEntityById(id, itemCategoryEntity);
         return ResponseEntity.ok(itemCategoryLocaleService.update(entity, request));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(
-            @PathVariable("item-type-id") Long itemTypeId,
             @PathVariable("item-category-id") Long itemCategoryId,
             @PathVariable Long id) {
-        ItemCategoryEntity itemCategoryEntity = itemCategoryService.getEntityById(itemTypeId, itemCategoryId);
+        ItemCategoryEntity itemCategoryEntity = itemCategoryService.getEntityById(itemCategoryId);
         ItemCategoryLocaleEntity entity = itemCategoryLocaleService.getEntityById(id, itemCategoryEntity);
         return ResponseEntity.ok(itemCategoryLocaleService.delete(entity));
     }

@@ -2,7 +2,9 @@
 
 Base URL: `/api/v1/item-types`
 
-Item types classify inventory items (e.g. ingredient, packaging, asset). Type names and descriptions are locale-specific and embedded in every response via the `locales` array. All records support soft-delete — deleted records are hidden from all responses.
+Item types (e.g. `INGREDIENT`, `PACKAGING`, `ASSET`, `EQUIPMENT`) are used to classify items directly — each item carries an `item_type_id`. Item types are independent of item categories; item categories form a separate standalone tree and are not nested under item types.
+
+The `is_consumable` flag indicates whether items of this type are consumed during use. Type names and descriptions are locale-specific and embedded in every response via the `locales` array. All records support soft-delete — deleted records are hidden from all responses.
 
 ---
 
@@ -32,6 +34,7 @@ Item types classify inventory items (e.g. ingredient, packaging, asset). Type na
 | `is_consumable`| Boolean | Yes      | not null                 | Whether the type is consumed in use      |
 | `sort_order`   | Integer | Yes      | not null                 | Display order                            |
 | `locales`      | Array   | —        | read-only                | All locale translations for this type    |
+| `items`        | Array   | —        | read-only, getById only  | Summary of all active items of this type. Each entry contains `id`, `code`, `unit_type` (summary), `sort_order`, `locales` — no back-reference to item type |
 
 ### Item Type Locale
 
@@ -140,10 +143,36 @@ Returns a single item type with all its locale translations.
         "description": "রেসিপি বা উৎপাদনে ব্যবহৃত উপকরণ",
         "sort_order": 1
       }
+    ],
+    "items": [
+      {
+        "id": 1,
+        "code": "TOMATO",
+        "unit_type": {
+          "id": 2,
+          "code": "WEIGHT",
+          "sort_order": 1,
+          "locales": [
+            { "id": 3, "locale_id": 1, "name": "Weight", "description": "", "sort_order": 1 }
+          ]
+        },
+        "sort_order": 1,
+        "locales": [
+          {
+            "id": 1,
+            "locale_id": 1,
+            "name": "Tomato",
+            "description": "Fresh red tomato",
+            "sort_order": 1
+          }
+        ]
+      }
     ]
   }
 }
 ```
+
+> `items` lists all active items classified under this item type.
 
 ---
 

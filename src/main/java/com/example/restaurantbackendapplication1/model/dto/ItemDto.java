@@ -17,7 +17,7 @@ import java.util.List;
 public class ItemDto {
     private Long id;
     private String code;
-    private Long unitId;
+    private UnitDto unit;
     private Integer sortOrder;
     private List<ItemLocaleDto> locales;
 }

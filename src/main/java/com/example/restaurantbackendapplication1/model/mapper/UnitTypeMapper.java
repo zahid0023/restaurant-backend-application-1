@@ -5,6 +5,7 @@ import com.example.restaurantbackendapplication1.dto.request.unittype.UnitTypeRe
 import com.example.restaurantbackendapplication1.dto.request.unittype.UpdateUnitTypeRequest;
 import com.example.restaurantbackendapplication1.model.dto.UnitTypeDto;
 import com.example.restaurantbackendapplication1.model.dto.UnitTypeLocaleDto;
+import com.example.restaurantbackendapplication1.model.dto.UnitTypeSummaryDto;
 import com.example.restaurantbackendapplication1.model.entity.LocaleEntity;
 import com.example.restaurantbackendapplication1.model.entity.UnitTypeEntity;
 import com.example.restaurantbackendapplication1.model.entity.UnitTypeLocaleEntity;
@@ -40,10 +41,24 @@ public class UnitTypeMapper {
         entity.setSortOrder(request.getSortOrder());
     }
 
+    public UnitTypeSummaryDto toSummaryDto(UnitTypeEntity entity) {
+        List<UnitTypeLocaleDto> locales = entity.getUnitTypeLocaleEntities().stream()
+                .map(UnitTypeLocaleMapper::toDto)
+                .collect(Collectors.toList());
+
+        return UnitTypeSummaryDto.builder()
+                .id(entity.getId())
+                .code(entity.getCode())
+                .sortOrder(entity.getSortOrder())
+                .locales(locales)
+                .build();
+    }
+
     public UnitTypeDto toDto(UnitTypeEntity entity) {
         List<UnitTypeLocaleDto> locales = entity.getUnitTypeLocaleEntities().stream()
                 .map(UnitTypeLocaleMapper::toDto)
                 .collect(Collectors.toList());
+
         return UnitTypeDto.builder()
                 .id(entity.getId())
                 .code(entity.getCode())

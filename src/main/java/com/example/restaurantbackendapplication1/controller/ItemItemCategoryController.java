@@ -1,6 +1,5 @@
 package com.example.restaurantbackendapplication1.controller;
 
-import com.example.restaurantbackendapplication1.commons.dto.request.PaginatedRequest;
 import com.example.restaurantbackendapplication1.dto.request.itemcategory.AssignItemRequest;
 import com.example.restaurantbackendapplication1.model.entity.ItemCategoryEntity;
 import com.example.restaurantbackendapplication1.model.entity.ItemEntity;
@@ -8,8 +7,6 @@ import com.example.restaurantbackendapplication1.model.entity.ItemItemCategoryEn
 import com.example.restaurantbackendapplication1.service.ItemCategoryService;
 import com.example.restaurantbackendapplication1.service.ItemItemCategoryService;
 import com.example.restaurantbackendapplication1.service.ItemService;
-import jakarta.validation.Valid;
-import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -38,13 +35,6 @@ public class ItemItemCategoryController {
         ItemEntity itemEntity = itemService.getEntityById(request.getItemId());
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(itemItemCategoryService.assign(itemCategoryEntity, itemEntity));
-    }
-
-    @GetMapping("/{item-category-id}/items")
-    public ResponseEntity<?> getAllItems(
-            @PathVariable("item-category-id") Long itemCategoryId,
-            @Valid @ParameterObject PaginatedRequest request) {
-        return ResponseEntity.ok(itemItemCategoryService.getAllItems(itemCategoryId, request));
     }
 
     @DeleteMapping("/{item-id}/{item-category-id}")

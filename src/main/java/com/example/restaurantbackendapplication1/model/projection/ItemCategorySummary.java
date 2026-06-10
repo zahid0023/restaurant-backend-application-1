@@ -10,9 +10,6 @@ import java.util.List;
 public interface ItemCategorySummary {
     Long getId();
 
-    @Value("#{target.itemTypeEntity.id}")
-    Long getItemTypeId();
-
     @Value("#{target.itemCategoryEntity?.id}")
     Long getParentId();
 

@@ -2,13 +2,11 @@ package com.example.restaurantbackendapplication1.model.mapper;
 
 import com.example.restaurantbackendapplication1.dto.request.itemcategory.CreateItemCategoryRequest;
 import com.example.restaurantbackendapplication1.dto.request.itemcategory.UpdateItemCategoryRequest;
-import com.example.restaurantbackendapplication1.dto.request.itemcategorylocale.CreateItemCategoryLocaleRequest;
 import com.example.restaurantbackendapplication1.model.dto.ItemCategoryDto;
 import com.example.restaurantbackendapplication1.model.dto.ItemCategoryLocaleDto;
-import com.example.restaurantbackendapplication1.model.dto.ItemDto;
+import com.example.restaurantbackendapplication1.model.dto.ItemSummaryDto;
 import com.example.restaurantbackendapplication1.model.entity.ItemCategoryEntity;
 import com.example.restaurantbackendapplication1.model.entity.ItemCategoryLocaleEntity;
-import com.example.restaurantbackendapplication1.model.entity.ItemTypeEntity;
 import com.example.restaurantbackendapplication1.model.entity.LocaleEntity;
 import lombok.experimental.UtilityClass;
 
@@ -21,11 +19,9 @@ import java.util.stream.Collectors;
 public class ItemCategoryMapper {
 
     public static ItemCategoryEntity fromRequest(CreateItemCategoryRequest request,
-                                                 ItemTypeEntity itemTypeEntity,
                                                  ItemCategoryEntity itemCategoryEntity,
                                                  Map<Long, LocaleEntity> localeEntityMap) {
         ItemCategoryEntity entity = new ItemCategoryEntity();
-        entity.setItemTypeEntity(itemTypeEntity);
         entity.setItemCategoryEntity(itemCategoryEntity);
         entity.setCode(request.getCode());
         entity.setSortOrder(request.getSortOrder());
@@ -54,7 +50,6 @@ public class ItemCategoryMapper {
                 .filter(sc -> sc.getIsActive() && !sc.getIsDeleted())
                 .map(child -> ItemCategoryDto.builder()
                         .id(child.getId())
-                        .itemTypeId(child.getItemTypeEntity().getId())
                         .code(child.getCode())
                         .sortOrder(child.getSortOrder())
                         .locales(child.getItemCategoryLocaleEntities().stream()
@@ -63,14 +58,13 @@ public class ItemCategoryMapper {
                         .build())
                 .toList();
 
-        List<ItemDto> items = entity.getItemItemCategoryEntities().stream()
-                .filter(iic -> iic.getIsActive() && !iic.getIsDeleted())
-                .map(iic -> ItemMapper.toDto(iic.getItemEntity()))
+        List<ItemSummaryDto> items = entity.getItemItemCategoryEntities().stream()
+                .filter(itemItemCategoryEntity -> itemItemCategoryEntity.getIsActive() && !itemItemCategoryEntity.getIsDeleted())
+                .map(itemItemCategoryEntity -> ItemMapper.toSummaryDto(itemItemCategoryEntity.getItemEntity()))
                 .toList();
 
         return ItemCategoryDto.builder()
                 .id(entity.getId())
-                .itemTypeId(entity.getItemTypeEntity().getId())
                 .code(entity.getCode())
                 .sortOrder(entity.getSortOrder())
                 .locales(locales)

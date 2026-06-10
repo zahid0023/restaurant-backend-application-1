@@ -4,6 +4,7 @@ import com.example.restaurantbackendapplication1.dto.request.itemtype.CreateItem
 import com.example.restaurantbackendapplication1.dto.request.itemtype.ItemTypeRequest;
 import com.example.restaurantbackendapplication1.dto.request.itemtype.UpdateItemTypeRequest;
 import com.example.restaurantbackendapplication1.dto.request.itemtypelocale.CreateItemTypeLocaleRequest;
+import com.example.restaurantbackendapplication1.model.dto.ItemSummaryDto;
 import com.example.restaurantbackendapplication1.model.dto.ItemTypeDto;
 import com.example.restaurantbackendapplication1.model.dto.ItemTypeLocaleDto;
 import com.example.restaurantbackendapplication1.model.entity.ItemTypeEntity;
@@ -50,12 +51,17 @@ public class ItemTypeMapper {
                 .map(ItemTypeLocaleMapper::toDto)
                 .toList();
 
+        List<ItemSummaryDto> items = entity.getItemEntities().stream()
+                .map(ItemMapper::toSummaryDto)
+                .toList();
+
         return ItemTypeDto.builder()
                 .id(entity.getId())
                 .code(entity.getCode())
                 .isConsumable(entity.getIsConsumable())
                 .sortOrder(entity.getSortOrder())
                 .locales(locales)
+                .items(items)
                 .build();
     }
 }

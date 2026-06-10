@@ -20,4 +20,5 @@ public class ItemTypeDto {
     private Boolean isConsumable;
     private Integer sortOrder;
     private List<ItemTypeLocaleDto> locales;
+    private List<ItemSummaryDto> items;
 }

@@ -27,6 +27,10 @@ public interface ItemService {
 
     PaginatedResponse<ItemSummary> getAll(PaginatedRequest request);
 
+    PaginatedResponse<ItemSummary> getAll(Long itemTypeId, PaginatedRequest request);
+
+    PaginatedResponse<ItemSummary> search(String query, PaginatedRequest request);
+
     SuccessResponse update(ItemEntity entity,
                            UpdateItemRequest request);
 

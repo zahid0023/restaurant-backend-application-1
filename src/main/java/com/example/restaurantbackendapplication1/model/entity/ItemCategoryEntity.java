@@ -17,11 +17,6 @@ import java.util.Set;
 @Table(name = "item_categories")
 public class ItemCategoryEntity extends AuditableEntity {
 
-    @NotNull
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "item_type_id", nullable = false)
-    private ItemTypeEntity itemTypeEntity;
-
     @Size(max = 50)
     @NotNull
     @Column(name = "code", nullable = false, length = 50)

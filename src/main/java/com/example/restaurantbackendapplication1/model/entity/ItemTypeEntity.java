@@ -34,4 +34,7 @@ public class ItemTypeEntity extends AuditableEntity {
     @OneToMany(mappedBy = "itemTypeEntity", cascade = CascadeType.ALL)
     private Set<ItemTypeLocaleEntity> itemTypeLocaleEntities = new LinkedHashSet<>();
 
+    @OneToMany(mappedBy = "itemTypeEntity")
+    private Set<ItemEntity> itemEntities = new LinkedHashSet<>();
+
 }

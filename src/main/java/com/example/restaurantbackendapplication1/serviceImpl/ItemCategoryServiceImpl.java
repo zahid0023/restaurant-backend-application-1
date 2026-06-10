@@ -8,7 +8,6 @@ import com.example.restaurantbackendapplication1.dto.request.itemcategory.Update
 import com.example.restaurantbackendapplication1.dto.response.ItemCategoryResponse;
 import com.example.restaurantbackendapplication1.model.dto.ItemCategoryDto;
 import com.example.restaurantbackendapplication1.model.entity.ItemCategoryEntity;
-import com.example.restaurantbackendapplication1.model.entity.ItemTypeEntity;
 import com.example.restaurantbackendapplication1.model.entity.LocaleEntity;
 import com.example.restaurantbackendapplication1.model.enums.ItemCategorySortField;
 import com.example.restaurantbackendapplication1.model.mapper.ItemCategoryMapper;
@@ -41,10 +40,9 @@ public class ItemCategoryServiceImpl implements ItemCategoryService {
     @Transactional
     @Override
     public SuccessResponse create(CreateItemCategoryRequest request,
-                                  ItemTypeEntity itemTypeEntity,
                                   ItemCategoryEntity itemCategoryEntity,
                                   Map<Long, LocaleEntity> localeEntityMap) {
-        ItemCategoryEntity entity = ItemCategoryMapper.fromRequest(request, itemTypeEntity, itemCategoryEntity, localeEntityMap);
+        ItemCategoryEntity entity = ItemCategoryMapper.fromRequest(request, itemCategoryEntity, localeEntityMap);
         itemCategoryRepository.save(entity);
         log.info("ItemCategory created with id: {}", entity.getId());
         return new SuccessResponse(true, entity.getId());
@@ -52,27 +50,21 @@ public class ItemCategoryServiceImpl implements ItemCategoryService {
 
     @Transactional(readOnly = true)
     @Override
-    public ItemCategoryResponse getById(Long itemTypeId, Long id) {
-        ItemCategoryEntity entity = getEntityById(itemTypeId, id);
+    public ItemCategoryResponse getById(Long id) {
+        ItemCategoryEntity entity = getEntityById(id);
         ItemCategoryDto dto = ItemCategoryMapper.toDto(entity);
         return new ItemCategoryResponse(dto);
     }
 
     @Override
-    public PaginatedResponse<ItemCategorySummary> getAll(Long itemTypeId, PaginatedRequest request) {
-        Page<@NonNull ItemCategorySummary> page = itemCategoryRepository.findAllByItemTypeEntity_IdAndIsActiveAndIsDeleted(itemTypeId, true, false, request.toPageable(ALLOWED_SORT_FIELDS));
+    public PaginatedResponse<ItemCategorySummary> getAllRoots(PaginatedRequest request) {
+        Page<@NonNull ItemCategorySummary> page = itemCategoryRepository.findAllByItemCategoryEntityIsNullAndIsActiveAndIsDeleted(true, false, request.toPageable(ALLOWED_SORT_FIELDS));
         return Pagination.buildPaginatedResponse(page);
     }
 
     @Override
-    public PaginatedResponse<ItemCategorySummary> getAllRoots(Long itemTypeId, PaginatedRequest request) {
-        Page<@NonNull ItemCategorySummary> page = itemCategoryRepository.findAllByItemTypeEntity_IdAndItemCategoryEntityIsNullAndIsActiveAndIsDeleted(itemTypeId, true, false, request.toPageable(ALLOWED_SORT_FIELDS));
-        return Pagination.buildPaginatedResponse(page);
-    }
-
-    @Override
-    public PaginatedResponse<ItemCategorySummary> getAllSubCategories(Long itemTypeId, Long itemCategoryId, PaginatedRequest request) {
-        Page<@NonNull ItemCategorySummary> page = itemCategoryRepository.findAllByItemTypeEntity_IdAndItemCategoryEntity_IdAndIsActiveAndIsDeleted(itemTypeId, itemCategoryId, true, false, request.toPageable(ALLOWED_SORT_FIELDS));
+    public PaginatedResponse<ItemCategorySummary> getAllSubCategories(Long itemCategoryId, PaginatedRequest request) {
+        Page<@NonNull ItemCategorySummary> page = itemCategoryRepository.findAllByItemCategoryEntity_IdAndIsActiveAndIsDeleted(itemCategoryId, true, false, request.toPageable(ALLOWED_SORT_FIELDS));
         return Pagination.buildPaginatedResponse(page);
     }
 
@@ -94,12 +86,6 @@ public class ItemCategoryServiceImpl implements ItemCategoryService {
         itemCategoryRepository.save(entity);
         log.info("ItemCategory soft-deleted with id: {}", entity.getId());
         return new SuccessResponse(true, entity.getId());
-    }
-
-    @Override
-    public ItemCategoryEntity getEntityById(Long itemTypeId, Long id) {
-        return itemCategoryRepository.findByItemTypeEntity_IdAndIdAndIsActiveAndIsDeleted(itemTypeId, id, true, false)
-                .orElseThrow(() -> new EntityNotFoundException("ItemCategoryEntity with id: " + itemTypeId + " and id: " + id));
     }
 
     @Override

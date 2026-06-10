@@ -78,6 +78,18 @@ public class ItemServiceImpl implements ItemService {
         return Pagination.buildPaginatedResponse(page);
     }
 
+    @Override
+    public PaginatedResponse<ItemSummary> getAll(Long itemTypeId, PaginatedRequest request) {
+        Page<@NonNull ItemSummary> page = itemRepository.findAllByItemTypeEntity_IdAndIsActiveAndIsDeleted(itemTypeId, true, false, request.toPageable(ALLOWED_SORT_FIELDS));
+        return Pagination.buildPaginatedResponse(page);
+    }
+
+    @Override
+    public PaginatedResponse<ItemSummary> search(String query, PaginatedRequest request) {
+        Page<@NonNull ItemSummary> page = itemRepository.searchByQuery(query, request.toPageable(ALLOWED_SORT_FIELDS));
+        return Pagination.buildPaginatedResponse(page);
+    }
+
     @Transactional
     @Override
     public SuccessResponse update(ItemEntity entity,

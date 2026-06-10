@@ -52,7 +52,12 @@ public class ItemController {
     }
 
     @GetMapping
-    public ResponseEntity<?> getAll(@Valid @ParameterObject PaginatedRequest request) {
+    public ResponseEntity<?> getAll(
+            @RequestParam(required = false) String query,
+            @Valid @ParameterObject PaginatedRequest request) {
+        if (query != null && !query.isBlank()) {
+            return ResponseEntity.ok(itemService.search(query, request));
+        }
         return ResponseEntity.ok(itemService.getAll(request));
     }
 

@@ -7,7 +7,6 @@ import com.example.restaurantbackendapplication1.dto.request.itemcategory.Create
 import com.example.restaurantbackendapplication1.dto.request.itemcategory.UpdateItemCategoryRequest;
 import com.example.restaurantbackendapplication1.dto.response.ItemCategoryResponse;
 import com.example.restaurantbackendapplication1.model.entity.ItemCategoryEntity;
-import com.example.restaurantbackendapplication1.model.entity.ItemTypeEntity;
 import com.example.restaurantbackendapplication1.model.entity.LocaleEntity;
 import com.example.restaurantbackendapplication1.model.projection.ItemCategorySummary;
 
@@ -15,21 +14,16 @@ import java.util.Map;
 
 public interface ItemCategoryService {
     SuccessResponse create(CreateItemCategoryRequest request,
-                           ItemTypeEntity itemTypeEntity,
                            ItemCategoryEntity itemCategoryEntity,
                            Map<Long, LocaleEntity> localeEntityMap);
 
-    ItemCategoryEntity getEntityById(Long itemTypeId, Long id);
-
     ItemCategoryEntity getEntityById(Long id);
 
-    ItemCategoryResponse getById(Long itemTypeId, Long id);
+    ItemCategoryResponse getById(Long id);
 
-    PaginatedResponse<ItemCategorySummary> getAll(Long itemTypeId, PaginatedRequest request);
+    PaginatedResponse<ItemCategorySummary> getAllRoots(PaginatedRequest request);
 
-    PaginatedResponse<ItemCategorySummary> getAllRoots(Long itemTypeId, PaginatedRequest request);
-
-    PaginatedResponse<ItemCategorySummary> getAllSubCategories(Long itemTypeId, Long itemCategoryId, PaginatedRequest request);
+    PaginatedResponse<ItemCategorySummary> getAllSubCategories(Long itemCategoryId, PaginatedRequest request);
 
     SuccessResponse update(ItemCategoryEntity entity,
                            UpdateItemCategoryRequest request);
