@@ -9,6 +9,7 @@ import com.example.restaurantbackendapplication1.dto.response.MenuCategoryRespon
 import com.example.restaurantbackendapplication1.model.dto.MenuCategoryDto;
 import com.example.restaurantbackendapplication1.model.entity.LocaleEntity;
 import com.example.restaurantbackendapplication1.model.entity.MenuCategoryEntity;
+import com.example.restaurantbackendapplication1.model.entity.MenuTypeEntity;
 import com.example.restaurantbackendapplication1.model.enums.MenuCategorySortField;
 import com.example.restaurantbackendapplication1.model.mapper.MenuCategoryMapper;
 import com.example.restaurantbackendapplication1.model.projection.MenuCategorySummary;
@@ -40,8 +41,9 @@ public class MenuCategoryServiceImpl implements MenuCategoryService {
     @Transactional
     @Override
     public SuccessResponse create(CreateMenuCategoryRequest request,
+                                  MenuTypeEntity menuTypeEntity,
                                   Map<Long, LocaleEntity> localeEntityMap) {
-        MenuCategoryEntity entity = MenuCategoryMapper.create(request, localeEntityMap);
+        MenuCategoryEntity entity = MenuCategoryMapper.create(request, menuTypeEntity, localeEntityMap);
         menuCategoryRepository.save(entity);
         log.info("MenuCategory created with id: {}", entity.getId());
         return new SuccessResponse(true, entity.getId());

@@ -2,22 +2,22 @@
 
 Base URL: `/api/v1`
 
-Dishes represent menu items within a menu category. Dish names and descriptions are locale-specific and embedded in every response via the `locales` array. Variants (with their recipes and ingredients) can be created inline when creating a dish. All records support soft-delete — deleted records are hidden from all responses.
+Dishes are standalone resources. Dish names and descriptions are locale-specific and embedded in every response via the `locales` array. All records support soft-delete — deleted records are hidden from all responses.
 
 ---
 
 ## Endpoints
 
-| Method | Path                                                                                       | Description               |
-|--------|--------------------------------------------------------------------------------------------|---------------------------|
-| POST   | `/api/v1/menu-categories/{menu-category-id}/dishes`                                        | Create a dish             |
-| GET    | `/api/v1/menu-categories/{menu-category-id}/dishes/{id}`                                   | Get a dish                |
-| GET    | `/api/v1/menu-categories/{menu-category-id}/dishes`                                        | List all dishes           |
-| PUT    | `/api/v1/menu-categories/{menu-category-id}/dishes/{id}`                                   | Update a dish             |
-| DELETE | `/api/v1/menu-categories/{menu-category-id}/dishes/{id}`                                   | Delete a dish             |
-| POST   | `/api/v1/menus/{menu-id}/menu-categories/{menu-category-id}/dishes/{dish-id}/locales`      | Create a dish locale      |
-| PUT    | `/api/v1/menus/{menu-id}/menu-categories/{menu-category-id}/dishes/{dish-id}/locales/{id}` | Update a dish locale      |
-| DELETE | `/api/v1/menus/{menu-id}/menu-categories/{menu-category-id}/dishes/{dish-id}/locales/{id}` | Delete a dish locale      |
+| Method | Path                                          | Description          |
+|--------|-----------------------------------------------|----------------------|
+| POST   | `/api/v1/dishes`                              | Create a dish        |
+| GET    | `/api/v1/dishes/{id}`                         | Get a dish           |
+| GET    | `/api/v1/dishes`                              | List all dishes      |
+| PUT    | `/api/v1/dishes/{id}`                         | Update a dish        |
+| DELETE | `/api/v1/dishes/{id}`                         | Delete a dish        |
+| POST   | `/api/v1/dishes/{dish-id}/locales`            | Create a dish locale |
+| PUT    | `/api/v1/dishes/{dish-id}/locales/{id}`       | Update a dish locale |
+| DELETE | `/api/v1/dishes/{dish-id}/locales/{id}`       | Delete a dish locale |
 
 ---
 
@@ -25,38 +25,30 @@ Dishes represent menu items within a menu category. Dish names and descriptions 
 
 ### Dish
 
-| Field               | Type    | Required | Constraints            | Description                                        |
-|---------------------|---------|----------|------------------------|----------------------------------------------------|
-| `id`                | Long    | —        | read-only              | Auto-generated identifier                          |
-| `menu_category_id`  | Long    | —        | read-only              | ID of the parent menu category                     |
-| `code`              | String  | Yes      | max 50 chars, not blank, create-only | Unique dish code (e.g., `BURGER_CLASSIC`) |
-| `sort_order`        | Integer | Yes      | not null               | Display order                                      |
-| `is_veg`            | Boolean | No       | —                      | Whether the dish is vegetarian                     |
-| `locales`           | Array   | —        | read-only              | All locale translations for this dish              |
+| Field        | Type    | Required | Constraints                            | Description                               |
+|--------------|---------|----------|----------------------------------------|-------------------------------------------|
+| `id`         | Long    | —        | read-only                              | Auto-generated identifier                 |
+| `code`       | String  | Yes      | max 50 chars, not blank, create-only   | Unique dish code (e.g., `BURGER_CLASSIC`) |
+| `sort_order` | Integer | Yes      | not null                               | Display order                             |
+| `locales`    | Array   | —        | read-only                              | All locale translations for this dish     |
 
 ### Dish Locale
 
-| Field         | Type    | Required | Constraints              | Description                          |
-|---------------|---------|----------|--------------------------|--------------------------------------|
-| `id`          | Long    | —        | read-only                | Auto-generated identifier            |
-| `locale_id`   | Long    | Yes      | not null, must exist     | ID of an existing active locale      |
-| `name`        | String  | Yes      | not blank, max 255 chars | Localized name of the dish           |
-| `description` | String  | No       | —                        | Localized description                |
-| `sort_order`  | Integer | Yes      | not null                 | Display order for this locale entry  |
+| Field         | Type    | Required | Constraints              | Description                         |
+|---------------|---------|----------|--------------------------|-------------------------------------|
+| `id`          | Long    | —        | read-only                | Auto-generated identifier           |
+| `locale_id`   | Long    | Yes      | not null, must exist     | ID of an existing active locale     |
+| `name`        | String  | Yes      | not blank, max 255 chars | Localized name of the dish          |
+| `description` | String  | No       | —                        | Localized description               |
+| `sort_order`  | Integer | Yes      | not null                 | Display order for this locale entry |
 
 ---
 
 ## Create Dish
 
-`POST /api/v1/menu-categories/{menu-category-id}/dishes`
+`POST /api/v1/dishes`
 
-Creates a dish along with optional locale translations and variants. Variants are created inline — each variant must include a `recipe` with at least one ingredient. All provided `locale_id` values must reference existing active locales. All provided `item_id` and `unit_id` values must reference existing active records.
-
-### Path Parameters
-
-| Parameter          | Type | Description              |
-|--------------------|------|--------------------------|
-| `menu-category-id` | Long | ID of the menu category  |
+Creates a dish with optional embedded locale translations.
 
 ### Request Body
 
@@ -64,7 +56,6 @@ Creates a dish along with optional locale translations and variants. Variants ar
 {
   "code": "BURGER_CLASSIC",
   "sort_order": 1,
-  "is_veg": false,
   "locales": [
     {
       "locale_id": 1,
@@ -78,39 +69,6 @@ Creates a dish along with optional locale translations and variants. Variants ar
       "description": "তাজা সবজি সহ রসালো বিফ প্যাটি।",
       "sort_order": 2
     }
-  ],
-  "variants": [
-    {
-      "code": "SINGLE",
-      "sort_order": 1,
-      "price": 5.99,
-      "is_default": true,
-      "is_available": true,
-      "is_featured": false,
-      "locales": [
-        {
-          "locale_id": 1,
-          "name": "Single",
-          "description": "Single patty burger",
-          "sort_order": 1
-        }
-      ],
-      "recipe": {
-        "code": "BURGER_CLASSIC_SINGLE",
-        "ingredients": [
-          {
-            "item_id": 3,
-            "quantity": 1.000,
-            "unit_id": 1
-          },
-          {
-            "item_id": 7,
-            "quantity": 0.100,
-            "unit_id": 2
-          }
-        ]
-      }
-    }
   ]
 }
 ```
@@ -121,9 +79,7 @@ Creates a dish along with optional locale translations and variants. Variants ar
 |--------------|---------|----------|-------------------------|
 | `code`       | String  | Yes      | Not blank, max 50 chars |
 | `sort_order` | Integer | Yes      | Not null                |
-| `is_veg`     | Boolean | No       | —                       |
 | `locales`    | Array   | No       | See locale fields below |
-| `variants`   | Array   | No       | See variant fields in [Dish Variant API](dish-variant-api.md) |
 
 **Locale fields (`locales[]`):**
 
@@ -147,16 +103,15 @@ Creates a dish along with optional locale translations and variants. Variants ar
 
 ## Get Dish
 
-`GET /api/v1/menu-categories/{menu-category-id}/dishes/{id}`
+`GET /api/v1/dishes/{id}`
 
 Returns a single dish with all its locale translations.
 
 ### Path Parameters
 
-| Parameter          | Type | Description              |
-|--------------------|------|--------------------------|
-| `menu-category-id` | Long | ID of the menu category  |
-| `id`               | Long | ID of the dish           |
+| Parameter | Type | Description    |
+|-----------|------|----------------|
+| `id`      | Long | ID of the dish |
 
 ### Response `200 OK`
 
@@ -164,10 +119,8 @@ Returns a single dish with all its locale translations.
 {
   "dish": {
     "id": 1,
-    "menu_category_id": 2,
     "code": "BURGER_CLASSIC",
     "sort_order": 1,
-    "is_veg": false,
     "locales": [
       {
         "id": 1,
@@ -192,24 +145,18 @@ Returns a single dish with all its locale translations.
 
 ## List All Dishes
 
-`GET /api/v1/menu-categories/{menu-category-id}/dishes`
+`GET /api/v1/dishes`
 
-Returns a paginated list of active (non-deleted) dishes for a menu category.
-
-### Path Parameters
-
-| Parameter          | Type | Description              |
-|--------------------|------|--------------------------|
-| `menu-category-id` | Long | ID of the menu category  |
+Returns a paginated list of all active (non-deleted) dishes.
 
 ### Query Parameters
 
-| Parameter  | Type    | Default | Constraints                              | Description              |
-|------------|---------|---------|------------------------------------------|--------------------------|
-| `page`     | Integer | `0`     | >= 0                                     | Zero-based page index    |
-| `size`     | Integer | `10`    | 1 – 50                                   | Number of items per page |
-| `sort_by`  | String  | `id`    | `id`, `code`, `sortOrder`, `createdAt`   | Field to sort by         |
-| `sort_dir` | String  | `ASC`   | `ASC`, `DESC`                            | Sort direction           |
+| Parameter  | Type    | Default | Constraints                            | Description              |
+|------------|---------|---------|----------------------------------------|--------------------------|
+| `page`     | Integer | `0`     | >= 0                                   | Zero-based page index    |
+| `size`     | Integer | `10`    | 1 – 50                                 | Number of items per page |
+| `sort_by`  | String  | `id`    | `id`, `code`, `sortOrder`, `createdAt` | Field to sort by         |
+| `sort_dir` | String  | `ASC`   | `ASC`, `DESC`                          | Sort direction           |
 
 ### Response `200 OK`
 
@@ -218,17 +165,20 @@ Returns a paginated list of active (non-deleted) dishes for a menu category.
   "data": [
     {
       "id": 1,
-      "menu_category_id": 2,
       "code": "BURGER_CLASSIC",
       "sort_order": 1,
-      "is_veg": false
+      "locales": [
+        { "id": 1, "locale_id": 1, "name": "Classic Burger", "description": "A juicy beef patty with fresh vegetables.", "sort_order": 1 },
+        { "id": 2, "locale_id": 2, "name": "ক্লাসিক বার্গার", "description": "তাজা সবজি সহ রসালো বিফ প্যাটি।", "sort_order": 2 }
+      ]
     },
     {
       "id": 2,
-      "menu_category_id": 2,
       "code": "VEGGIE_WRAP",
       "sort_order": 2,
-      "is_veg": true
+      "locales": [
+        { "id": 3, "locale_id": 1, "name": "Veggie Wrap", "description": "Fresh vegetables in a soft wrap.", "sort_order": 1 }
+      ]
     }
   ],
   "current_page": 0,
@@ -244,23 +194,21 @@ Returns a paginated list of active (non-deleted) dishes for a menu category.
 
 ## Update Dish
 
-`PUT /api/v1/menu-categories/{menu-category-id}/dishes/{id}`
+`PUT /api/v1/dishes/{id}`
 
-Updates `sort_order` and `is_veg`. The `code` field is set at creation and cannot be changed. Locale translations are managed via the dish locale endpoints. Variants are managed via the [Dish Variant API](dish-variant-api.md).
+Updates `sort_order`. The `code` is immutable and cannot be changed. Locale translations are managed via the dish locale endpoints.
 
 ### Path Parameters
 
-| Parameter          | Type | Description              |
-|--------------------|------|--------------------------|
-| `menu-category-id` | Long | ID of the menu category  |
-| `id`               | Long | ID of the dish           |
+| Parameter | Type | Description    |
+|-----------|------|----------------|
+| `id`      | Long | ID of the dish |
 
 ### Request Body
 
 ```json
 {
-  "sort_order": 2,
-  "is_veg": true
+  "sort_order": 2
 }
 ```
 
@@ -269,7 +217,6 @@ Updates `sort_order` and `is_veg`. The `code` field is set at creation and canno
 | Field        | Type    | Required | Validation |
 |--------------|---------|----------|------------|
 | `sort_order` | Integer | Yes      | Not null   |
-| `is_veg`     | Boolean | No       | —          |
 
 ### Response `200 OK`
 
@@ -284,16 +231,15 @@ Updates `sort_order` and `is_veg`. The `code` field is set at creation and canno
 
 ## Delete Dish
 
-`DELETE /api/v1/menu-categories/{menu-category-id}/dishes/{id}`
+`DELETE /api/v1/dishes/{id}`
 
 Soft-deletes the dish. The record is not removed from the database but will no longer appear in any response.
 
 ### Path Parameters
 
-| Parameter          | Type | Description              |
-|--------------------|------|--------------------------|
-| `menu-category-id` | Long | ID of the menu category  |
-| `id`               | Long | ID of the dish           |
+| Parameter | Type | Description    |
+|-----------|------|----------------|
+| `id`      | Long | ID of the dish |
 
 ### Response `200 OK`
 
@@ -308,23 +254,21 @@ Soft-deletes the dish. The record is not removed from the database but will no l
 
 ## Dish Locales
 
-Dish locale endpoints manage per-locale translations for a dish. The `{dish-id}` path parameter must reference an existing, active dish.
+Dish locale endpoints manage per-locale translations for a dish. The `{dish-id}` must reference an existing active dish.
 
 ---
 
 ### Create Dish Locale
 
-`POST /api/v1/menus/{menu-id}/menu-categories/{menu-category-id}/dishes/{dish-id}/locales`
+`POST /api/v1/dishes/{dish-id}/locales`
 
 Adds a new locale translation to an existing dish.
 
 #### Path Parameters
 
-| Parameter          | Type | Description              |
-|--------------------|------|--------------------------|
-| `menu-id`          | Long | ID of the menu           |
-| `menu-category-id` | Long | ID of the menu category  |
-| `dish-id`          | Long | ID of the dish           |
+| Parameter | Type | Description    |
+|-----------|------|----------------|
+| `dish-id` | Long | ID of the dish |
 
 #### Request Body
 
@@ -359,18 +303,16 @@ Adds a new locale translation to an existing dish.
 
 ### Update Dish Locale
 
-`PUT /api/v1/menus/{menu-id}/menu-categories/{menu-category-id}/dishes/{dish-id}/locales/{id}`
+`PUT /api/v1/dishes/{dish-id}/locales/{id}`
 
-Updates an existing locale translation for a dish. The `locale_id` cannot be changed.
+Updates an existing locale translation. The `locale_id` cannot be changed; use delete + create to switch locale.
 
 #### Path Parameters
 
-| Parameter          | Type | Description              |
-|--------------------|------|--------------------------|
-| `menu-id`          | Long | ID of the menu           |
-| `menu-category-id` | Long | ID of the menu category  |
-| `dish-id`          | Long | ID of the dish           |
-| `id`               | Long | ID of the dish locale    |
+| Parameter | Type | Description           |
+|-----------|------|-----------------------|
+| `dish-id` | Long | ID of the dish        |
+| `id`      | Long | ID of the dish locale |
 
 #### Request Body
 
@@ -403,18 +345,16 @@ Updates an existing locale translation for a dish. The `locale_id` cannot be cha
 
 ### Delete Dish Locale
 
-`DELETE /api/v1/menus/{menu-id}/menu-categories/{menu-category-id}/dishes/{dish-id}/locales/{id}`
+`DELETE /api/v1/dishes/{dish-id}/locales/{id}`
 
-Soft-deletes a dish locale. The record is not removed from the database but will no longer appear in any response.
+Soft-deletes a dish locale translation.
 
 #### Path Parameters
 
-| Parameter          | Type | Description              |
-|--------------------|------|--------------------------|
-| `menu-id`          | Long | ID of the menu           |
-| `menu-category-id` | Long | ID of the menu category  |
-| `dish-id`          | Long | ID of the dish           |
-| `id`               | Long | ID of the dish locale    |
+| Parameter | Type | Description           |
+|-----------|------|-----------------------|
+| `dish-id` | Long | ID of the dish        |
+| `id`      | Long | ID of the dish locale |
 
 #### Response `200 OK`
 
@@ -429,19 +369,9 @@ Soft-deletes a dish locale. The record is not removed from the database but will
 
 ## Error Responses
 
-All errors follow a common structure:
-
-```json
-{
-  "request_id": "abc-123",
-  "status": 404,
-  "error": "ENTITY_NOT_FOUND",
-  "message": "Dish not found with id: 99"
-}
-```
-
-| HTTP Status | Error Code                 | Cause                                                                    |
-|-------------|----------------------------|--------------------------------------------------------------------------|
-| 400         | `INVALID_ARGUMENT`         | Missing required fields, blank code, or invalid sort field               |
-| 404         | `ENTITY_NOT_FOUND`         | Dish, menu category, locale, or dish locale not found or already deleted |
-| 409         | `DATA_INTEGRITY_VIOLATION` | Constraint violation (e.g. duplicate code)                               |
+| HTTP Status | Cause                                                              |
+|-------------|--------------------------------------------------------------------|
+| 400         | Missing required fields, blank code, or invalid sort field         |
+| 404         | Dish or dish locale not found or already deleted                   |
+| 401         | JWT token missing or invalid                                       |
+| 403         | Authenticated user lacks permission                                |

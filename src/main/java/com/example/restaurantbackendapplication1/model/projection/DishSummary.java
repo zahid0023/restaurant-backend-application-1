@@ -10,12 +10,8 @@ import java.util.List;
 public interface DishSummary {
     Long getId();
 
-    @Value("#{target.menuCategoryEntity.id}")
-    Long getMenuCategoryId();
-
     String getCode();
     Integer getSortOrder();
-Boolean getIsVeg();
 
     @Value("#{target.dishesLocaleEntities}")
     List<LocaleSummary> getLocales();

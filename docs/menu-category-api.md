@@ -10,6 +10,23 @@ Authorization: Bearer <token>
 
 ---
 
+## Endpoints
+
+| Method | Path | Description |
+|--------|------|-------------|
+| POST   | `/api/v1/menu-categories` | Create a menu category |
+| GET    | `/api/v1/menu-categories/{id}` | Get a menu category |
+| GET    | `/api/v1/menu-categories` | List all menu categories |
+| PUT    | `/api/v1/menu-categories/{id}` | Update a menu category |
+| DELETE | `/api/v1/menu-categories/{id}` | Delete a menu category |
+| POST   | `/api/v1/menu-categories/{menu-category-id}/locales` | Create a menu category locale |
+| PUT    | `/api/v1/menu-categories/{menu-category-id}/locales/{id}` | Update a menu category locale |
+| DELETE | `/api/v1/menu-categories/{menu-category-id}/locales/{id}` | Delete a menu category locale |
+| POST   | `/api/v1/menu-categories/{menu-category-id}/dishes/assign` | Assign a dish to a menu category |
+| DELETE | `/api/v1/menu-categories/{menu-category-id}/dishes/{dish-id}/unassign` | Unassign a dish from a menu category |
+
+---
+
 ## Menu Categories
 
 ### Create Menu Category
@@ -22,19 +39,20 @@ Creates a new menu category with optional embedded locale translations.
 
 ```json
 {
+  "menu_type_id": 1,
   "code": "STARTERS",
   "sort_order": 1,
   "locales": [
     {
       "locale_id": 1,
       "name": "Starters",
-      "description": "Cold and warm starters",
+      "description": "Light appetizers to begin your meal",
       "sort_order": 1
     },
     {
       "locale_id": 2,
-      "name": "Mezeler",
-      "description": "Soğuk ve sıcak mezeler",
+      "name": "স্টার্টার",
+      "description": "খাবার শুরুর জন্য হালকা অ্যাপেটাইজার",
       "sort_order": 1
     }
   ]
@@ -43,7 +61,8 @@ Creates a new menu category with optional embedded locale translations.
 
 | Field | Type | Required | Constraints |
 |---|---|---|---|
-| `code` | string | yes | max 50 chars, not blank |
+| `menu_type_id` | long | yes | must be an existing active menu type |
+| `code` | string | yes | max 50 chars, not blank, immutable after creation |
 | `sort_order` | integer | yes | |
 | `locales` | array | no | see locale fields below |
 | `locales[].locale_id` | long | yes | must be an existing active locale |
@@ -81,8 +100,8 @@ Creates a new menu category with optional embedded locale translations.
     "code": "STARTERS",
     "sort_order": 1,
     "locales": [
-      { "id": 1, "locale_id": 1, "name": "Starters", "description": "Cold and warm starters", "sort_order": 1 },
-      { "id": 2, "locale_id": 2, "name": "Mezeler", "description": "Soğuk ve sıcak mezeler", "sort_order": 1 }
+      { "id": 1, "locale_id": 1, "name": "Starters", "description": "Light appetizers to begin your meal", "sort_order": 1 },
+      { "id": 2, "locale_id": 2, "name": "স্টার্টার", "description": "খাবার শুরুর জন্য হালকা অ্যাপেটাইজার", "sort_order": 1 }
     ]
   }
 }
@@ -115,16 +134,16 @@ Returns a paginated list of all active menu categories.
       "code": "STARTERS",
       "sort_order": 1,
       "locales": [
-        { "id": 1, "locale_id": 1, "name": "Starters", "description": "Cold and warm starters", "sort_order": 1 },
-        { "id": 2, "locale_id": 2, "name": "Mezeler", "description": "Soğuk ve sıcak mezeler", "sort_order": 1 }
+        { "id": 1, "locale_id": 1, "name": "Starters", "description": "Light appetizers to begin your meal", "sort_order": 1 },
+        { "id": 2, "locale_id": 2, "name": "স্টার্টার", "description": "খাবার শুরুর জন্য হালকা অ্যাপেটাইজার", "sort_order": 1 }
       ]
     },
     {
       "id": 2,
       "code": "MAIN_COURSE",
-      "sort_order": 2,
+      "sort_order": 3,
       "locales": [
-        { "id": 3, "locale_id": 1, "name": "Main Course", "description": "Main dishes", "sort_order": 1 }
+        { "id": 3, "locale_id": 1, "name": "Main Course", "description": "Hearty main course dishes for lunch", "sort_order": 1 }
       ]
     }
   ],
@@ -141,7 +160,7 @@ Returns a paginated list of all active menu categories.
 
 ### Update Menu Category
 
-Updates the mutable fields of an existing menu category. `code` is immutable and cannot be changed. Locale translations are managed separately via the Menu Category Locales API.
+Updates the mutable fields of an existing menu category. `code` is immutable and cannot be changed. Locale translations are managed separately via the locale endpoints below.
 
 **`PUT /api/v1/menu-categories/{id}`**
 
@@ -217,10 +236,10 @@ Manage locale-specific translations for a menu category. The `{menu-category-id}
 
 ```json
 {
-  "locale_id": 1,
-  "name": "Starters",
-  "description": "Cold and warm starters",
-  "sort_order": 1
+  "locale_id": 3,
+  "name": "Entrées",
+  "description": "Légères entrées pour commencer votre repas",
+  "sort_order": 3
 }
 ```
 
@@ -236,7 +255,7 @@ Manage locale-specific translations for a menu category. The `{menu-category-id}
 ```json
 {
   "success": true,
-  "id": 1
+  "id": 3
 }
 ```
 
@@ -260,7 +279,7 @@ Updates the translation fields. The locale cannot be changed; use delete + creat
 ```json
 {
   "name": "Starters",
-  "description": "Cold and warm starters - updated",
+  "description": "Light appetizers to begin your meal - updated",
   "sort_order": 1
 }
 ```
@@ -306,11 +325,78 @@ Soft-deletes a locale translation.
 
 ---
 
+## Menu Category Dishes
+
+Manage dish assignments for a menu category. A dish can be assigned to one or more categories. A category can have one or more dishes. Assignments are soft-deleted on unassign.
+
+---
+
+### Assign Dish
+
+Assigns an existing active dish to a menu category. A dish can only be assigned once per category.
+
+**`POST /api/v1/menu-categories/{menu-category-id}/dishes/assign`**
+
+#### Path Parameters
+
+| Parameter | Type | Description |
+|---|---|---|
+| `menu-category-id` | long | Menu category ID |
+
+#### Request Body
+
+```json
+{
+  "dish_id": 11
+}
+```
+
+| Field | Type | Required | Constraints |
+|---|---|---|---|
+| `dish_id` | long | yes | must be an existing active dish; unique per category |
+
+#### Response `201 Created`
+
+```json
+{
+  "success": true,
+  "id": 5
+}
+```
+
+> `id` is the assignment record ID, not the dish ID.
+
+---
+
+### Unassign Dish
+
+Soft-deletes the assignment between a category and a dish. The dish itself is not affected.
+
+**`DELETE /api/v1/menu-categories/{menu-category-id}/dishes/{dish-id}/unassign`**
+
+#### Path Parameters
+
+| Parameter | Type | Description |
+|---|---|---|
+| `menu-category-id` | long | Menu category ID |
+| `dish-id` | long | ID of the dish to unassign |
+
+#### Response `200 OK`
+
+```json
+{
+  "success": true,
+  "id": 5
+}
+```
+
+---
+
 ## Error Responses
 
 ### 404 Not Found
 
-Returned when the requested resource does not exist or has been soft-deleted.
+Returned when the requested resource does not exist, has been soft-deleted, or a dish is not assigned to the category.
 
 ```json
 {

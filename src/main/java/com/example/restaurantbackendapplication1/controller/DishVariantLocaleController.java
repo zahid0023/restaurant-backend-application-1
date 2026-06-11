@@ -44,7 +44,6 @@ public class DishVariantLocaleController {
             @PathVariable("variant-id") Long variantId,
             @Valid @RequestBody CreateDishVariantLocaleRequest request) {
         menuCategoryService.getEntityById(menuCategoryId);
-        dishService.getEntityById(menuCategoryId, dishId);
         DishVariantEntity dishVariantEntity = dishVariantService.getEntityById(dishId, variantId);
         LocaleEntity localeEntity = localeService.getEntityById(request.getLocaleId());
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -59,7 +58,6 @@ public class DishVariantLocaleController {
             @PathVariable Long id,
             @Valid @RequestBody UpdateDishVariantLocaleRequest request) {
         menuCategoryService.getEntityById(menuCategoryId);
-        dishService.getEntityById(menuCategoryId, dishId);
         DishVariantLocaleEntity entity = dishVariantLocaleService.getEntityById(variantId, id);
         return ResponseEntity.ok(dishVariantLocaleService.update(entity, request));
     }
@@ -71,7 +69,6 @@ public class DishVariantLocaleController {
             @PathVariable("variant-id") Long variantId,
             @PathVariable Long id) {
         menuCategoryService.getEntityById(menuCategoryId);
-        dishService.getEntityById(menuCategoryId, dishId);
         DishVariantLocaleEntity entity = dishVariantLocaleService.getEntityById(variantId, id);
         return ResponseEntity.ok(dishVariantLocaleService.delete(entity));
     }

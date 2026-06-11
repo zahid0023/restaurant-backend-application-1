@@ -22,7 +22,4 @@ public class CreateDishRequest extends DishRequest {
 
     @Valid
     private List<CreateDishLocaleRequest> locales;
-
-    @Valid
-    private List<CreateDishVariantRequest> variants;
 }

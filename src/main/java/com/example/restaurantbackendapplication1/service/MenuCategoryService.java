@@ -8,12 +8,14 @@ import com.example.restaurantbackendapplication1.dto.request.menucategory.Update
 import com.example.restaurantbackendapplication1.dto.response.MenuCategoryResponse;
 import com.example.restaurantbackendapplication1.model.entity.LocaleEntity;
 import com.example.restaurantbackendapplication1.model.entity.MenuCategoryEntity;
+import com.example.restaurantbackendapplication1.model.entity.MenuTypeEntity;
 import com.example.restaurantbackendapplication1.model.projection.MenuCategorySummary;
 
 import java.util.Map;
 
 public interface MenuCategoryService {
     SuccessResponse create(CreateMenuCategoryRequest request,
+                           MenuTypeEntity menuTypeEntity,
                            Map<Long, LocaleEntity> localeEntityMap);
 
     MenuCategoryEntity getEntityById(Long id);
@@ -22,7 +24,8 @@ public interface MenuCategoryService {
 
     PaginatedResponse<MenuCategorySummary> getAll(PaginatedRequest request);
 
-    SuccessResponse update(MenuCategoryEntity entity, UpdateMenuCategoryRequest request);
+    SuccessResponse update(MenuCategoryEntity entity,
+                           UpdateMenuCategoryRequest request);
 
     SuccessResponse delete(Long id);
 }

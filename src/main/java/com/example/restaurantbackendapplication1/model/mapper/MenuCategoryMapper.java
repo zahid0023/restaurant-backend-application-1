@@ -9,6 +9,7 @@ import com.example.restaurantbackendapplication1.model.dto.MenuCategoryLocaleDto
 import com.example.restaurantbackendapplication1.model.entity.LocaleEntity;
 import com.example.restaurantbackendapplication1.model.entity.MenuCategoryEntity;
 import com.example.restaurantbackendapplication1.model.entity.MenuCategoryLocaleEntity;
+import com.example.restaurantbackendapplication1.model.entity.MenuTypeEntity;
 import lombok.experimental.UtilityClass;
 
 import java.util.List;
@@ -20,9 +21,11 @@ import java.util.stream.Collectors;
 public class MenuCategoryMapper {
 
     public static MenuCategoryEntity create(CreateMenuCategoryRequest request,
+                                            MenuTypeEntity menuTypeEntity,
                                             Map<Long, LocaleEntity> localeEntityMap) {
         MenuCategoryEntity entity = new MenuCategoryEntity();
         entity.setCode(request.getCode());
+        entity.setMenuTypeEntity(menuTypeEntity);
         applyCommonFields(entity, request);
         if (request.getLocales() != null) {
             entity.setMenuCategoryLocaleEntities(mapLocales(request.getLocales(), entity, localeEntityMap));

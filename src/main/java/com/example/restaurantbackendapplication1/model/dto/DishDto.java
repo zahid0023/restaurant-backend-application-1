@@ -16,9 +16,7 @@ import java.util.List;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class DishDto {
     private Long id;
-    private Long menuCategoryId;
     private String code;
     private Integer sortOrder;
-    private Boolean isVeg;
     private List<DishLocaleDto> locales;
 }

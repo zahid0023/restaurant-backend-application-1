@@ -6,8 +6,10 @@ import com.example.restaurantbackendapplication1.dto.request.menucategory.Update
 import com.example.restaurantbackendapplication1.dto.request.menucategory.menucategorylocale.CreateMenuCategoryLocaleRequest;
 import com.example.restaurantbackendapplication1.model.entity.LocaleEntity;
 import com.example.restaurantbackendapplication1.model.entity.MenuCategoryEntity;
+import com.example.restaurantbackendapplication1.model.entity.MenuTypeEntity;
 import com.example.restaurantbackendapplication1.service.LocaleService;
 import com.example.restaurantbackendapplication1.service.MenuCategoryService;
+import com.example.restaurantbackendapplication1.service.MenuTypeService;
 import com.example.restaurantbackendapplication1.utils.LocaleUtils;
 import jakarta.validation.Valid;
 import org.springdoc.core.annotations.ParameterObject;
@@ -22,20 +24,24 @@ import java.util.Map;
 public class MenuCategoryController {
 
     private final MenuCategoryService menuCategoryService;
+    private final MenuTypeService menuTypeService;
     private final LocaleService localeService;
 
     public MenuCategoryController(MenuCategoryService menuCategoryService,
+                                  MenuTypeService menuTypeService,
                                   LocaleService localeService) {
         this.menuCategoryService = menuCategoryService;
+        this.menuTypeService = menuTypeService;
         this.localeService = localeService;
     }
 
     @PostMapping
     public ResponseEntity<?> create(@Valid @RequestBody CreateMenuCategoryRequest request) {
+        MenuTypeEntity menuTypeEntity = menuTypeService.getEntityById(request.getMenuTypeId());
         Map<Long, LocaleEntity> localeEntityMap = LocaleUtils.resolveLocaleMap(
                 request.getLocales(), CreateMenuCategoryLocaleRequest::getLocaleId, localeService);
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(menuCategoryService.create(request, localeEntityMap));
+                .body(menuCategoryService.create(request, menuTypeEntity, localeEntityMap));
     }
 
     @GetMapping("/{id}")
@@ -43,7 +49,7 @@ public class MenuCategoryController {
         return ResponseEntity.ok(menuCategoryService.getById(id));
     }
 
-    @GetMapping
+    @GetMapping("")
     public ResponseEntity<?> getAll(@Valid @ParameterObject PaginatedRequest request) {
         return ResponseEntity.ok(menuCategoryService.getAll(request));
     }

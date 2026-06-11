@@ -40,4 +40,5 @@ public class DishesLocaleEntity extends AuditableEntity {
     @ColumnDefault("0")
     @Column(name = "sort_order", nullable = false)
     private Integer sortOrder;
+
 }

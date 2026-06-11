@@ -58,7 +58,7 @@ public class DishVariantController {
             @PathVariable("dish-id") Long dishId,
             @Valid @RequestBody CreateDishVariantRequest request) {
         menuCategoryService.getEntityById(menuCategoryId);
-        DishEntity dishEntity = dishService.getEntityById(menuCategoryId, dishId);
+        DishEntity dishEntity = null;
         Map<Long, LocaleEntity> localeEntityMap = LocaleUtils.resolveLocaleMap(
                 request.getLocales(), CreateDishVariantLocaleRequest::getLocaleId, localeService);
         Map<Long, ItemEntity> itemEntityMap = ItemUtils.resolveItemMap(

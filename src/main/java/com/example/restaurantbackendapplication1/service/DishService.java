@@ -7,29 +7,22 @@ import com.example.restaurantbackendapplication1.dto.request.dish.CreateDishRequ
 import com.example.restaurantbackendapplication1.dto.request.dish.UpdateDishRequest;
 import com.example.restaurantbackendapplication1.dto.response.DishResponse;
 import com.example.restaurantbackendapplication1.model.entity.DishEntity;
-import com.example.restaurantbackendapplication1.model.entity.ItemEntity;
 import com.example.restaurantbackendapplication1.model.entity.LocaleEntity;
-import com.example.restaurantbackendapplication1.model.entity.MenuCategoryEntity;
-import com.example.restaurantbackendapplication1.model.entity.UnitEntity;
 import com.example.restaurantbackendapplication1.model.projection.DishSummary;
 
 import java.util.Map;
 
 public interface DishService {
 
-    SuccessResponse create(CreateDishRequest request,
-                           MenuCategoryEntity menuCategoryEntity,
-                           Map<Long, LocaleEntity> localeEntityMap,
-                           Map<Long, ItemEntity> itemEntityMap,
-                           Map<Long, UnitEntity> unitEntityMap);
+    SuccessResponse create(CreateDishRequest request, Map<Long, LocaleEntity> localeEntityMap);
 
-    DishEntity getEntityById(Long menuCategoryId, Long id);
+    DishEntity getEntityById(Long id);
 
-    DishResponse getById(Long menuCategoryId, Long id);
+    DishResponse getById(Long id);
 
-    PaginatedResponse<DishSummary> getAll(Long menuCategoryId, PaginatedRequest request);
+    PaginatedResponse<DishSummary> getAll(PaginatedRequest request);
 
     SuccessResponse update(DishEntity entity, UpdateDishRequest request);
 
-    SuccessResponse delete(Long menuCategoryId, Long id);
+    SuccessResponse delete(Long id);
 }

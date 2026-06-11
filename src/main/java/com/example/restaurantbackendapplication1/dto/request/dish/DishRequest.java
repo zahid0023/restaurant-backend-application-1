@@ -11,6 +11,4 @@ public class DishRequest {
 
     @NotNull
     private Integer sortOrder;
-
-    private Boolean isVeg;
 }

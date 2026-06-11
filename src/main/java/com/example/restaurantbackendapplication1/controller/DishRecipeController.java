@@ -56,7 +56,6 @@ public class DishRecipeController {
             @PathVariable("variant-id") Long variantId,
             @Valid @RequestBody CreateDishRecipeRequest request) {
         menuCategoryService.getEntityById(menuCategoryId);
-        dishService.getEntityById(menuCategoryId, dishId);
         DishVariantEntity dishVariantEntity = dishVariantService.getEntityById(dishId, variantId);
         Map<Long, ItemEntity> itemEntityMap = ItemUtils.resolveItemMap(
                 request.getIngredients(), DishRecipeIngredientRequest::getItemId, itemService);
@@ -73,7 +72,6 @@ public class DishRecipeController {
             @PathVariable("variant-id") Long variantId,
             @PathVariable Long id) {
         menuCategoryService.getEntityById(menuCategoryId);
-        dishService.getEntityById(menuCategoryId, dishId);
         return ResponseEntity.ok(dishRecipeService.getById(variantId, id));
     }
 
@@ -84,7 +82,6 @@ public class DishRecipeController {
             @PathVariable("variant-id") Long variantId,
             @Valid @ParameterObject PaginatedRequest request) {
         menuCategoryService.getEntityById(menuCategoryId);
-        dishService.getEntityById(menuCategoryId, dishId);
         return ResponseEntity.ok(dishRecipeService.getAll(variantId, request));
     }
 
@@ -96,7 +93,6 @@ public class DishRecipeController {
             @PathVariable Long id,
             @Valid @RequestBody UpdateDishRecipeRequest request) {
         menuCategoryService.getEntityById(menuCategoryId);
-        dishService.getEntityById(menuCategoryId, dishId);
         DishRecipeEntity entity = dishRecipeService.getEntityById(variantId, id);
         return ResponseEntity.ok(dishRecipeService.update(entity, request));
     }
@@ -108,7 +104,6 @@ public class DishRecipeController {
             @PathVariable("variant-id") Long variantId,
             @PathVariable Long id) {
         menuCategoryService.getEntityById(menuCategoryId);
-        dishService.getEntityById(menuCategoryId, dishId);
         return ResponseEntity.ok(dishRecipeService.delete(variantId, id));
     }
 

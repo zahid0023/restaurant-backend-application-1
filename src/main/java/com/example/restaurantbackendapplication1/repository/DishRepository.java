@@ -11,9 +11,7 @@ import java.util.Optional;
 
 public interface DishRepository extends JpaRepository<@NonNull DishEntity, @NonNull Long> {
 
-    Optional<DishEntity> findByMenuCategoryEntity_IdAndIdAndIsActiveAndIsDeleted(
-            Long menuCategoryId, Long id, Boolean isActive, Boolean isDeleted);
+    Optional<DishEntity> findByIdAndIsActiveAndIsDeleted(Long id, Boolean isActive, Boolean isDeleted);
 
-    Page<@NonNull DishSummary> findAllByMenuCategoryEntity_IdAndIsActiveAndIsDeleted(
-            Long menuCategoryId, Boolean isActive, Boolean isDeleted, Pageable pageable);
+    Page<@NonNull DishSummary> findAllByIsActiveAndIsDeleted(Boolean isActive, Boolean isDeleted, Pageable pageable);
 }

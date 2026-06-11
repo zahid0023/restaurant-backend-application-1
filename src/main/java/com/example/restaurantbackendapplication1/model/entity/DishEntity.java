@@ -7,8 +7,6 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -18,12 +16,6 @@ import java.util.Set;
 @Entity
 @Table(name = "dishes")
 public class DishEntity extends AuditableEntity {
-
-    @NotNull
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "menu_category_id", nullable = false)
-    private MenuCategoryEntity menuCategoryEntity;
 
     @Size(max = 50)
     @NotNull
@@ -35,13 +27,7 @@ public class DishEntity extends AuditableEntity {
     @Column(name = "sort_order", nullable = false)
     private Integer sortOrder;
 
-    @Column(name = "is_veg")
-    private Boolean isVeg;
-
     @OneToMany(mappedBy = "dishEntity", cascade = CascadeType.ALL)
     private Set<DishesLocaleEntity> dishesLocaleEntities = new LinkedHashSet<>();
-
-    @OneToMany(mappedBy = "dishEntity", cascade = CascadeType.ALL)
-    private Set<DishVariantEntity> dishVariantEntities = new LinkedHashSet<>();
 
 }

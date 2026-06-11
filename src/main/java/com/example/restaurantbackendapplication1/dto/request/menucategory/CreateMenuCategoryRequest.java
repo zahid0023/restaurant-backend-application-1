@@ -14,6 +14,7 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = false)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class CreateMenuCategoryRequest extends MenuCategoryRequest {
+    private Long menuTypeId;
 
     @NotBlank
     @Size(max = 50)

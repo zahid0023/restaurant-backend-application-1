@@ -8,10 +8,7 @@ import com.example.restaurantbackendapplication1.dto.request.dish.UpdateDishRequ
 import com.example.restaurantbackendapplication1.dto.response.DishResponse;
 import com.example.restaurantbackendapplication1.model.dto.DishDto;
 import com.example.restaurantbackendapplication1.model.entity.DishEntity;
-import com.example.restaurantbackendapplication1.model.entity.ItemEntity;
 import com.example.restaurantbackendapplication1.model.entity.LocaleEntity;
-import com.example.restaurantbackendapplication1.model.entity.MenuCategoryEntity;
-import com.example.restaurantbackendapplication1.model.entity.UnitEntity;
 import com.example.restaurantbackendapplication1.model.enums.DishSortField;
 import com.example.restaurantbackendapplication1.model.mapper.DishMapper;
 import com.example.restaurantbackendapplication1.model.projection.DishSummary;
@@ -42,34 +39,30 @@ public class DishServiceImpl implements DishService {
 
     @Transactional
     @Override
-    public SuccessResponse create(CreateDishRequest request,
-                                  MenuCategoryEntity menuCategoryEntity,
-                                  Map<Long, LocaleEntity> localeEntityMap,
-                                  Map<Long, ItemEntity> itemEntityMap,
-                                  Map<Long, UnitEntity> unitEntityMap) {
-        DishEntity entity = DishMapper.create(request, menuCategoryEntity, localeEntityMap, itemEntityMap, unitEntityMap);
+    public SuccessResponse create(CreateDishRequest request, Map<Long, LocaleEntity> localeEntityMap) {
+        DishEntity entity = DishMapper.create(request, localeEntityMap);
         dishRepository.save(entity);
         log.info("Dish created with id: {}", entity.getId());
         return new SuccessResponse(true, entity.getId());
     }
 
     @Override
-    public DishEntity getEntityById(Long menuCategoryId, Long id) {
-        return dishRepository.findByMenuCategoryEntity_IdAndIdAndIsActiveAndIsDeleted(menuCategoryId, id, true, false)
+    public DishEntity getEntityById(Long id) {
+        return dishRepository.findByIdAndIsActiveAndIsDeleted(id, true, false)
                 .orElseThrow(() -> new EntityNotFoundException("Dish not found with id: " + id));
     }
 
     @Override
-    public DishResponse getById(Long menuCategoryId, Long id) {
-        DishEntity entity = getEntityById(menuCategoryId, id);
+    public DishResponse getById(Long id) {
+        DishEntity entity = getEntityById(id);
         DishDto dto = DishMapper.toDto(entity);
         return new DishResponse(dto);
     }
 
     @Override
-    public PaginatedResponse<DishSummary> getAll(Long menuCategoryId, PaginatedRequest request) {
+    public PaginatedResponse<DishSummary> getAll(PaginatedRequest request) {
         Page<@NonNull DishSummary> page = dishRepository
-                .findAllByMenuCategoryEntity_IdAndIsActiveAndIsDeleted(menuCategoryId, true, false, request.toPageable(ALLOWED_SORT_FIELDS));
+                .findAllByIsActiveAndIsDeleted(true, false, request.toPageable(ALLOWED_SORT_FIELDS));
         return Pagination.buildPaginatedResponse(page);
     }
 
@@ -84,8 +77,8 @@ public class DishServiceImpl implements DishService {
 
     @Transactional
     @Override
-    public SuccessResponse delete(Long menuCategoryId, Long id) {
-        DishEntity entity = getEntityById(menuCategoryId, id);
+    public SuccessResponse delete(Long id) {
+        DishEntity entity = getEntityById(id);
         entity.setIsDeleted(true);
         entity.setIsActive(false);
         dishRepository.save(entity);
