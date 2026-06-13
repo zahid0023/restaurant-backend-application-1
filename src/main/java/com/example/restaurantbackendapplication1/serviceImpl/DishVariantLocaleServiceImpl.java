@@ -37,8 +37,9 @@ public class DishVariantLocaleServiceImpl implements DishVariantLocaleService {
 
     @Override
     public DishVariantLocaleEntity getEntityById(Long dishVariantId, Long id) {
-        return dishVariantLocaleRepository.findByDishVariantEntity_IdAndIdAndIsActiveAndIsDeleted(dishVariantId, id, true, false)
-                .orElseThrow(() -> new EntityNotFoundException("DishVariant locale not found with id: " + id));
+        return dishVariantLocaleRepository
+                .findByDishVariantEntity_IdAndIdAndIsActiveAndIsDeleted(dishVariantId, id, true, false)
+                .orElseThrow(() -> new EntityNotFoundException("DishVariantLocale not found with id: " + id));
     }
 
     @Transactional

@@ -46,19 +46,14 @@ public class DishVariantEntity extends AuditableEntity {
     private Boolean isDefault = false;
 
     @NotNull
-    @ColumnDefault("true")
-    @Column(name = "is_available", nullable = false)
-    private Boolean isAvailable = true;
-
-    @NotNull
     @ColumnDefault("false")
-    @Column(name = "is_featured", nullable = false)
-    private Boolean isFeatured = false;
+    @Column(name = "is_veg", nullable = false)
+    private Boolean isVeg = false;
 
     @OneToMany(mappedBy = "dishVariantEntity", cascade = CascadeType.ALL)
     private Set<DishVariantLocaleEntity> dishVariantLocaleEntities = new LinkedHashSet<>();
 
     @OneToMany(mappedBy = "dishVariantEntity", cascade = CascadeType.ALL)
-    private Set<DishRecipeEntity> dishRecipeEntities = new LinkedHashSet<>();
+    private Set<DishVariantIngredientEntity> dishVariantIngredientEntities = new LinkedHashSet<>();
 
 }

@@ -18,7 +18,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/items")
-public class ItemController {
+public class    ItemController {
 
     private final ItemService itemService;
     private final ItemTypeService itemTypeService;

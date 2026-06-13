@@ -21,8 +21,7 @@ public class DishVariantDto {
     private Integer sortOrder;
     private BigDecimal price;
     private Boolean isDefault;
-    private Boolean isAvailable;
-    private Boolean isFeatured;
+    private Boolean isVeg;
     private List<DishVariantLocaleDto> locales;
-    private DishRecipeDto recipe;
+    private List<DishVariantIngredientDto> ingredients;
 }

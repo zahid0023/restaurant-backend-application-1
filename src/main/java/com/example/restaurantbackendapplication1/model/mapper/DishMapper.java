@@ -6,7 +6,7 @@ import com.example.restaurantbackendapplication1.dto.request.dish.UpdateDishRequ
 import com.example.restaurantbackendapplication1.model.dto.DishDto;
 import com.example.restaurantbackendapplication1.model.dto.DishLocaleDto;
 import com.example.restaurantbackendapplication1.model.entity.DishEntity;
-import com.example.restaurantbackendapplication1.model.entity.DishesLocaleEntity;
+import com.example.restaurantbackendapplication1.model.entity.DishLocaleEntity;
 import com.example.restaurantbackendapplication1.model.entity.LocaleEntity;
 import lombok.experimental.UtilityClass;
 
@@ -25,7 +25,7 @@ public class DishMapper {
         applyCommonFields(entity, request);
 
         if (request.getLocales() != null) {
-            Set<DishesLocaleEntity> localeEntities = request.getLocales().stream()
+            Set<DishLocaleEntity> localeEntities = request.getLocales().stream()
                     .map(lr -> DishLocaleMapper.create(lr, entity, localeEntityMap.get(lr.getLocaleId())))
                     .collect(Collectors.toSet());
             entity.setDishesLocaleEntities(localeEntities);

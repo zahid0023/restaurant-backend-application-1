@@ -1,16 +1,14 @@
 package com.example.restaurantbackendapplication1.model.mapper;
 
-import com.example.restaurantbackendapplication1.dto.request.dishrecipe.CreateDishRecipeRequest;
 import com.example.restaurantbackendapplication1.dto.request.dishvariant.CreateDishVariantRequest;
 import com.example.restaurantbackendapplication1.dto.request.dishvariant.DishVariantRequest;
 import com.example.restaurantbackendapplication1.dto.request.dishvariant.UpdateDishVariantRequest;
-import com.example.restaurantbackendapplication1.dto.request.dishvariantlocale.CreateDishVariantLocaleRequest;
-import com.example.restaurantbackendapplication1.model.dto.DishRecipeDto;
 import com.example.restaurantbackendapplication1.model.dto.DishVariantDto;
+import com.example.restaurantbackendapplication1.model.dto.DishVariantIngredientDto;
 import com.example.restaurantbackendapplication1.model.dto.DishVariantLocaleDto;
 import com.example.restaurantbackendapplication1.model.entity.DishEntity;
-import com.example.restaurantbackendapplication1.model.entity.DishRecipeEntity;
 import com.example.restaurantbackendapplication1.model.entity.DishVariantEntity;
+import com.example.restaurantbackendapplication1.model.entity.DishVariantIngredientEntity;
 import com.example.restaurantbackendapplication1.model.entity.DishVariantLocaleEntity;
 import com.example.restaurantbackendapplication1.model.entity.ItemEntity;
 import com.example.restaurantbackendapplication1.model.entity.LocaleEntity;
@@ -35,9 +33,22 @@ public class DishVariantMapper {
         entity.setCode(request.getCode());
         applyCommonFields(entity, request);
 
-        entity.setDishVariantLocaleEntities(mapLocales(request.getLocales(), entity, localeEntityMap));
+        if (request.getLocales() != null) {
+            Set<DishVariantLocaleEntity> localeEntities = request.getLocales().stream()
+                    .map(lr -> DishVariantLocaleMapper.create(lr, entity, localeEntityMap.get(lr.getLocaleId())))
+                    .collect(Collectors.toSet());
+            entity.setDishVariantLocaleEntities(localeEntities);
+        }
 
-        entity.setDishRecipeEntities(Set.of(mapRecipe(request.getRecipe(), entity, itemEntityMap, unitEntityMap)));
+        if (request.getIngredients() != null) {
+            Set<DishVariantIngredientEntity> ingredientEntities = request.getIngredients().stream()
+                    .map(ir -> DishVariantIngredientMapper.create(
+                            ir, entity,
+                            itemEntityMap.get(ir.getItemId()),
+                            unitEntityMap.get(ir.getUnitId())))
+                    .collect(Collectors.toSet());
+            entity.setDishVariantIngredientEntities(ingredientEntities);
+        }
 
         return entity;
     }
@@ -50,33 +61,19 @@ public class DishVariantMapper {
         entity.setSortOrder(request.getSortOrder());
         entity.setPrice(request.getPrice());
         entity.setIsDefault(request.getIsDefault());
-        entity.setIsAvailable(request.getIsAvailable());
-        entity.setIsFeatured(request.getIsFeatured());
-    }
-
-    private Set<DishVariantLocaleEntity> mapLocales(List<CreateDishVariantLocaleRequest> locales,
-                                                    DishVariantEntity entity,
-                                                    Map<Long, LocaleEntity> localeEntityMap) {
-        return locales.stream()
-                .map(locale -> DishVariantLocaleMapper.create(locale, entity, localeEntityMap.get(locale.getLocaleId())))
-                .collect(Collectors.toSet());
-    }
-
-    private DishRecipeEntity mapRecipe(CreateDishRecipeRequest recipe,
-                                       DishVariantEntity entity,
-                                       Map<Long, ItemEntity> itemEntityMap,
-                                       Map<Long, UnitEntity> unitEntityMap) {
-        return DishRecipeMapper.create(recipe, entity, itemEntityMap, unitEntityMap);
+        entity.setIsVeg(request.getIsVeg());
     }
 
     public DishVariantDto toDto(DishVariantEntity entity) {
         List<DishVariantLocaleDto> locales = entity.getDishVariantLocaleEntities().stream()
                 .map(DishVariantLocaleMapper::toDto)
                 .toList();
-        DishRecipeDto recipe = entity.getDishRecipeEntities().stream()
-                .findFirst()
-                .map(DishRecipeMapper::toDto)
-                .orElse(null);
+
+        List<DishVariantIngredientDto> ingredients = entity.getDishVariantIngredientEntities().stream()
+                .filter(i -> Boolean.TRUE.equals(i.getIsActive()) && Boolean.FALSE.equals(i.getIsDeleted()))
+                .map(DishVariantIngredientMapper::toDto)
+                .toList();
+
         return DishVariantDto.builder()
                 .id(entity.getId())
                 .dishId(entity.getDishEntity().getId())
@@ -84,10 +81,9 @@ public class DishVariantMapper {
                 .sortOrder(entity.getSortOrder())
                 .price(entity.getPrice())
                 .isDefault(entity.getIsDefault())
-                .isAvailable(entity.getIsAvailable())
-                .isFeatured(entity.getIsFeatured())
+                .isVeg(entity.getIsVeg())
                 .locales(locales)
-                .recipe(recipe)
+                .ingredients(ingredients)
                 .build();
     }
 }

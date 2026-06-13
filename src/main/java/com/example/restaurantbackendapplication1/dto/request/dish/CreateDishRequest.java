@@ -1,7 +1,6 @@
 package com.example.restaurantbackendapplication1.dto.request.dish;
 
 import com.example.restaurantbackendapplication1.dto.request.dishlocale.CreateDishLocaleRequest;
-import com.example.restaurantbackendapplication1.dto.request.dishvariant.CreateDishVariantRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;

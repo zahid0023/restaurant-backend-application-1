@@ -4,7 +4,7 @@ import com.example.restaurantbackendapplication1.commons.dto.response.SuccessRes
 import com.example.restaurantbackendapplication1.dto.request.dishlocale.CreateDishLocaleRequest;
 import com.example.restaurantbackendapplication1.dto.request.dishlocale.UpdateDishLocaleRequest;
 import com.example.restaurantbackendapplication1.model.entity.DishEntity;
-import com.example.restaurantbackendapplication1.model.entity.DishesLocaleEntity;
+import com.example.restaurantbackendapplication1.model.entity.DishLocaleEntity;
 import com.example.restaurantbackendapplication1.model.entity.LocaleEntity;
 
 public interface DishLocaleService {
@@ -13,9 +13,9 @@ public interface DishLocaleService {
                            LocaleEntity localeEntity,
                            CreateDishLocaleRequest request);
 
-    DishesLocaleEntity getEntityById(Long dishId, Long id);
+    DishLocaleEntity getEntityById(Long dishId, Long id);
 
-    SuccessResponse update(DishesLocaleEntity entity, UpdateDishLocaleRequest request);
+    SuccessResponse update(DishLocaleEntity entity, UpdateDishLocaleRequest request);
 
-    SuccessResponse delete(DishesLocaleEntity entity);
+    SuccessResponse delete(DishLocaleEntity entity);
 }

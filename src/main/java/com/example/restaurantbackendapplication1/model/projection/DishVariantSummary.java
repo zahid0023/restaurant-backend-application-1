@@ -18,8 +18,7 @@ public interface DishVariantSummary {
     Integer getSortOrder();
     BigDecimal getPrice();
     Boolean getIsDefault();
-    Boolean getIsAvailable();
-    Boolean getIsFeatured();
+    Boolean getIsVeg();
 
     @Value("#{target.dishVariantLocaleEntities}")
     List<LocaleSummary> getLocales();

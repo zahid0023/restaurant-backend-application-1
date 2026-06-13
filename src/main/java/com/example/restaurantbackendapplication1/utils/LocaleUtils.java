@@ -16,13 +16,21 @@ public class LocaleUtils {
             List<T> localeRequests,
             Function<T, Long> localeIdExtractor,
             LocaleService localeService) {
-        if (localeRequests == null || localeRequests.isEmpty()) {
+        return resolveEntityMap(localeRequests, localeIdExtractor, localeService::getAll, LocaleEntity::getId);
+    }
+
+    public static <T, E> Map<Long, E> resolveEntityMap(
+            List<T> requests,
+            Function<T, Long> idExtractor,
+            Function<Set<Long>, List<E>> fetchAll,
+            Function<E, Long> entityIdExtractor) {
+        if (requests == null || requests.isEmpty()) {
             return Collections.emptyMap();
         }
-        Set<Long> localeIds = localeRequests.stream()
-                .map(localeIdExtractor)
+        Set<Long> ids = requests.stream()
+                .map(idExtractor)
                 .collect(Collectors.toSet());
-        return localeService.getAll(localeIds).stream()
-                .collect(Collectors.toMap(LocaleEntity::getId, l -> l));
+        return fetchAll.apply(ids).stream()
+                .collect(Collectors.toMap(entityIdExtractor, e -> e));
     }
 }

@@ -13,5 +13,4 @@ public class CreateDishVariantLocaleRequest extends DishVariantLocaleRequest {
 
     @NotNull
     private Long localeId;
-
 }

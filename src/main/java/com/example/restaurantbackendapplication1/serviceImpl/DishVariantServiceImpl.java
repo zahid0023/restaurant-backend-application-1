@@ -42,8 +42,8 @@ public class DishVariantServiceImpl implements DishVariantService {
 
     @Transactional
     @Override
-    public SuccessResponse create(CreateDishVariantRequest request,
-                                  DishEntity dishEntity,
+    public SuccessResponse create(DishEntity dishEntity,
+                                  CreateDishVariantRequest request,
                                   Map<Long, LocaleEntity> localeEntityMap,
                                   Map<Long, ItemEntity> itemEntityMap,
                                   Map<Long, UnitEntity> unitEntityMap) {
@@ -84,8 +84,7 @@ public class DishVariantServiceImpl implements DishVariantService {
 
     @Transactional
     @Override
-    public SuccessResponse delete(Long dishId, Long id) {
-        DishVariantEntity entity = getEntityById(dishId, id);
+    public SuccessResponse delete(DishVariantEntity entity) {
         entity.setIsDeleted(true);
         entity.setIsActive(false);
         dishVariantRepository.save(entity);

@@ -28,6 +28,6 @@ public class DishEntity extends AuditableEntity {
     private Integer sortOrder;
 
     @OneToMany(mappedBy = "dishEntity", cascade = CascadeType.ALL)
-    private Set<DishesLocaleEntity> dishesLocaleEntities = new LinkedHashSet<>();
+    private Set<DishLocaleEntity> dishesLocaleEntities = new LinkedHashSet<>();
 
 }

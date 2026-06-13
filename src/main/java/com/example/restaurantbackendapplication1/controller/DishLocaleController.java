@@ -3,7 +3,7 @@ package com.example.restaurantbackendapplication1.controller;
 import com.example.restaurantbackendapplication1.dto.request.dishlocale.CreateDishLocaleRequest;
 import com.example.restaurantbackendapplication1.dto.request.dishlocale.UpdateDishLocaleRequest;
 import com.example.restaurantbackendapplication1.model.entity.DishEntity;
-import com.example.restaurantbackendapplication1.model.entity.DishesLocaleEntity;
+import com.example.restaurantbackendapplication1.model.entity.DishLocaleEntity;
 import com.example.restaurantbackendapplication1.model.entity.LocaleEntity;
 import com.example.restaurantbackendapplication1.service.DishLocaleService;
 import com.example.restaurantbackendapplication1.service.DishService;
@@ -44,7 +44,7 @@ public class DishLocaleController {
             @PathVariable("dish-id") Long dishId,
             @PathVariable Long id,
             @Valid @RequestBody UpdateDishLocaleRequest request) {
-        DishesLocaleEntity entity = dishLocaleService.getEntityById(dishId, id);
+        DishLocaleEntity entity = dishLocaleService.getEntityById(dishId, id);
         return ResponseEntity.ok(dishLocaleService.update(entity, request));
     }
 
@@ -52,7 +52,7 @@ public class DishLocaleController {
     public ResponseEntity<?> delete(
             @PathVariable("dish-id") Long dishId,
             @PathVariable Long id) {
-        DishesLocaleEntity entity = dishLocaleService.getEntityById(dishId, id);
+        DishLocaleEntity entity = dishLocaleService.getEntityById(dishId, id);
         return ResponseEntity.ok(dishLocaleService.delete(entity));
     }
 }

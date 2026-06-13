@@ -23,7 +23,7 @@ Creates a new item with optional embedded locale translations.
 ```json 
 {
   "item_type_id": 1,
-  "unit_type_id": 2,
+  "unit_type_id": 2,  
   "code": "TOMATO",
   "sort_order": 1,
   "locales": [

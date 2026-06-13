@@ -17,8 +17,8 @@ import java.util.Map;
 
 public interface DishVariantService {
 
-    SuccessResponse create(CreateDishVariantRequest request,
-                           DishEntity dishEntity,
+    SuccessResponse create(DishEntity dishEntity,
+                           CreateDishVariantRequest request,
                            Map<Long, LocaleEntity> localeEntityMap,
                            Map<Long, ItemEntity> itemEntityMap,
                            Map<Long, UnitEntity> unitEntityMap);
@@ -31,5 +31,5 @@ public interface DishVariantService {
 
     SuccessResponse update(DishVariantEntity entity, UpdateDishVariantRequest request);
 
-    SuccessResponse delete(Long dishId, Long id);
+    SuccessResponse delete(DishVariantEntity entity);
 }

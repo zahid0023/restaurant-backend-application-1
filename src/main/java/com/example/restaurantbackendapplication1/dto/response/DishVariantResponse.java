@@ -8,7 +8,7 @@ import tools.jackson.databind.annotation.JsonNaming;
 @Data
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class DishVariantResponse {
-    private final DishVariantDto dishVariant;
+    private DishVariantDto dishVariant;
 
     public DishVariantResponse(DishVariantDto dishVariant) {
         this.dishVariant = dishVariant;
