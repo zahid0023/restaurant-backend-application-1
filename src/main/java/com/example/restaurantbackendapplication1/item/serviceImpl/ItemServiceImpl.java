@@ -1,0 +1,116 @@
+package com.example.restaurantbackendapplication1.item.serviceImpl;
+
+import com.example.restaurantbackendapplication1.commons.dto.request.PaginatedRequest;
+import com.example.restaurantbackendapplication1.commons.dto.response.PaginatedResponse;
+import com.example.restaurantbackendapplication1.commons.dto.response.SuccessResponse;
+import com.example.restaurantbackendapplication1.item.dto.request.CreateItemRequest;
+import com.example.restaurantbackendapplication1.item.dto.request.UpdateItemRequest;
+import com.example.restaurantbackendapplication1.item.dto.response.ItemResponse;
+import com.example.restaurantbackendapplication1.item.model.dto.ItemDto;
+import com.example.restaurantbackendapplication1.item.model.entity.ItemEntity;
+import com.example.restaurantbackendapplication1.item.model.entity.ItemTypeEntity;
+import com.example.restaurantbackendapplication1.item.model.enums.ItemSortField;
+import com.example.restaurantbackendapplication1.item.model.mapper.ItemMapper;
+import com.example.restaurantbackendapplication1.item.model.projection.ItemSummary;
+import com.example.restaurantbackendapplication1.item.repository.ItemRepository;
+import com.example.restaurantbackendapplication1.item.service.ItemService;
+import com.example.restaurantbackendapplication1.commons.utils.EntityValidator;
+import com.example.restaurantbackendapplication1.commons.utils.Pagination;
+import com.example.restaurantbackendapplication1.locale.model.entity.LocaleEntity;
+import com.example.restaurantbackendapplication1.unit.model.entity.UnitTypeEntity;
+import jakarta.persistence.EntityNotFoundException;
+import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.NonNull;
+import org.springframework.data.domain.Page;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+@Service
+@Slf4j
+public class ItemServiceImpl implements ItemService {
+
+    private static final Set<String> ALLOWED_SORT_FIELDS = ItemSortField.allowedFields();
+
+    private final ItemRepository itemRepository;
+
+    public ItemServiceImpl(ItemRepository itemRepository) {
+        this.itemRepository = itemRepository;
+    }
+
+    @Transactional
+    @Override
+    public SuccessResponse create(CreateItemRequest request,
+                                  ItemTypeEntity itemTypeEntity,
+                                  UnitTypeEntity unitTypeEntity,
+                                  Map<Long, LocaleEntity> localeEntityMap) {
+        ItemEntity entity = ItemMapper.fromRequest(request, itemTypeEntity, unitTypeEntity, localeEntityMap);
+        itemRepository.save(entity);
+        log.info("Item created with id: {}", entity.getId());
+        return new SuccessResponse(true, entity.getId());
+    }
+
+    @Override
+    public ItemEntity getEntityById(Long id) {
+        return itemRepository.findByIdAndIsActiveAndIsDeleted(id, true, false)
+                .orElseThrow(() -> new EntityNotFoundException("Item not found with id: " + id));
+    }
+
+    @Override
+    public List<ItemEntity> getAll(Set<Long> ids) {
+        List<ItemEntity> entities = itemRepository.findAllByIdInAndIsActiveAndIsDeleted(ids, true, false);
+        EntityValidator.validateAllFound(ids, entities, ItemEntity::getId, "Item");
+        return entities;
+    }
+
+    @Override
+    public ItemResponse getById(Long id) {
+        ItemEntity entity = getEntityById(id);
+        ItemDto dto = ItemMapper.toDto(entity);
+        return new ItemResponse(dto);
+    }
+
+    @Override
+    public PaginatedResponse<ItemSummary> getAll(PaginatedRequest request) {
+        Page<@NonNull ItemSummary> page = itemRepository.findAllByIsActiveAndIsDeleted(
+                true, false, request.toPageable(ALLOWED_SORT_FIELDS)
+        );
+        return Pagination.buildPaginatedResponse(page);
+    }
+
+    @Override
+    public PaginatedResponse<ItemSummary> getAll(Long itemTypeId, PaginatedRequest request) {
+        Page<@NonNull ItemSummary> page = itemRepository.findAllByItemTypeEntity_IdAndIsActiveAndIsDeleted(itemTypeId, true, false, request.toPageable(ALLOWED_SORT_FIELDS));
+        return Pagination.buildPaginatedResponse(page);
+    }
+
+    @Override
+    public PaginatedResponse<ItemSummary> search(String query, PaginatedRequest request) {
+        Page<@NonNull ItemSummary> page = itemRepository.searchByQuery(query, request.toPageable(ALLOWED_SORT_FIELDS));
+        return Pagination.buildPaginatedResponse(page);
+    }
+
+    @Transactional
+    @Override
+    public SuccessResponse update(ItemEntity entity,
+                                  UpdateItemRequest request) {
+        ItemMapper.update(entity, request);
+        itemRepository.save(entity);
+        log.info("Item updated with id: {}", entity.getId());
+        return new SuccessResponse(true, entity.getId());
+    }
+
+    @Transactional
+    @Override
+    public SuccessResponse delete(Long id) {
+        ItemEntity entity = getEntityById(id);
+        entity.setIsDeleted(true);
+        entity.setIsActive(false);
+        itemRepository.save(entity);
+        log.info("Item soft-deleted with id: {}", entity.getId());
+        return new SuccessResponse(true, entity.getId());
+    }
+}

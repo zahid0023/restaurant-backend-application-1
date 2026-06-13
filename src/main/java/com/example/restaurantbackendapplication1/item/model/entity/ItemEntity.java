@@ -1,0 +1,49 @@
+package com.example.restaurantbackendapplication1.item.model.entity;
+
+import com.example.restaurantbackendapplication1.commons.model.entity.AuditableEntity;
+import com.example.restaurantbackendapplication1.unit.model.entity.UnitTypeEntity;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+import lombok.Getter;
+import lombok.Setter;
+import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
+import java.util.LinkedHashSet;
+import java.util.Set;
+
+@Getter
+@Setter
+@Entity
+@Table(name = "items")
+public class ItemEntity extends AuditableEntity {
+    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "item_type_id", nullable = false)
+    private ItemTypeEntity itemTypeEntity;
+
+    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @OnDelete(action = OnDeleteAction.RESTRICT)
+    @JoinColumn(name = "unit_type_id", nullable = false)
+    private UnitTypeEntity unitTypeEntity;
+
+    @NotNull
+    @ColumnDefault("0")
+    @Column(name = "sort_order", nullable = false)
+    private Integer sortOrder;
+
+    @OneToMany(mappedBy = "itemEntity", cascade = CascadeType.ALL)
+    private Set<ItemLocaleEntity> itemLocaleEntities = new LinkedHashSet<>();
+
+    @OneToMany(mappedBy = "itemEntity", cascade = CascadeType.ALL)
+    private Set<ItemItemCategoryEntity> itemItemCategoryEntities = new LinkedHashSet<>();
+
+    @Size(max = 20)
+    @NotNull
+    @Column(name = "code", nullable = false, length = 20)
+    private String code;
+
+}

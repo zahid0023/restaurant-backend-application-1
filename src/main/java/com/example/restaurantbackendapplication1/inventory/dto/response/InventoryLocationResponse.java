@@ -1,0 +1,16 @@
+package com.example.restaurantbackendapplication1.inventory.dto.response;
+
+import com.example.restaurantbackendapplication1.inventory.model.dto.InventoryLocationDto;
+import lombok.Data;
+import tools.jackson.databind.PropertyNamingStrategies;
+import tools.jackson.databind.annotation.JsonNaming;
+
+@Data
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+public class InventoryLocationResponse {
+    private final InventoryLocationDto inventoryLocation;
+
+    public InventoryLocationResponse(InventoryLocationDto inventoryLocation) {
+        this.inventoryLocation = inventoryLocation;
+    }
+}
