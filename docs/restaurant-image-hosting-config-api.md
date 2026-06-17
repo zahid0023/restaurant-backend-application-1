@@ -2,9 +2,11 @@
 
 Base URL: `/api/v1/restaurant-image-hosting-configs`
 
-Manages the restaurant's image storage provider configuration. Each config record stores a provider (`S3` or
+Manages the restaurant's image storage provider configuration. Each config record stores a `name`, a `provider` (`S3` or
 `CLOUDINARY`) and the corresponding credentials as a key-value map. The system validates that all required keys for the
 chosen provider are present and non-blank on create.
+
+`provider` and `config` credentials are **immutable after creation** — only `name` can be updated via PUT.
 
 All records support soft-delete — deleted records are hidden from all responses.
 
@@ -12,13 +14,14 @@ All records support soft-delete — deleted records are hidden from all response
 
 ## Endpoints
 
-| Method | Path                                                 | Description                         |
-|--------|------------------------------------------------------|-------------------------------------|
-| POST   | `/api/v1/restaurant-image-hosting-configs`           | Create a config                     |
-| GET    | `/api/v1/restaurant-image-hosting-configs`           | List all configs (paginated)        |
-| GET    | `/api/v1/restaurant-image-hosting-configs/{id}`      | Get a config by ID                  |
-| GET    | `/api/v1/restaurant-image-hosting-configs/providers` | List all available providers        |
-| DELETE | `/api/v1/restaurant-image-hosting-configs/{id}`      | Soft-delete a config                |
+| Method | Path                                                 | Description                  |
+|--------|------------------------------------------------------|------------------------------|
+| POST   | `/api/v1/restaurant-image-hosting-configs`           | Create a config              |
+| GET    | `/api/v1/restaurant-image-hosting-configs`           | List all configs (paginated) |
+| GET    | `/api/v1/restaurant-image-hosting-configs/{id}`      | Get a config by ID           |
+| GET    | `/api/v1/restaurant-image-hosting-configs/providers` | List all available providers |
+| PUT    | `/api/v1/restaurant-image-hosting-configs/{id}`      | Update config name           |
+| DELETE | `/api/v1/restaurant-image-hosting-configs/{id}`      | Soft-delete a config         |
 
 ---
 
@@ -36,11 +39,12 @@ Authorization: Bearer <token>
 
 ### RestaurantImageHostingConfig
 
-| Field      | Type                     | Required | Description                                                             |
-|------------|--------------------------|----------|-------------------------------------------------------------------------|
-| `id`       | Long                     | —        | Auto-generated identifier (read-only)                                   |
-| `provider` | String (enum)            | Yes      | Storage provider: `S3` or `CLOUDINARY`                                  |
-| `config`   | Object (String → String) | Yes      | Provider credentials map — required keys depend on provider (see below) |
+| Field      | Type                     | Required | Description                                                          |
+|------------|--------------------------|----------|----------------------------------------------------------------------|
+| `id`       | Long                     | —        | Auto-generated identifier (read-only)                                |
+| `name`     | String                   | Yes      | Human-readable label (e.g. "Cloudinary Marketing", "S3 Backup")      |
+| `provider` | String (enum)            | Yes      | Storage provider: `S3` or `CLOUDINARY` — immutable after creation    |
+| `config`   | Object (String → String) | Yes      | Provider credentials map — immutable after creation (see keys below) |
 
 ### Provider Config Keys
 
@@ -68,14 +72,21 @@ Authorization: Bearer <token>
 `POST /api/v1/restaurant-image-hosting-configs`
 
 Creates a new image hosting config. The `config` map is validated against the required keys for the chosen `provider`
-before saving.
+before saving. `provider` and `config` cannot be changed after creation.
 
-### Request Body
+### Request Fields
+
+| Field      | Type          | Required | Validation                                                                  |
+|------------|---------------|----------|-----------------------------------------------------------------------------|
+| `name`     | String        | Yes      | Not null                                                                    |
+| `provider` | String (enum) | Yes      | Not null — `S3` or `CLOUDINARY`                                             |
+| `config`   | Object        | Yes      | Not null — all required keys for the provider must be present and non-blank |
 
 **S3 example:**
 
 ```json
 {
+  "name": "S3 Backup",
   "provider": "S3",
   "config": {
     "bucket": "restaurant-images",
@@ -90,6 +101,7 @@ before saving.
 
 ```json
 {
+  "name": "Cloudinary Marketing",
   "provider": "CLOUDINARY",
   "config": {
     "cloud_name": "my-restaurant-cloud",
@@ -98,13 +110,6 @@ before saving.
   }
 }
 ```
-
-### Request Fields
-
-| Field      | Type          | Required | Validation                                                                  |
-|------------|---------------|----------|-----------------------------------------------------------------------------|
-| `provider` | String (enum) | Yes      | Not null — `S3` or `CLOUDINARY`                                             |
-| `config`   | Object        | Yes      | Not null — all required keys for the provider must be present and non-blank |
 
 ### Response `201 Created`
 
@@ -135,6 +140,7 @@ Returns a single config by ID.
 {
   "restaurant_image_hosting_config": {
     "id": 1,
+    "name": "S3 Backup",
     "provider": "S3",
     "config": {
       "bucket": "restaurant-images",
@@ -156,12 +162,12 @@ Returns a paginated list of all active (non-deleted) configs.
 
 ### Query Parameters
 
-| Parameter  | Type   | Default | Constraints                   | Description              |
-|------------|--------|---------|-------------------------------|--------------------------|
-| `page`     | int    | `0`     | >= 0                          | Zero-based page index    |
-| `size`     | int    | `10`    | 1 – 50                        | Number of items per page |
-| `sort_by`  | String | `id`    | `id`, `provider`, `createdAt` | Field to sort by         |
-| `sort_dir` | String | `ASC`   | `ASC`, `DESC`                 | Sort direction           |
+| Parameter  | Type   | Default | Constraints                    | Description              |
+|------------|--------|---------|--------------------------------|--------------------------|
+| `page`     | int    | `0`     | >= 0                           | Zero-based page index    |
+| `size`     | int    | `10`    | 1 – 50                         | Number of items per page |
+| `sort_by`  | String | `id`    | `id`, `provider`, `created_at` | Field to sort by         |
+| `sort_dir` | String | `ASC`   | `ASC`, `DESC`                  | Sort direction           |
 
 ### Response `200 OK`
 
@@ -170,6 +176,7 @@ Returns a paginated list of all active (non-deleted) configs.
   "data": [
     {
       "id": 1,
+      "name": "S3 Backup",
       "provider": "S3",
       "config": {
         "bucket": "restaurant-images",
@@ -180,6 +187,7 @@ Returns a paginated list of all active (non-deleted) configs.
     },
     {
       "id": 2,
+      "name": "Cloudinary Marketing",
       "provider": "CLOUDINARY",
       "config": {
         "cloud_name": "my-restaurant-cloud",
@@ -204,7 +212,7 @@ Returns a paginated list of all active (non-deleted) configs.
 `GET /api/v1/restaurant-image-hosting-configs/providers`
 
 Returns all supported image hosting providers and their required config keys. Use this endpoint to discover which
-providers are available and what credentials are needed before creating or updating a config.
+providers are available and what credentials are needed before creating a config.
 
 ### Response `200 OK`
 
@@ -214,22 +222,78 @@ providers are available and what credentials are needed before creating or updat
     "provider": "S3",
     "label": "Amazon S3",
     "required_keys": [
-      { "key": "bucket",     "label": "Bucket Name" },
-      { "key": "region",     "label": "AWS Region" },
-      { "key": "access_key", "label": "Access Key ID" },
-      { "key": "secret_key", "label": "Secret Access Key" }
+      {
+        "key": "bucket",
+        "label": "Bucket Name"
+      },
+      {
+        "key": "region",
+        "label": "AWS Region"
+      },
+      {
+        "key": "access_key",
+        "label": "Access Key ID"
+      },
+      {
+        "key": "secret_key",
+        "label": "Secret Access Key"
+      }
     ]
   },
   {
     "provider": "CLOUDINARY",
     "label": "Cloudinary",
     "required_keys": [
-      { "key": "cloud_name", "label": "Cloud Name" },
-      { "key": "api_key",    "label": "API Key" },
-      { "key": "api_secret", "label": "API Secret" }
+      {
+        "key": "cloud_name",
+        "label": "Cloud Name"
+      },
+      {
+        "key": "api_key",
+        "label": "API Key"
+      },
+      {
+        "key": "api_secret",
+        "label": "API Secret"
+      }
     ]
   }
 ]
+```
+
+---
+
+## Update Config Name
+
+`PUT /api/v1/restaurant-image-hosting-configs/{id}`
+
+Updates the display name of an existing config. `provider` and `config` credentials cannot be changed.
+
+### Path Parameters
+
+| Parameter | Type | Description      |
+|-----------|------|------------------|
+| `id`      | Long | ID of the config |
+
+### Request Fields
+
+| Field  | Type   | Required | Validation | Description      |
+|--------|--------|----------|------------|------------------|
+| `name` | String | Yes      | Not null   | New display name |
+
+```json
+{
+  "name": "Cloudinary Food Photos"
+}
+```
+
+### Response `200 OK`
+
+```json
+{
+  "success": true,
+  "id": 1
+}
 ```
 
 ---
@@ -238,8 +302,7 @@ providers are available and what credentials are needed before creating or updat
 
 `DELETE /api/v1/restaurant-image-hosting-configs/{id}`
 
-Soft-deletes the config. The record is not removed from the database but will no longer appear in any response,
-including `GET /active`.
+Soft-deletes the config. The record is not removed from the database but will no longer appear in any response.
 
 ### Path Parameters
 
@@ -271,12 +334,12 @@ All errors follow a common structure:
 }
 ```
 
-| HTTP Status | Error Code                 | Cause                                                                           |
-|-------------|----------------------------|---------------------------------------------------------------------------------|
-| 400         | `INVALID_ARGUMENT`         | `provider` is null, `config` is null, or required config keys are missing/blank |
-| 400         | `INVALID_ARGUMENT`         | Invalid `provider` value (not `S3` or `CLOUDINARY`)                             |
-| 400         | `INVALID_ARGUMENT`         | Invalid pagination `sort_by` field                                              |
-| 401         | `UNAUTHORIZED`             | JWT token is missing or invalid                                                 |
-| 403         | `FORBIDDEN`                | Authenticated user lacks permission                                             |
-| 404         | `ENTITY_NOT_FOUND`         | Config not found or already deleted                                             |
-| 409         | `DATA_INTEGRITY_VIOLATION` | Optimistic lock conflict on concurrent update (`@Version`)                      |
+| HTTP Status | Error Code                 | Cause                                                                              |
+|-------------|----------------------------|------------------------------------------------------------------------------------|
+| 400         | `INVALID_ARGUMENT`         | `name` or `provider` is null, `config` is null, or required keys are missing/blank |
+| 400         | `INVALID_ARGUMENT`         | Invalid `provider` value (not `S3` or `CLOUDINARY`)                                |
+| 400         | `INVALID_ARGUMENT`         | Invalid pagination `sort_by` field                                                 |
+| 401         | `UNAUTHORIZED`             | JWT token is missing or invalid                                                    |
+| 403         | `FORBIDDEN`                | Authenticated user lacks permission                                                |
+| 404         | `ENTITY_NOT_FOUND`         | Config not found or already deleted                                                |
+| 409         | `DATA_INTEGRITY_VIOLATION` | Optimistic lock conflict on concurrent update (`@Version`)                         |

@@ -2,6 +2,9 @@ CREATE TABLE IF NOT EXISTS restaurant_image_hosting_configs
 (
     id         bigserial primary key,
 
+    name       varchar(100)                                       NOT NULL,
+    -- e.g. "Cloudinary Marketing", "Cloudinary Food", "S3 Backup",
+
     provider   varchar(50)                                        not null,
     -- e.g. CLOUDINARY, S3
 

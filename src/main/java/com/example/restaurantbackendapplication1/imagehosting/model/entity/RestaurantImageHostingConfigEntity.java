@@ -18,6 +18,10 @@ import java.util.Map;
 public class RestaurantImageHostingConfigEntity extends AuditableEntity {
 
     @NotNull
+    @Column(name = "name", nullable = false, length = 100)
+    private String name;
+
+    @NotNull
     @Enumerated(EnumType.STRING)
     @Column(name = "provider", nullable = false, length = 50)
     private ImageHostingProvider provider;

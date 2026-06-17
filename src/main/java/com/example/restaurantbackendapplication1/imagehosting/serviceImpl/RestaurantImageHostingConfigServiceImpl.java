@@ -5,6 +5,7 @@ import com.example.restaurantbackendapplication1.commons.dto.response.PaginatedR
 import com.example.restaurantbackendapplication1.commons.dto.response.SuccessResponse;
 import com.example.restaurantbackendapplication1.commons.utils.Pagination;
 import com.example.restaurantbackendapplication1.imagehosting.dto.request.CreateRestaurantImageHostingConfigRequest;
+import com.example.restaurantbackendapplication1.imagehosting.dto.request.UpdateRestaurantImageHostingConfigRequest;
 import com.example.restaurantbackendapplication1.imagehosting.dto.response.RestaurantImageHostingConfigResponse;
 import com.example.restaurantbackendapplication1.imagehosting.enums.RestaurantImageHostingConfigSortField;
 import com.example.restaurantbackendapplication1.imagehosting.model.dto.RestaurantImageHostingConfigDto;
@@ -63,6 +64,16 @@ public class RestaurantImageHostingConfigServiceImpl implements RestaurantImageH
                 true, false, request.toPageable(ALLOWED_SORT_FIELDS)
         );
         return Pagination.buildPaginatedResponse(page);
+    }
+
+    @Transactional
+    @Override
+    public SuccessResponse update(RestaurantImageHostingConfigEntity entity,
+                                  UpdateRestaurantImageHostingConfigRequest request) {
+        RestaurantImageHostingConfigMapper.update(entity, request);
+        repository.save(entity);
+        log.info("RestaurantImageHostingConfig updated with id: {}", entity.getId());
+        return new SuccessResponse(true, entity.getId());
     }
 
     @Transactional

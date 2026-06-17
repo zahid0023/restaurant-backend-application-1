@@ -9,6 +9,7 @@ import java.util.Map;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public interface RestaurantImageHostingConfigSummary {
     Long getId();
+    String getName();
     ImageHostingProvider getProvider();
     Map<String, String> getConfig();
 }

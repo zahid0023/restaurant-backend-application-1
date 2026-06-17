@@ -34,7 +34,7 @@ public class RestaurantBasicInfoLocaleController {
     public ResponseEntity<?> create(
             @PathVariable("restaurant-basic-info-id") Long restaurantBasicInfoId,
             @Valid @RequestBody CreateRestaurantBasicInfoLocaleRequest request) {
-        RestaurantBasicInfoEntity restaurantBasicInfoEntity = restaurantBasicInfoService.getEntityById(restaurantBasicInfoId);
+        RestaurantBasicInfoEntity restaurantBasicInfoEntity = restaurantBasicInfoService.getEntity();
         LocaleEntity localeEntity = localeService.getEntityById(request.getLocaleId());
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(restaurantBasicInfoLocaleService.create(restaurantBasicInfoEntity, localeEntity, request));

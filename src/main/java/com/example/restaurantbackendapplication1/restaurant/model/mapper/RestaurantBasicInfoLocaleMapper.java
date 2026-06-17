@@ -28,10 +28,7 @@ public class RestaurantBasicInfoLocaleMapper {
 
     private void applyCommonFields(RestaurantBasicInfoLocaleEntity entity, RestaurantBasicInfoLocaleRequest request) {
         entity.setName(request.getName());
-        entity.setEstd(request.getEstd());
         entity.setShortDescription(request.getShortDescription());
-        entity.setLat(request.getLat());
-        entity.setLon(request.getLon());
         entity.setAddress(request.getAddress());
         entity.setSortOrder(request.getSortOrder());
     }
@@ -42,10 +39,7 @@ public class RestaurantBasicInfoLocaleMapper {
                 .localeId(entity.getLocaleEntity().getId())
                 .sortOrder(entity.getSortOrder())
                 .name(entity.getName())
-                .estd(entity.getEstd())
                 .shortDescription(entity.getShortDescription())
-                .lat(entity.getLat())
-                .lon(entity.getLon())
                 .address(entity.getAddress())
                 .build();
     }

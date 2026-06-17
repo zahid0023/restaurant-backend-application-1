@@ -58,4 +58,14 @@ public class RestaurantBasicInfoEntity extends AuditableEntity {
     @OneToMany(mappedBy = "restaurantBasicInfoEntity", cascade = CascadeType.ALL)
     private Set<RestaurantBasicInfoLocaleEntity> restaurantBasicInfoLocaleEntities = new LinkedHashSet<>();
 
+    @NotNull
+    @Column(name = "estd", nullable = false)
+    private Short estd;
+
+    @Column(name = "lat")
+    private Double lat;
+
+    @Column(name = "lon")
+    private Double lon;
+
 }

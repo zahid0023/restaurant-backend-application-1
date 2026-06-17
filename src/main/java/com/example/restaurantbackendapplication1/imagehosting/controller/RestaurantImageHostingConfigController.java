@@ -2,6 +2,8 @@ package com.example.restaurantbackendapplication1.imagehosting.controller;
 
 import com.example.restaurantbackendapplication1.commons.dto.request.PaginatedRequest;
 import com.example.restaurantbackendapplication1.imagehosting.dto.request.CreateRestaurantImageHostingConfigRequest;
+import com.example.restaurantbackendapplication1.imagehosting.dto.request.UpdateRestaurantImageHostingConfigRequest;
+import com.example.restaurantbackendapplication1.imagehosting.model.entity.RestaurantImageHostingConfigEntity;
 import com.example.restaurantbackendapplication1.imagehosting.dto.response.ImageHostingProviderResponse;
 import com.example.restaurantbackendapplication1.imagehosting.enums.ImageHostingProvider;
 import com.example.restaurantbackendapplication1.imagehosting.service.RestaurantImageHostingConfigService;
@@ -47,6 +49,14 @@ public class RestaurantImageHostingConfigController {
                 .map(ImageHostingProviderResponse::from)
                 .toList();
         return ResponseEntity.ok(providers);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> update(
+            @PathVariable Long id,
+            @Valid @RequestBody UpdateRestaurantImageHostingConfigRequest request) {
+        RestaurantImageHostingConfigEntity entity = restaurantImageHostingConfigService.getEntityById(id);
+        return ResponseEntity.ok(restaurantImageHostingConfigService.update(entity, request));
     }
 
     @DeleteMapping("/{id}")

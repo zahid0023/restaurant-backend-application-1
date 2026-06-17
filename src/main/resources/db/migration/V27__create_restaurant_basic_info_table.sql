@@ -1,9 +1,11 @@
 CREATE TABLE IF NOT EXISTS restaurant_basic_info
 (
-    id         bigserial PRIMARY KEY,
+    id         bigint PRIMARY KEY CHECK ( id = 1 ),
 
     code       varchar(50)                      NOT NULL UNIQUE,
     sort_order integer                          NOT NULL DEFAULT 0,
+
+    estd       smallint                         NOT NULL,
 
     country_id bigint references countries (id) NOT NULL,
     city_id    bigint references cities (id)    NOT NULL,
@@ -11,6 +13,9 @@ CREATE TABLE IF NOT EXISTS restaurant_basic_info
     phone      varchar(50),
     email      varchar(255),
     logo_url   varchar(500),
+
+    lat        float,
+    lon        float,
 
     created_by bigint references users (id)     NOT NULL,
     created_at timestamp with time zone         NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -23,6 +28,22 @@ CREATE TABLE IF NOT EXISTS restaurant_basic_info
     deleted_at timestamp with time zone
 );
 
+INSERT INTO restaurant_basic_info (id,
+                                   code,
+                                   estd,
+                                   country_id,
+                                   city_id,
+                                   created_by,
+                                   updated_by)
+VALUES (1,
+        'DEFAULT',
+        2025,
+        1,
+        1,
+        1,
+        1)
+ON CONFLICT (id) DO NOTHING;
+
 CREATE TABLE IF NOT EXISTS restaurant_basic_info_locales
 (
     id                       bigserial PRIMARY KEY,
@@ -32,10 +53,7 @@ CREATE TABLE IF NOT EXISTS restaurant_basic_info_locales
     sort_order               int                          NOT NULL DEFAULT 0,
 
     name                     varchar(255)                 NOT NULL,
-    estd                     smallint                     NOT NULL,
     short_description        varchar(1024),
-    lat                      float,
-    lon                      float,
     address                  text,
 
     created_by               bigint references users (id) NOT NULL,

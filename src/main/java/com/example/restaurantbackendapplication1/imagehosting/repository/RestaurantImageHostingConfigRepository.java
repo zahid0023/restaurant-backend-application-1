@@ -15,6 +15,6 @@ public interface RestaurantImageHostingConfigRepository
     Optional<RestaurantImageHostingConfigEntity> findByIdAndIsActiveAndIsDeleted(
             Long id, Boolean isActive, Boolean isDeleted);
 
-    Page<RestaurantImageHostingConfigSummary> findAllByIsActiveAndIsDeleted(
+Page<RestaurantImageHostingConfigSummary> findAllByIsActiveAndIsDeleted(
             Boolean isActive, Boolean isDeleted, Pageable pageable);
 }

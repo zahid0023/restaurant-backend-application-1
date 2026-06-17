@@ -1,5 +1,7 @@
 package com.example.restaurantbackendapplication1.restaurant.model.dto;
 
+import com.example.restaurantbackendapplication1.address.model.dto.CityDto;
+import com.example.restaurantbackendapplication1.address.model.dto.CountryDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,8 +20,11 @@ public class RestaurantBasicInfoDto {
     private Long id;
     private String code;
     private Integer sortOrder;
-    private Long countryId;
-    private Long cityId;
+    private Short estd;
+    private Double lat;
+    private Double lon;
+    private CountryDto country;
+    private CityDto city;
     private String phone;
     private String email;
     private String logoUrl;

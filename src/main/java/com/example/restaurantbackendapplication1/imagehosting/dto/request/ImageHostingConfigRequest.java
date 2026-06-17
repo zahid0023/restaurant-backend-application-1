@@ -11,6 +11,9 @@ import java.util.Map;
 @Data
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class ImageHostingConfigRequest {
+    @NotNull(message = "Name must not be null")
+    private String name;
+
     @NotNull(message = "Provider must not be null")
     private ImageHostingProvider provider;
 

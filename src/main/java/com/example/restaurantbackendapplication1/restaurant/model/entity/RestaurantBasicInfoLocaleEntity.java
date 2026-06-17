@@ -39,19 +39,9 @@ public class RestaurantBasicInfoLocaleEntity extends AuditableEntity {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @NotNull
-    @Column(name = "estd", nullable = false)
-    private Short estd;
-
     @Size(max = 1024)
     @Column(name = "short_description", length = 1024)
     private String shortDescription;
-
-    @Column(name = "lat")
-    private Double lat;
-
-    @Column(name = "lon")
-    private Double lon;
 
     @Column(name = "address", length = Integer.MAX_VALUE)
     private String address;

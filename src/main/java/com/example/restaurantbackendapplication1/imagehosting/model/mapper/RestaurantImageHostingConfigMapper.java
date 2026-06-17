@@ -18,11 +18,12 @@ public class RestaurantImageHostingConfigMapper {
 
     public void update(RestaurantImageHostingConfigEntity entity,
                        UpdateRestaurantImageHostingConfigRequest request) {
-        applyCommonFields(entity, request);
+        entity.setName(request.getName());
     }
 
     private void applyCommonFields(RestaurantImageHostingConfigEntity entity,
                                    ImageHostingConfigRequest request) {
+        entity.setName(request.getName());
         entity.setProvider(request.getProvider());
         entity.setConfig(request.getConfig());
     }
@@ -30,6 +31,7 @@ public class RestaurantImageHostingConfigMapper {
     public RestaurantImageHostingConfigDto toDto(RestaurantImageHostingConfigEntity entity) {
         return RestaurantImageHostingConfigDto.builder()
                 .id(entity.getId())
+                .name(entity.getName())
                 .provider(entity.getProvider())
                 .config(entity.getConfig())
                 .build();

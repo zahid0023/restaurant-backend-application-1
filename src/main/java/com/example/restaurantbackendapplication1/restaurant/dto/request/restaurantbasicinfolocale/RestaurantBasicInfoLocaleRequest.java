@@ -15,15 +15,8 @@ public class RestaurantBasicInfoLocaleRequest {
     @Size(max = 255)
     private String name;
 
-    @NotNull
-    private Short estd;
-
     @Size(max = 1024)
     private String shortDescription;
-
-    private Double lat;
-
-    private Double lon;
 
     private String address;
 
