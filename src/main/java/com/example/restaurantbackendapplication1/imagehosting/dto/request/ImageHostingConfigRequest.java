@@ -2,10 +2,15 @@ package com.example.restaurantbackendapplication1.imagehosting.dto.request;
 
 import com.example.restaurantbackendapplication1.imagehosting.enums.ImageHostingProvider;
 import jakarta.validation.constraints.NotNull;
+import lombok.Data;
+import tools.jackson.databind.PropertyNamingStrategies;
+import tools.jackson.databind.annotation.JsonNaming;
 
 import java.util.Map;
 
-public class ImageStorageConfigRequest {
+@Data
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+public class ImageHostingConfigRequest {
     @NotNull(message = "Provider must not be null")
     private ImageHostingProvider provider;
 
