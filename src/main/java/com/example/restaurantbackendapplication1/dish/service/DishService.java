@@ -24,5 +24,9 @@ public interface DishService {
 
     SuccessResponse update(DishEntity entity, UpdateDishRequest request);
 
+    SuccessResponse setFeatured(DishEntity entity, Boolean isFeatured);
+
+    PaginatedResponse<?> getFeatured(PaginatedRequest request);
+
     SuccessResponse delete(Long id);
 }

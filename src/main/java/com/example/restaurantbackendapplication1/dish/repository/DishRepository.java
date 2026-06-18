@@ -14,4 +14,6 @@ public interface DishRepository extends JpaRepository<@NonNull DishEntity, @NonN
     Optional<DishEntity> findByIdAndIsActiveAndIsDeleted(Long id, Boolean isActive, Boolean isDeleted);
 
     Page<@NonNull DishSummary> findAllByIsActiveAndIsDeleted(Boolean isActive, Boolean isDeleted, Pageable pageable);
+
+    Page<@NonNull DishEntity> findAllByIsFeaturedAndIsActiveAndIsDeleted(Boolean isFeatured, Boolean isActive, Boolean isDeleted, Pageable pageable);
 }

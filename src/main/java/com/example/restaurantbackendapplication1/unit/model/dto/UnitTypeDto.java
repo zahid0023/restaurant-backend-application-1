@@ -19,4 +19,5 @@ public class UnitTypeDto {
     private String code;
     private Integer sortOrder;
     private List<UnitTypeLocaleDto> locales;
+    private List<UnitDto> units;
 }

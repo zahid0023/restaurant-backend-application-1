@@ -78,19 +78,10 @@ Soft-deletes the assignment between an item and a category.
 
 ## Error Responses
 
-All errors follow a common structure:
-
-```json
-{
-  "request_id": "abc-123",
-  "status": 404,
-  "error": "ENTITY_NOT_FOUND",
-  "message": "PlatformItem 3 is not assigned to PlatformItemCategory 2"
-}
-```
-
-| HTTP Status | Error Code                 | Cause                                                        |
-|-------------|----------------------------|--------------------------------------------------------------|
-| 400         | `INVALID_ARGUMENT`         | Missing required fields                                      |
-| 404         | `ENTITY_NOT_FOUND`         | Item, item category, or assignment not found or already deleted |
-| 409         | `DATA_INTEGRITY_VIOLATION` | Item is already assigned to the given category               |
+| HTTP Status | Cause                                                                    |
+|-------------|--------------------------------------------------------------------------|
+| 400         | Missing required fields                                                  |
+| 404         | Item, item category, or assignment not found or already deleted          |
+| 409         | Item is already assigned to the given category                           |
+| 401         | JWT token missing or invalid                                             |
+| 403         | Authenticated user lacks permission                                      |

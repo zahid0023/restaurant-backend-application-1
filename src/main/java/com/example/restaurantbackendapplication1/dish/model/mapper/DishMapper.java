@@ -5,6 +5,7 @@ import com.example.restaurantbackendapplication1.dish.dto.request.DishRequest;
 import com.example.restaurantbackendapplication1.dish.dto.request.UpdateDishRequest;
 import com.example.restaurantbackendapplication1.dish.model.dto.DishDto;
 import com.example.restaurantbackendapplication1.dish.model.dto.DishLocaleDto;
+import com.example.restaurantbackendapplication1.dish.model.dto.DishVariantDto;
 import com.example.restaurantbackendapplication1.dish.model.entity.DishEntity;
 import com.example.restaurantbackendapplication1.dish.model.entity.DishLocaleEntity;
 import com.example.restaurantbackendapplication1.locale.model.entity.LocaleEntity;
@@ -42,16 +43,23 @@ public class DishMapper {
         entity.setSortOrder(request.getSortOrder());
     }
 
-    public DishDto toDto(DishEntity entity) {
+    public DishDto toDto(DishEntity entity, Boolean includeVariants) {
         List<DishLocaleDto> locales = entity.getDishesLocaleEntities().stream()
                 .map(DishLocaleMapper::toDto)
                 .toList();
-
+        List<DishVariantDto> variants = includeVariants ?
+                entity.getDishVariantEntities().stream()
+                        .filter(v -> Boolean.TRUE.equals(v.getIsActive()) && Boolean.FALSE.equals(v.getIsDeleted()))
+                        .map(v -> DishVariantMapper.toDto(v, false, false))
+                        .toList()
+                : null;
         return DishDto.builder()
                 .id(entity.getId())
                 .code(entity.getCode())
                 .sortOrder(entity.getSortOrder())
+                .isFeatured(entity.getIsFeatured())
                 .locales(locales)
+                .variants(variants)
                 .build();
     }
 }

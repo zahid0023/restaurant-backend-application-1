@@ -49,7 +49,7 @@ public class ItemTypeServiceImpl implements ItemTypeService {
     @Override
     public ItemTypeResponse getById(Long id) {
         ItemTypeEntity entity = getEntityById(id);
-        ItemTypeDto dto = ItemTypeMapper.toDto(entity);
+        ItemTypeDto dto = ItemTypeMapper.toDto(entity, false);
         return new ItemTypeResponse(dto);
     }
 

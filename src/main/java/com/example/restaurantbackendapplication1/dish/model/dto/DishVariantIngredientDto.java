@@ -1,5 +1,8 @@
 package com.example.restaurantbackendapplication1.dish.model.dto;
 
+import com.example.restaurantbackendapplication1.item.model.dto.ItemDto;
+import com.example.restaurantbackendapplication1.unit.model.dto.UnitDto;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,12 +16,13 @@ import java.math.BigDecimal;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class DishVariantIngredientDto {
     private Long id;
-    private Long dishVariantId;
-    private Long itemId;
+    private DishVariantDto dishVariant;
+    private ItemDto item;
     private BigDecimal quantity;
-    private Long unitId;
+    private UnitDto unit;
     private Integer sortOrder;
 }

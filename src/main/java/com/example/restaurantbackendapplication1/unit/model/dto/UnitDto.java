@@ -1,5 +1,6 @@
 package com.example.restaurantbackendapplication1.unit.model.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,10 +14,11 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class UnitDto {
     private Long id;
-    private Long unitTypeId;
+    private UnitTypeDto unitType;
     private String code;
     private Boolean isBase;
     private Integer sortOrder;

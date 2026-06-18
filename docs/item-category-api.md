@@ -154,14 +154,6 @@ Returns a single item category with locale translations, immediate sub-categorie
       {
         "id": 1,
         "code": "CHICKEN_BREAST",
-        "unit_type": {
-          "id": 2,
-          "code": "WEIGHT",
-          "sort_order": 1,
-          "locales": [
-            { "id": 3, "locale_id": 1, "name": "Weight", "description": "", "sort_order": 1 }
-          ]
-        },
         "sort_order": 1,
         "locales": [
           {

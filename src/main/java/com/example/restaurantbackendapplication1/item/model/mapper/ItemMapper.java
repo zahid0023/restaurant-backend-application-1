@@ -6,14 +6,13 @@ import com.example.restaurantbackendapplication1.item.dto.request.UpdateItemRequ
 import com.example.restaurantbackendapplication1.item.dto.request.itemlocale.CreateItemLocaleRequest;
 import com.example.restaurantbackendapplication1.item.model.dto.ItemDto;
 import com.example.restaurantbackendapplication1.item.model.dto.ItemLocaleDto;
-import com.example.restaurantbackendapplication1.item.model.dto.ItemSummaryDto;
 import com.example.restaurantbackendapplication1.item.model.entity.ItemEntity;
 import com.example.restaurantbackendapplication1.item.model.entity.ItemLocaleEntity;
+import com.example.restaurantbackendapplication1.item.model.dto.ItemTypeDto;
 import com.example.restaurantbackendapplication1.item.model.entity.ItemTypeEntity;
 import com.example.restaurantbackendapplication1.locale.model.entity.LocaleEntity;
-import com.example.restaurantbackendapplication1.unit.model.dto.UnitTypeSummaryDto;
+import com.example.restaurantbackendapplication1.unit.model.dto.UnitTypeDto;
 import com.example.restaurantbackendapplication1.unit.model.entity.UnitTypeEntity;
-import com.example.restaurantbackendapplication1.unit.model.mapper.UnitTypeMapper;
 import lombok.experimental.UtilityClass;
 
 import java.util.List;
@@ -55,23 +54,7 @@ public class ItemMapper {
                 .collect(Collectors.toSet());
     }
 
-    public static ItemSummaryDto toSummaryDto(ItemEntity entity) {
-        List<ItemLocaleDto> localeDtos = entity.getItemLocaleEntities().stream()
-                .map(ItemLocaleMapper::toDto)
-                .toList();
-
-        UnitTypeSummaryDto unitTypeSummaryDto = UnitTypeMapper.toSummaryDto(entity.getUnitTypeEntity());
-
-        return ItemSummaryDto.builder()
-                .id(entity.getId())
-                .code(entity.getCode())
-                .sortOrder(entity.getSortOrder())
-                .locales(localeDtos)
-                .unitType(unitTypeSummaryDto)
-                .build();
-    }
-
-    public static ItemDto toDto(ItemEntity entity) {
+    public static ItemDto toDto(ItemEntity entity, ItemTypeDto itemType, UnitTypeDto unitType) {
         List<ItemLocaleDto> localeDtos = entity.getItemLocaleEntities().stream()
                 .map(ItemLocaleMapper::toDto)
                 .toList();
@@ -79,6 +62,8 @@ public class ItemMapper {
         return ItemDto.builder()
                 .id(entity.getId())
                 .code(entity.getCode())
+                .itemType(itemType)
+                .unitType(unitType)
                 .sortOrder(entity.getSortOrder())
                 .locales(localeDtos)
                 .build();

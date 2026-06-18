@@ -4,7 +4,6 @@ import com.example.restaurantbackendapplication1.item.dto.request.itemcategory.C
 import com.example.restaurantbackendapplication1.item.dto.request.itemcategory.UpdateItemCategoryRequest;
 import com.example.restaurantbackendapplication1.item.model.dto.ItemCategoryDto;
 import com.example.restaurantbackendapplication1.item.model.dto.ItemCategoryLocaleDto;
-import com.example.restaurantbackendapplication1.item.model.dto.ItemSummaryDto;
 import com.example.restaurantbackendapplication1.item.model.entity.ItemCategoryEntity;
 import com.example.restaurantbackendapplication1.item.model.entity.ItemCategoryLocaleEntity;
 import com.example.restaurantbackendapplication1.locale.model.entity.LocaleEntity;
@@ -42,25 +41,20 @@ public class ItemCategoryMapper {
     }
 
     public static ItemCategoryDto toDto(ItemCategoryEntity entity) {
-        List<ItemCategoryLocaleDto> locales = entity.getItemCategoryLocaleEntities().stream()
-                .map(ItemCategoryLocaleMapper::toDto)
-                .toList();
+        return buildDto(entity, null);
+    }
 
+    public static ItemCategoryDto toDtoWithSubCategories(ItemCategoryEntity entity) {
         List<ItemCategoryDto> subCategories = entity.getSubCategoryEntities().stream()
                 .filter(sc -> sc.getIsActive() && !sc.getIsDeleted())
-                .map(child -> ItemCategoryDto.builder()
-                        .id(child.getId())
-                        .code(child.getCode())
-                        .sortOrder(child.getSortOrder())
-                        .locales(child.getItemCategoryLocaleEntities().stream()
-                                .map(ItemCategoryLocaleMapper::toDto)
-                                .toList())
-                        .build())
+                .map(ItemCategoryMapper::toDtoWithSubCategories)
                 .toList();
+        return buildDto(entity, subCategories);
+    }
 
-        List<ItemSummaryDto> items = entity.getItemItemCategoryEntities().stream()
-                .filter(itemItemCategoryEntity -> itemItemCategoryEntity.getIsActive() && !itemItemCategoryEntity.getIsDeleted())
-                .map(itemItemCategoryEntity -> ItemMapper.toSummaryDto(itemItemCategoryEntity.getItemEntity()))
+    private static ItemCategoryDto buildDto(ItemCategoryEntity entity, List<ItemCategoryDto> subCategories) {
+        List<ItemCategoryLocaleDto> locales = entity.getItemCategoryLocaleEntities().stream()
+                .map(ItemCategoryLocaleMapper::toDto)
                 .toList();
 
         return ItemCategoryDto.builder()
@@ -69,7 +63,6 @@ public class ItemCategoryMapper {
                 .sortOrder(entity.getSortOrder())
                 .locales(locales)
                 .subCategories(subCategories)
-                .items(items)
                 .build();
     }
 }

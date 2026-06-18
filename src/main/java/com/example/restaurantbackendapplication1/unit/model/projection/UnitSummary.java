@@ -10,8 +10,8 @@ import java.util.List;
 public interface UnitSummary {
     Long getId();
 
-    @Value("#{target.unitTypeEntity}")
-    UnitTypeSummary getUnitType();
+    @Value("#{target.unitTypeEntity.id}")
+    Long getUnitTypeId();
 
     String getCode();
     Boolean getIsBase();

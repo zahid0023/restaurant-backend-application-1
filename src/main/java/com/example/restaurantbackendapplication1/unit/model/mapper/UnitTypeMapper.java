@@ -5,7 +5,6 @@ import com.example.restaurantbackendapplication1.unit.dto.request.unittype.UnitT
 import com.example.restaurantbackendapplication1.unit.dto.request.unittype.UpdateUnitTypeRequest;
 import com.example.restaurantbackendapplication1.unit.model.dto.UnitTypeDto;
 import com.example.restaurantbackendapplication1.unit.model.dto.UnitTypeLocaleDto;
-import com.example.restaurantbackendapplication1.unit.model.dto.UnitTypeSummaryDto;
 import com.example.restaurantbackendapplication1.locale.model.entity.LocaleEntity;
 import com.example.restaurantbackendapplication1.unit.model.entity.UnitTypeEntity;
 import com.example.restaurantbackendapplication1.unit.model.entity.UnitTypeLocaleEntity;
@@ -41,19 +40,6 @@ public class UnitTypeMapper {
         entity.setSortOrder(request.getSortOrder());
     }
 
-    public UnitTypeSummaryDto toSummaryDto(UnitTypeEntity entity) {
-        List<UnitTypeLocaleDto> locales = entity.getUnitTypeLocaleEntities().stream()
-                .map(UnitTypeLocaleMapper::toDto)
-                .collect(Collectors.toList());
-
-        return UnitTypeSummaryDto.builder()
-                .id(entity.getId())
-                .code(entity.getCode())
-                .sortOrder(entity.getSortOrder())
-                .locales(locales)
-                .build();
-    }
-
     public UnitTypeDto toDto(UnitTypeEntity entity) {
         List<UnitTypeLocaleDto> locales = entity.getUnitTypeLocaleEntities().stream()
                 .map(UnitTypeLocaleMapper::toDto)
@@ -66,4 +52,5 @@ public class UnitTypeMapper {
                 .locales(locales)
                 .build();
     }
+
 }

@@ -27,7 +27,15 @@ public class DishEntity extends AuditableEntity {
     @Column(name = "sort_order", nullable = false)
     private Integer sortOrder;
 
+    @NotNull
+    @ColumnDefault("false")
+    @Column(name = "is_featured", nullable = false)
+    private Boolean isFeatured = false;
+
     @OneToMany(mappedBy = "dishEntity", cascade = CascadeType.ALL)
     private Set<DishLocaleEntity> dishesLocaleEntities = new LinkedHashSet<>();
+
+    @OneToMany(mappedBy = "dishEntity")
+    private Set<DishVariantEntity> dishVariantEntities = new LinkedHashSet<>();
 
 }

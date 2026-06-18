@@ -5,6 +5,7 @@ import com.example.restaurantbackendapplication1.item.dto.request.itemtype.Creat
 import com.example.restaurantbackendapplication1.item.dto.request.itemtype.UpdateItemTypeRequest;
 import com.example.restaurantbackendapplication1.item.dto.request.itemtypelocale.CreateItemTypeLocaleRequest;
 import com.example.restaurantbackendapplication1.item.model.entity.ItemTypeEntity;
+import com.example.restaurantbackendapplication1.item.service.ItemService;
 import com.example.restaurantbackendapplication1.locale.model.entity.LocaleEntity;
 import com.example.restaurantbackendapplication1.item.service.ItemTypeService;
 import com.example.restaurantbackendapplication1.locale.service.LocaleService;
@@ -23,11 +24,14 @@ public class ItemTypeController {
 
     private final ItemTypeService itemTypeService;
     private final LocaleService localeService;
+    private final ItemService itemService;
 
     public ItemTypeController(ItemTypeService itemTypeService,
-                              LocaleService localeService) {
+                              LocaleService localeService,
+                              ItemService itemService) {
         this.itemTypeService = itemTypeService;
         this.localeService = localeService;
+        this.itemService = itemService;
     }
 
     @PostMapping
@@ -45,6 +49,11 @@ public class ItemTypeController {
     @GetMapping
     public ResponseEntity<?> getAll(@Valid @ParameterObject PaginatedRequest request) {
         return ResponseEntity.ok(itemTypeService.getAll(request));
+    }
+
+    @GetMapping("/{id}/items")
+    public ResponseEntity<?> getAllItems(@PathVariable Long id, @Valid @ParameterObject PaginatedRequest request) {
+        return ResponseEntity.ok(itemService.getAll(id, request));
     }
 
     @PutMapping("/{id}")

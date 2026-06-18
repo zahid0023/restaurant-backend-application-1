@@ -6,6 +6,7 @@ import com.example.restaurantbackendapplication1.unit.dto.request.UpdateUnitRequ
 import com.example.restaurantbackendapplication1.unit.dto.request.unitlocale.CreateUnitLocaleRequest;
 import com.example.restaurantbackendapplication1.unit.model.dto.UnitDto;
 import com.example.restaurantbackendapplication1.unit.model.dto.UnitLocaleDto;
+import com.example.restaurantbackendapplication1.unit.model.dto.UnitTypeDto;
 import com.example.restaurantbackendapplication1.locale.model.entity.LocaleEntity;
 import com.example.restaurantbackendapplication1.unit.model.entity.UnitEntity;
 import com.example.restaurantbackendapplication1.unit.model.entity.UnitLocaleEntity;
@@ -51,13 +52,21 @@ public class UnitMapper {
     }
 
     public UnitDto toDto(UnitEntity entity) {
+        return buildDto(entity, null);
+    }
+
+    public UnitDto toDtoWithUnitType(UnitEntity entity) {
+        return buildDto(entity, UnitTypeMapper.toDto(entity.getUnitTypeEntity()));
+    }
+
+    private UnitDto buildDto(UnitEntity entity, UnitTypeDto unitType) {
         List<UnitLocaleDto> localeDtos = entity.getUnitLocaleEntities().stream()
                 .map(UnitLocaleMapper::toDto)
                 .toList();
 
         return UnitDto.builder()
                 .id(entity.getId())
-                .unitTypeId(entity.getUnitTypeEntity().getId())
+                .unitType(unitType)
                 .code(entity.getCode())
                 .isBase(entity.getIsBase())
                 .sortOrder(entity.getSortOrder())

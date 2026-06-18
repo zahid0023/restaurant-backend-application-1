@@ -60,7 +60,7 @@ public class DishVariantIngredientServiceImpl implements DishVariantIngredientSe
     @Override
     public DishVariantIngredientResponse getById(Long dishVariantId, Long id) {
         DishVariantIngredientEntity entity = getEntityById(dishVariantId, id);
-        DishVariantIngredientDto dto = DishVariantIngredientMapper.toDto(entity);
+        DishVariantIngredientDto dto = DishVariantIngredientMapper.toDto(entity, true);
         return new DishVariantIngredientResponse(dto);
     }
 

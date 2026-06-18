@@ -138,7 +138,14 @@ Returns a paginated list of all active units for the specified unit type.
   "data": [
     {
       "id": 1,
-      "unit_type_id": 1,
+      "unit_type": {
+        "id": 1,
+        "code": "WEIGHT",
+        "sort_order": 1,
+        "locales": [
+          { "id": 1, "locale_id": 1, "name": "Weight", "description": "Units that measure mass", "sort_order": 1 }
+        ]
+      },
       "code": "KG",
       "is_base": true,
       "sort_order": 1,
@@ -148,7 +155,14 @@ Returns a paginated list of all active units for the specified unit type.
     },
     {
       "id": 2,
-      "unit_type_id": 1,
+      "unit_type": {
+        "id": 1,
+        "code": "WEIGHT",
+        "sort_order": 1,
+        "locales": [
+          { "id": 1, "locale_id": 1, "name": "Weight", "description": "Units that measure mass", "sort_order": 1 }
+        ]
+      },
       "code": "G",
       "is_base": false,
       "sort_order": 2,

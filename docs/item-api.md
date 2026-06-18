@@ -140,8 +140,8 @@ GET /api/v1/items?query=TOM&size=5   → same, with custom page size
       "code": "TOMATO",
       "sort_order": 1,
       "locales": [
-        { "id": 1, "locale_code": "en", "name": "Tomato", "description": "Fresh red tomato", "sort_order": 1 },
-        { "id": 2, "locale_code": "bn", "name": "টমেটো", "description": "তাজা লাল টমেটো", "sort_order": 1 }
+        { "id": 1, "locale_id": 1, "name": "Tomato", "description": "Fresh red tomato", "sort_order": 1 },
+        { "id": 2, "locale_id": 2, "name": "টমেটো", "description": "তাজা লাল টমেটো", "sort_order": 1 }
       ]
     }
   ],
@@ -153,8 +153,6 @@ GET /api/v1/items?query=TOM&size=5   → same, with custom page size
   "has_previous": false
 }
 ```
-
-> Note: The list response returns a summary projection. Item locales use `locale_code`. Use the Get by ID endpoint to retrieve full locale detail with `locale_id`.
 
 ---
 

@@ -3,6 +3,7 @@ package com.example.restaurantbackendapplication1.dish.model.mapper;
 import com.example.restaurantbackendapplication1.dish.dto.request.dishvariant.CreateDishVariantRequest;
 import com.example.restaurantbackendapplication1.dish.dto.request.dishvariant.DishVariantRequest;
 import com.example.restaurantbackendapplication1.dish.dto.request.dishvariant.UpdateDishVariantRequest;
+import com.example.restaurantbackendapplication1.dish.model.dto.DishDto;
 import com.example.restaurantbackendapplication1.dish.model.dto.DishVariantDto;
 import com.example.restaurantbackendapplication1.dish.model.dto.DishVariantIngredientDto;
 import com.example.restaurantbackendapplication1.dish.model.dto.DishVariantLocaleDto;
@@ -64,19 +65,28 @@ public class DishVariantMapper {
         entity.setIsVeg(request.getIsVeg());
     }
 
-    public DishVariantDto toDto(DishVariantEntity entity) {
+    public DishVariantDto toDto(DishVariantEntity entity,
+                                Boolean includeDish,
+                                Boolean includeIngredients) {
         List<DishVariantLocaleDto> locales = entity.getDishVariantLocaleEntities().stream()
                 .map(DishVariantLocaleMapper::toDto)
                 .toList();
 
-        List<DishVariantIngredientDto> ingredients = entity.getDishVariantIngredientEntities().stream()
-                .filter(i -> Boolean.TRUE.equals(i.getIsActive()) && Boolean.FALSE.equals(i.getIsDeleted()))
-                .map(DishVariantIngredientMapper::toDto)
-                .toList();
+        DishDto dish = includeDish ?
+                DishMapper.toDto(entity.getDishEntity(), false) :
+                null;
+
+        List<DishVariantIngredientDto> ingredients = includeIngredients ?
+                entity.getDishVariantIngredientEntities().stream()
+                        .filter(i -> Boolean.TRUE.equals(i.getIsActive()) && Boolean.FALSE.equals(i.getIsDeleted()))
+                        .map(i -> DishVariantIngredientMapper.toDto(i, false))
+                        .toList() :
+                null;
+
 
         return DishVariantDto.builder()
                 .id(entity.getId())
-                .dishId(entity.getDishEntity().getId())
+                .dish(dish)
                 .code(entity.getCode())
                 .sortOrder(entity.getSortOrder())
                 .price(entity.getPrice())

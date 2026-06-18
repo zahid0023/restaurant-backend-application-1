@@ -55,7 +55,7 @@ public class DishServiceImpl implements DishService {
     @Override
     public DishResponse getById(Long id) {
         DishEntity entity = getEntityById(id);
-        DishDto dto = DishMapper.toDto(entity);
+        DishDto dto = DishMapper.toDto(entity, false);
         return new DishResponse(dto);
     }
 
@@ -73,6 +73,22 @@ public class DishServiceImpl implements DishService {
         dishRepository.save(entity);
         log.info("Dish updated with id: {}", entity.getId());
         return new SuccessResponse(true, entity.getId());
+    }
+
+    @Transactional
+    @Override
+    public SuccessResponse setFeatured(DishEntity entity, Boolean isFeatured) {
+        entity.setIsFeatured(isFeatured);
+        dishRepository.save(entity);
+        log.info("Dish id: {} is_featured set to: {}", entity.getId(), isFeatured);
+        return new SuccessResponse(true, entity.getId());
+    }
+
+    @Override
+    public PaginatedResponse<?> getFeatured(PaginatedRequest request) {
+        Page<?> page = dishRepository
+                .findAllByIsFeaturedAndIsActiveAndIsDeleted(true, true, false, request.toPageable(ALLOWED_SORT_FIELDS));
+        return Pagination.buildPaginatedResponse(page);
     }
 
     @Transactional

@@ -2,24 +2,29 @@
 
 Base URL: `/api/v1/item-types`
 
-Item types (e.g. `INGREDIENT`, `PACKAGING`, `ASSET`, `EQUIPMENT`) are used to classify items directly — each item carries an `item_type_id`. Item types are independent of item categories; item categories form a separate standalone tree and are not nested under item types.
+Item types (e.g. `INGREDIENT`, `PACKAGING`, `ASSET`, `EQUIPMENT`) are used to classify items directly — each item
+carries an `item_type_id`. Item types are independent of item categories; item categories form a separate standalone
+tree and are not nested under item types.
 
-The `is_consumable` flag indicates whether items of this type are consumed during use. Type names and descriptions are locale-specific and embedded in every response via the `locales` array. All records support soft-delete — deleted records are hidden from all responses.
+The `is_consumable` flag indicates whether items of this type are consumed during use. Type names and descriptions are
+locale-specific and embedded in every response via the `locales` array. All records support soft-delete — deleted
+records are hidden from all responses.
 
 ---
 
 ## Endpoints
 
-| Method | Path                                                | Description                  |
-|--------|-----------------------------------------------------|------------------------------|
-| POST   | `/api/v1/item-types`                                | Create an item type          |
-| GET    | `/api/v1/item-types`                                | List all item types          |
-| GET    | `/api/v1/item-types/{id}`                           | Get an item type             |
-| PUT    | `/api/v1/item-types/{id}`                           | Update an item type          |
-| DELETE | `/api/v1/item-types/{id}`                           | Delete an item type          |
-| POST   | `/api/v1/item-types/{item-type-id}/locales`         | Create an item type locale   |
-| PUT    | `/api/v1/item-types/{item-type-id}/locales/{id}`    | Update an item type locale   |
-| DELETE | `/api/v1/item-types/{item-type-id}/locales/{id}`    | Delete an item type locale   |
+| Method | Path                                             | Description                     |
+|--------|--------------------------------------------------|---------------------------------|
+| POST   | `/api/v1/item-types`                             | Create an item type             |
+| GET    | `/api/v1/item-types`                             | List all item types             |
+| GET    | `/api/v1/item-types/{id}`                        | Get an item type                |
+| GET    | `/api/v1/item-types/{id}/items`                  | List all items for an item type |
+| PUT    | `/api/v1/item-types/{id}`                        | Update an item type             |
+| DELETE | `/api/v1/item-types/{id}`                        | Delete an item type             |
+| POST   | `/api/v1/item-types/{item-type-id}/locales`      | Create an item type locale      |
+| PUT    | `/api/v1/item-types/{item-type-id}/locales/{id}` | Update an item type locale      |
+| DELETE | `/api/v1/item-types/{item-type-id}/locales/{id}` | Delete an item type locale      |
 
 ---
 
@@ -27,24 +32,23 @@ The `is_consumable` flag indicates whether items of this type are consumed durin
 
 ### Item Type
 
-| Field          | Type    | Required | Constraints              | Description                              |
-|----------------|---------|----------|--------------------------|------------------------------------------|
-| `id`           | Long    | —        | read-only                | Auto-generated identifier                |
-| `code`         | String  | Yes      | max 50 chars, not blank  | Unique type code (e.g. `INGREDIENT`)     |
-| `is_consumable`| Boolean | Yes      | not null                 | Whether the type is consumed in use      |
-| `sort_order`   | Integer | Yes      | not null                 | Display order                            |
-| `locales`      | Array   | —        | read-only                | All locale translations for this type    |
-| `items`        | Array   | —        | read-only, getById only  | Summary of all active items of this type. Each entry contains `id`, `code`, `unit_type` (summary), `sort_order`, `locales` — no back-reference to item type |
+| Field           | Type    | Required | Constraints             | Description                           |
+|-----------------|---------|----------|-------------------------|---------------------------------------|
+| `id`            | Long    | —        | read-only               | Auto-generated identifier             |
+| `code`          | String  | Yes      | max 50 chars, not blank | Unique type code (e.g. `INGREDIENT`)  |
+| `is_consumable` | Boolean | Yes      | not null                | Whether the type is consumed in use   |
+| `sort_order`    | Integer | Yes      | not null                | Display order                         |
+| `locales`       | Array   | —        | read-only               | All locale translations for this type |
 
 ### Item Type Locale
 
-| Field         | Type    | Required | Constraints              | Description                              |
-|---------------|---------|----------|--------------------------|------------------------------------------|
-| `id`          | Long    | —        | read-only                | Auto-generated identifier                |
-| `locale_id`   | Long    | Yes      | must exist               | ID of an existing active locale          |
-| `name`        | String  | Yes      | max 255 chars, not blank | Localized name of the item type          |
-| `description` | String  | No       | defaults to `""`         | Localized description                    |
-| `sort_order`  | Integer | Yes      | not null                 | Display order for this locale entry      |
+| Field         | Type    | Required | Constraints              | Description                         |
+|---------------|---------|----------|--------------------------|-------------------------------------|
+| `id`          | Long    | —        | read-only                | Auto-generated identifier           |
+| `locale_id`   | Long    | Yes      | must exist               | ID of an existing active locale     |
+| `name`        | String  | Yes      | max 255 chars, not blank | Localized name of the item type     |
+| `description` | String  | No       | defaults to `""`         | Localized description               |
+| `sort_order`  | Integer | Yes      | not null                 | Display order for this locale entry |
 
 ---
 
@@ -52,7 +56,8 @@ The `is_consumable` flag indicates whether items of this type are consumed durin
 
 `POST /api/v1/item-types`
 
-Creates an item type along with its locale-specific translations in one request. All provided `locale_id` values must reference existing, active locales.
+Creates an item type along with its locale-specific translations in one request. All provided `locale_id` values must
+reference existing, active locales.
 
 ### Request Body
 
@@ -80,12 +85,12 @@ Creates an item type along with its locale-specific translations in one request.
 
 ### Request Fields
 
-| Field          | Type    | Required | Validation               |
-|----------------|---------|----------|--------------------------|
-| `code`         | String  | Yes      | Not blank, max 50 chars  |
-| `is_consumable`| Boolean | Yes      | Not null                 |
-| `sort_order`   | Integer | Yes      | Not null                 |
-| `locales`      | Array   | No       | See locale fields below  |
+| Field           | Type    | Required | Validation              |
+|-----------------|---------|----------|-------------------------|
+| `code`          | String  | Yes      | Not blank, max 50 chars |
+| `is_consumable` | Boolean | Yes      | Not null                |
+| `sort_order`    | Integer | Yes      | Not null                |
+| `locales`       | Array   | No       | See locale fields below |
 
 **Locale fields (`locales[]`):**
 
@@ -111,12 +116,13 @@ Creates an item type along with its locale-specific translations in one request.
 
 `GET /api/v1/item-types/{id}`
 
-Returns a single item type with all its locale translations.
+Returns a single item type with all its locale translations. Items belonging to this type are **not** included in this
+response — use `GET /api/v1/item-types/{id}/items` to retrieve them.
 
 ### Path Parameters
 
-| Parameter | Type | Description       |
-|-----------|------|-------------------|
+| Parameter | Type | Description         |
+|-----------|------|---------------------|
 | `id`      | Long | ID of the item type |
 
 ### Response `200 OK`
@@ -143,36 +149,10 @@ Returns a single item type with all its locale translations.
         "description": "রেসিপি বা উৎপাদনে ব্যবহৃত উপকরণ",
         "sort_order": 1
       }
-    ],
-    "items": [
-      {
-        "id": 1,
-        "code": "TOMATO",
-        "unit_type": {
-          "id": 2,
-          "code": "WEIGHT",
-          "sort_order": 1,
-          "locales": [
-            { "id": 3, "locale_id": 1, "name": "Weight", "description": "", "sort_order": 1 }
-          ]
-        },
-        "sort_order": 1,
-        "locales": [
-          {
-            "id": 1,
-            "locale_id": 1,
-            "name": "Tomato",
-            "description": "Fresh red tomato",
-            "sort_order": 1
-          }
-        ]
-      }
     ]
   }
 }
 ```
-
-> `items` lists all active items classified under this item type.
 
 ---
 
@@ -245,11 +225,78 @@ Returns a paginated list of active (non-deleted) item types. Each item includes 
 
 ---
 
+## Get Items by Item Type
+
+`GET /api/v1/item-types/{id}/items`
+
+Returns a paginated list of active (non-deleted) items that belong to the specified item type.
+
+### Path Parameters
+
+| Parameter | Type | Description         |
+|-----------|------|---------------------|
+| `id`      | Long | ID of the item type |
+
+### Query Parameters
+
+| Parameter  | Type   | Default | Constraints                    | Description              |
+|------------|--------|---------|--------------------------------|--------------------------|
+| `page`     | int    | `0`     | >= 0                           | Zero-based page index    |
+| `size`     | int    | `10`    | 1 – 50                         | Number of items per page |
+| `sort_by`  | String | `id`    | `id`, `sortOrder`, `createdAt` | Field to sort by         |
+| `sort_dir` | String | `ASC`   | `ASC`, `DESC`                  | Sort direction           |
+
+### Response `200 OK`
+
+```json
+{
+  "data": [
+    {
+      "id": 1,
+      "code": "TOMATO",
+      "unit_type": {
+        "id": 1,
+        "code": "WEIGHT",
+        "sort_order": 1,
+        "locales": [
+          {
+            "id": 1,
+            "locale_id": 1,
+            "name": "Weight",
+            "description": "",
+            "sort_order": 1
+          }
+        ]
+      },
+      "sort_order": 1,
+      "locales": [
+        {
+          "id": 1,
+          "locale_code": "en",
+          "name": "Tomato",
+          "description": "Fresh tomato",
+          "sort_order": 1
+        }
+      ]
+    }
+  ],
+  "current_page": 0,
+  "total_pages": 1,
+  "total_elements": 1,
+  "page_size": 10,
+  "has_next": false,
+  "has_previous": false
+}
+```
+
+---
+
 ## Update Item Type
 
 `PUT /api/v1/item-types/{id}`
 
-Updates `is_consumable` and `sort_order`. The `code` field is set at creation time and cannot be changed. Locale translations are managed via the item type locale endpoints.
+Updates `is_consumable` and `sort_order`. The `code` field is set at creation time and cannot be changed. Locale
+translations are managed via the item type locale endpoints.
 
 ### Path Parameters
 
@@ -268,10 +315,10 @@ Updates `is_consumable` and `sort_order`. The `code` field is set at creation ti
 
 ### Request Fields
 
-| Field          | Type    | Required | Validation |
-|----------------|---------|----------|------------|
-| `is_consumable`| Boolean | Yes      | Not null   |
-| `sort_order`   | Integer | Yes      | Not null   |
+| Field           | Type    | Required | Validation |
+|-----------------|---------|----------|------------|
+| `is_consumable` | Boolean | Yes      | Not null   |
+| `sort_order`    | Integer | Yes      | Not null   |
 
 ### Response `200 OK`
 
@@ -309,7 +356,8 @@ Soft-deletes the item type. The record is not removed from the database but will
 
 ## Item Type Locales
 
-Item type locale endpoints manage per-locale translations for an item type. The `{item-type-id}` path parameter must reference an existing, active item type.
+Item type locale endpoints manage per-locale translations for an item type. The `{item-type-id}` path parameter must
+reference an existing, active item type.
 
 ---
 
@@ -321,9 +369,9 @@ Adds a new locale translation to an existing item type.
 
 #### Path Parameters
 
-| Parameter      | Type | Description           |
-|----------------|------|-----------------------|
-| `item-type-id` | Long | ID of the item type   |
+| Parameter      | Type | Description         |
+|----------------|------|---------------------|
+| `item-type-id` | Long | ID of the item type |
 
 #### Request Body
 
@@ -364,10 +412,10 @@ Updates an existing locale translation for an item type. The locale itself canno
 
 #### Path Parameters
 
-| Parameter      | Type | Description                  |
-|----------------|------|------------------------------|
-| `item-type-id` | Long | ID of the item type          |
-| `id`           | Long | ID of the item type locale   |
+| Parameter      | Type | Description                |
+|----------------|------|----------------------------|
+| `item-type-id` | Long | ID of the item type        |
+| `id`           | Long | ID of the item type locale |
 
 #### Request Body
 
@@ -402,14 +450,15 @@ Updates an existing locale translation for an item type. The locale itself canno
 
 `DELETE /api/v1/item-types/{item-type-id}/locales/{id}`
 
-Soft-deletes a locale translation. The record is not removed from the database but will no longer appear in any response.
+Soft-deletes a locale translation. The record is not removed from the database but will no longer appear in any
+response.
 
 #### Path Parameters
 
-| Parameter      | Type | Description                  |
-|----------------|------|------------------------------|
-| `item-type-id` | Long | ID of the item type          |
-| `id`           | Long | ID of the item type locale   |
+| Parameter      | Type | Description                |
+|----------------|------|----------------------------|
+| `item-type-id` | Long | ID of the item type        |
+| `id`           | Long | ID of the item type locale |
 
 #### Response `200 OK`
 
@@ -435,8 +484,8 @@ All errors follow a common structure:
 }
 ```
 
-| HTTP Status | Error Code                 | Cause                                                              |
-|-------------|----------------------------|--------------------------------------------------------------------|
-| 400         | `INVALID_ARGUMENT`         | Missing required fields or invalid sort field                      |
-| 404         | `ENTITY_NOT_FOUND`         | Item type or locale not found, or already deleted                  |
-| 409         | `DATA_INTEGRITY_VIOLATION` | Constraint violation (e.g. duplicate code or duplicate locale)     |
+| HTTP Status | Error Code                 | Cause                                                          |
+|-------------|----------------------------|----------------------------------------------------------------|
+| 400         | `INVALID_ARGUMENT`         | Missing required fields or invalid sort field                  |
+| 404         | `ENTITY_NOT_FOUND`         | Item type or locale not found, or already deleted              |
+| 409         | `DATA_INTEGRITY_VIOLATION` | Constraint violation (e.g. duplicate code or duplicate locale) |

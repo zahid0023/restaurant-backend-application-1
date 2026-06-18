@@ -62,7 +62,7 @@ public class DishVariantServiceImpl implements DishVariantService {
     @Override
     public DishVariantResponse getById(Long dishId, Long id) {
         DishVariantEntity entity = getEntityById(dishId, id);
-        DishVariantDto dto = DishVariantMapper.toDto(entity);
+        DishVariantDto dto = DishVariantMapper.toDto(entity, false, true);
         return new DishVariantResponse(dto);
     }
 

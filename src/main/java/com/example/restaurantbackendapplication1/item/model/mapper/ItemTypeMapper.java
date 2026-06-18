@@ -4,7 +4,7 @@ import com.example.restaurantbackendapplication1.item.dto.request.itemtype.Creat
 import com.example.restaurantbackendapplication1.item.dto.request.itemtype.ItemTypeRequest;
 import com.example.restaurantbackendapplication1.item.dto.request.itemtype.UpdateItemTypeRequest;
 import com.example.restaurantbackendapplication1.item.dto.request.itemtypelocale.CreateItemTypeLocaleRequest;
-import com.example.restaurantbackendapplication1.item.model.dto.ItemSummaryDto;
+import com.example.restaurantbackendapplication1.item.model.dto.ItemDto;
 import com.example.restaurantbackendapplication1.item.model.dto.ItemTypeDto;
 import com.example.restaurantbackendapplication1.item.model.dto.ItemTypeLocaleDto;
 import com.example.restaurantbackendapplication1.item.model.entity.ItemTypeEntity;
@@ -46,14 +46,17 @@ public class ItemTypeMapper {
                 .collect(Collectors.toSet());
     }
 
-    public ItemTypeDto toDto(ItemTypeEntity entity) {
+    public ItemTypeDto toDto(ItemTypeEntity entity,
+                             Boolean includeItems) {
         List<ItemTypeLocaleDto> locales = entity.getItemTypeLocaleEntities().stream()
                 .map(ItemTypeLocaleMapper::toDto)
                 .toList();
 
-        List<ItemSummaryDto> items = entity.getItemEntities().stream()
-                .map(ItemMapper::toSummaryDto)
-                .toList();
+        List<ItemDto> items = includeItems ?
+                entity.getItemEntities().stream()
+                        .map(item -> ItemMapper.toDto(item, null, null))
+                        .toList()
+                : null;
 
         return ItemTypeDto.builder()
                 .id(entity.getId())

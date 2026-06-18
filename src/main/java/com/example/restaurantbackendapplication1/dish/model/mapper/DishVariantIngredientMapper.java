@@ -3,11 +3,14 @@ package com.example.restaurantbackendapplication1.dish.model.mapper;
 import com.example.restaurantbackendapplication1.dish.dto.request.dishvariantingredient.CreateDishVariantIngredientRequest;
 import com.example.restaurantbackendapplication1.dish.dto.request.dishvariantingredient.DishVariantIngredientRequest;
 import com.example.restaurantbackendapplication1.dish.dto.request.dishvariantingredient.UpdateDishVariantIngredientRequest;
+import com.example.restaurantbackendapplication1.dish.model.dto.DishVariantDto;
 import com.example.restaurantbackendapplication1.dish.model.dto.DishVariantIngredientDto;
 import com.example.restaurantbackendapplication1.dish.model.entity.DishVariantEntity;
 import com.example.restaurantbackendapplication1.dish.model.entity.DishVariantIngredientEntity;
 import com.example.restaurantbackendapplication1.item.model.entity.ItemEntity;
+import com.example.restaurantbackendapplication1.item.model.mapper.ItemMapper;
 import com.example.restaurantbackendapplication1.unit.model.entity.UnitEntity;
+import com.example.restaurantbackendapplication1.unit.model.mapper.UnitMapper;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
@@ -38,13 +41,17 @@ public class DishVariantIngredientMapper {
         entity.setSortOrder(request.getSortOrder());
     }
 
-    public DishVariantIngredientDto toDto(DishVariantIngredientEntity entity) {
+    public DishVariantIngredientDto toDto(DishVariantIngredientEntity entity, Boolean includeDishVariant) {
+        DishVariantDto dishVariant = includeDishVariant ?
+                DishVariantMapper.toDto(entity.getDishVariantEntity(), true, false)
+                : null;
+
         return DishVariantIngredientDto.builder()
                 .id(entity.getId())
-                .dishVariantId(entity.getDishVariantEntity().getId())
-                .itemId(entity.getItemEntity().getId())
+                .dishVariant(dishVariant)
+                .item(ItemMapper.toDto(entity.getItemEntity(), null, null))
                 .quantity(entity.getQuantity())
-                .unitId(entity.getUnitEntity().getId())
+                .unit(UnitMapper.toDtoWithUnitType(entity.getUnitEntity()))
                 .sortOrder(entity.getSortOrder())
                 .build();
     }

@@ -1,6 +1,7 @@
 package com.example.restaurantbackendapplication1.item.model.dto;
 
-import com.example.restaurantbackendapplication1.unit.model.dto.UnitDto;
+import com.example.restaurantbackendapplication1.unit.model.dto.UnitTypeDto;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,11 +15,13 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class ItemDto {
     private Long id;
     private String code;
-    private UnitDto unit;
+    private ItemTypeDto itemType;
+    private UnitTypeDto unitType;
     private Integer sortOrder;
     private List<ItemLocaleDto> locales;
 }

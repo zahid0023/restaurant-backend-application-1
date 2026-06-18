@@ -12,6 +12,7 @@ public interface DishSummary {
 
     String getCode();
     Integer getSortOrder();
+    Boolean getIsFeatured();
 
     @Value("#{target.dishesLocaleEntities}")
     List<LocaleSummary> getLocales();

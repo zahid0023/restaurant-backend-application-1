@@ -11,6 +11,7 @@ import com.example.restaurantbackendapplication1.item.model.entity.ItemEntity;
 import com.example.restaurantbackendapplication1.item.model.entity.ItemTypeEntity;
 import com.example.restaurantbackendapplication1.item.model.enums.ItemSortField;
 import com.example.restaurantbackendapplication1.item.model.mapper.ItemMapper;
+import com.example.restaurantbackendapplication1.item.model.mapper.ItemTypeMapper;
 import com.example.restaurantbackendapplication1.item.model.projection.ItemSummary;
 import com.example.restaurantbackendapplication1.item.repository.ItemRepository;
 import com.example.restaurantbackendapplication1.item.service.ItemService;
@@ -18,6 +19,7 @@ import com.example.restaurantbackendapplication1.commons.utils.EntityValidator;
 import com.example.restaurantbackendapplication1.commons.utils.Pagination;
 import com.example.restaurantbackendapplication1.locale.model.entity.LocaleEntity;
 import com.example.restaurantbackendapplication1.unit.model.entity.UnitTypeEntity;
+import com.example.restaurantbackendapplication1.unit.model.mapper.UnitTypeMapper;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
@@ -69,7 +71,9 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public ItemResponse getById(Long id) {
         ItemEntity entity = getEntityById(id);
-        ItemDto dto = ItemMapper.toDto(entity);
+        ItemDto dto = ItemMapper.toDto(entity,
+                ItemTypeMapper.toDto(entity.getItemTypeEntity(), false),
+                UnitTypeMapper.toDto(entity.getUnitTypeEntity()));
         return new ItemResponse(dto);
     }
 

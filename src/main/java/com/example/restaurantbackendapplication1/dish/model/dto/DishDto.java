@@ -1,5 +1,6 @@
 package com.example.restaurantbackendapplication1.dish.model.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,10 +14,13 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class DishDto {
     private Long id;
     private String code;
     private Integer sortOrder;
+    private Boolean isFeatured;
     private List<DishLocaleDto> locales;
+    private List<DishVariantDto> variants;
 }

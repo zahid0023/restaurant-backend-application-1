@@ -29,4 +29,5 @@ public class UnitTypeEntity extends AuditableEntity {
     @OneToMany(mappedBy = "unitTypeEntity", cascade = CascadeType.ALL)
     private Set<UnitTypeLocaleEntity> unitTypeLocaleEntities = new LinkedHashSet<>();
 
+
 }

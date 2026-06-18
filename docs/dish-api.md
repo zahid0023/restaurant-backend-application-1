@@ -2,22 +2,25 @@
 
 Base URL: `/api/v1`
 
-Dishes are standalone resources. Dish names and descriptions are locale-specific and embedded in every response via the `locales` array. All records support soft-delete — deleted records are hidden from all responses.
+Dishes are standalone resources. Dish names and descriptions are locale-specific and embedded in every response via the
+`locales` array. All records support soft-delete — deleted records are hidden from all responses.
 
 ---
 
 ## Endpoints
 
-| Method | Path                                          | Description          |
-|--------|-----------------------------------------------|----------------------|
-| POST   | `/api/v1/dishes`                              | Create a dish        |
-| GET    | `/api/v1/dishes/{id}`                         | Get a dish           |
-| GET    | `/api/v1/dishes`                              | List all dishes      |
-| PUT    | `/api/v1/dishes/{id}`                         | Update a dish        |
-| DELETE | `/api/v1/dishes/{id}`                         | Delete a dish        |
-| POST   | `/api/v1/dishes/{dish-id}/locales`            | Create a dish locale |
-| PUT    | `/api/v1/dishes/{dish-id}/locales/{id}`       | Update a dish locale |
-| DELETE | `/api/v1/dishes/{dish-id}/locales/{id}`       | Delete a dish locale |
+| Method | Path                                    | Description            |
+|--------|-----------------------------------------|------------------------|
+| POST   | `/api/v1/dishes`                        | Create a dish          |
+| GET    | `/api/v1/dishes/{id}`                   | Get a dish             |
+| GET    | `/api/v1/dishes`                        | List all dishes        |
+| GET    | `/api/v1/dishes/featured`               | List featured dishes   |
+| PUT    | `/api/v1/dishes/{id}`                   | Update a dish          |
+| PATCH  | `/api/v1/dishes/{id}/featured`          | Set dish featured flag |
+| DELETE | `/api/v1/dishes/{id}`                   | Delete a dish          |
+| POST   | `/api/v1/dishes/{dish-id}/locales`      | Create a dish locale   |
+| PUT    | `/api/v1/dishes/{dish-id}/locales/{id}` | Update a dish locale   |
+| DELETE | `/api/v1/dishes/{dish-id}/locales/{id}` | Delete a dish locale   |
 
 ---
 
@@ -25,12 +28,13 @@ Dishes are standalone resources. Dish names and descriptions are locale-specific
 
 ### Dish
 
-| Field        | Type    | Required | Constraints                            | Description                               |
-|--------------|---------|----------|----------------------------------------|-------------------------------------------|
-| `id`         | Long    | —        | read-only                              | Auto-generated identifier                 |
-| `code`       | String  | Yes      | max 50 chars, not blank, create-only   | Unique dish code (e.g., `BURGER_CLASSIC`) |
-| `sort_order` | Integer | Yes      | not null                               | Display order                             |
-| `locales`    | Array   | —        | read-only                              | All locale translations for this dish     |
+| Field         | Type    | Required | Constraints                           | Description                                       |
+|---------------|---------|----------|---------------------------------------|---------------------------------------------------|
+| `id`          | Long    | —        | read-only                             | Auto-generated identifier                         |
+| `code`        | String  | Yes      | max 50 chars, not blank, create-only  | Unique dish code (e.g., `BURGER_CLASSIC`)         |
+| `sort_order`  | Integer | Yes      | not null                              | Display order                                     |
+| `is_featured` | Boolean | —        | defaults to `false`, toggle via PATCH | Whether this dish appears in the featured section |
+| `locales`     | Array   | —        | read-only                             | All locale translations for this dish             |
 
 ### Dish Locale
 
@@ -48,7 +52,8 @@ Dishes are standalone resources. Dish names and descriptions are locale-specific
 
 `POST /api/v1/dishes`
 
-Creates a dish with optional embedded locale translations.
+Creates a dish with optional embedded locale translations. `is_featured` is not accepted in this request — it defaults
+to `false` and can be changed via `PATCH /{id}/featured`.
 
 ### Request Body
 
@@ -121,6 +126,7 @@ Returns a single dish with all its locale translations.
     "id": 1,
     "code": "BURGER_CLASSIC",
     "sort_order": 1,
+    "is_featured": true,
     "locales": [
       {
         "id": 1,
@@ -167,17 +173,37 @@ Returns a paginated list of all active (non-deleted) dishes.
       "id": 1,
       "code": "BURGER_CLASSIC",
       "sort_order": 1,
+      "is_featured": true,
       "locales": [
-        { "id": 1, "locale_id": 1, "name": "Classic Burger", "description": "A juicy beef patty with fresh vegetables.", "sort_order": 1 },
-        { "id": 2, "locale_id": 2, "name": "ক্লাসিক বার্গার", "description": "তাজা সবজি সহ রসালো বিফ প্যাটি।", "sort_order": 2 }
+        {
+          "id": 1,
+          "locale_id": 1,
+          "name": "Classic Burger",
+          "description": "A juicy beef patty with fresh vegetables.",
+          "sort_order": 1
+        },
+        {
+          "id": 2,
+          "locale_id": 2,
+          "name": "ক্লাসিক বার্গার",
+          "description": "তাজা সবজি সহ রসালো বিফ প্যাটি।",
+          "sort_order": 2
+        }
       ]
     },
     {
       "id": 2,
       "code": "VEGGIE_WRAP",
       "sort_order": 2,
+      "is_featured": false,
       "locales": [
-        { "id": 3, "locale_id": 1, "name": "Veggie Wrap", "description": "Fresh vegetables in a soft wrap.", "sort_order": 1 }
+        {
+          "id": 3,
+          "locale_id": 1,
+          "name": "Veggie Wrap",
+          "description": "Fresh vegetables in a soft wrap.",
+          "sort_order": 1
+        }
       ]
     }
   ],
@@ -196,7 +222,8 @@ Returns a paginated list of all active (non-deleted) dishes.
 
 `PUT /api/v1/dishes/{id}`
 
-Updates `sort_order`. The `code` is immutable and cannot be changed. Locale translations are managed via the dish locale endpoints.
+Updates `sort_order`. The `code` is immutable and cannot be changed. Locale translations are managed via the dish locale
+endpoints.
 
 ### Path Parameters
 
@@ -217,6 +244,120 @@ Updates `sort_order`. The `code` is immutable and cannot be changed. Locale tran
 | Field        | Type    | Required | Validation |
 |--------------|---------|----------|------------|
 | `sort_order` | Integer | Yes      | Not null   |
+
+### Response `200 OK`
+
+```json
+{
+  "success": true,
+  "id": 1
+}
+```
+
+---
+
+## List Featured Dishes
+
+`GET /api/v1/dishes/featured`
+
+Returns a paginated list of all active dishes where `is_featured = true`. Intended for public-facing website sections (
+e.g. homepage banners, chef's picks).
+
+### Query Parameters
+
+| Parameter  | Type    | Default | Constraints                            | Description              |
+|------------|---------|---------|----------------------------------------|--------------------------|
+| `page`     | Integer | `0`     | >= 0                                   | Zero-based page index    |
+| `size`     | Integer | `10`    | 1 – 50                                 | Number of items per page |
+| `sort_by`  | String  | `id`    | `id`, `code`, `sortOrder`, `createdAt` | Field to sort by         |
+| `sort_dir` | String  | `ASC`   | `ASC`, `DESC`                          | Sort direction           |
+
+### Response `200 OK`
+
+```json
+{
+  "data": [
+    {
+      "id": 1,
+      "code": "BURGER_CLASSIC",
+      "sort_order": 1,
+      "is_featured": true,
+      "locales": [
+        {
+          "id": 1,
+          "locale_id": 1,
+          "name": "Classic Burger",
+          "description": "A juicy beef patty with fresh vegetables.",
+          "sort_order": 1
+        }
+      ],
+      "variants": [
+        {
+          "id": 1,
+          "dish_id": 1,
+          "code": "BURGER_CLASSIC_REG",
+          "sort_order": 1,
+          "price": "8.99",
+          "is_default": true,
+          "is_veg": false,
+          "locales": [
+            { "id": 1, "locale_id": 1, "name": "Regular", "description": null, "sort_order": 1 }
+          ],
+          "ingredients": []
+        },
+        {
+          "id": 2,
+          "dish_id": 1,
+          "code": "BURGER_CLASSIC_LRG",
+          "sort_order": 2,
+          "price": "11.99",
+          "is_default": false,
+          "is_veg": false,
+          "locales": [
+            { "id": 2, "locale_id": 1, "name": "Large", "description": null, "sort_order": 1 }
+          ],
+          "ingredients": []
+        }
+      ]
+    }
+  ],
+  "current_page": 0,
+  "total_pages": 1,
+  "total_elements": 1,
+  "page_size": 10,
+  "has_next": false,
+  "has_previous": false
+}
+```
+
+---
+
+## Set Dish Featured
+
+`PATCH /api/v1/dishes/{id}/featured`
+
+Marks a dish as featured or removes it from the featured section. `is_featured` defaults to `false` on creation and can
+only be changed through this endpoint.
+
+### Path Parameters
+
+| Parameter | Type | Description    |
+|-----------|------|----------------|
+| `id`      | Long | ID of the dish |
+
+### Request Body
+
+```json
+{
+  "is_featured": true
+}
+```
+
+### Request Fields
+
+| Field         | Type    | Required | Validation |
+|---------------|---------|----------|------------|
+| `is_featured` | Boolean | Yes      | Not null   |
 
 ### Response `200 OK`
 
@@ -369,9 +510,9 @@ Soft-deletes a dish locale translation.
 
 ## Error Responses
 
-| HTTP Status | Cause                                                              |
-|-------------|--------------------------------------------------------------------|
-| 400         | Missing required fields, blank code, or invalid sort field         |
-| 404         | Dish or dish locale not found or already deleted                   |
-| 401         | JWT token missing or invalid                                       |
-| 403         | Authenticated user lacks permission                                |
+| HTTP Status | Cause                                                      |
+|-------------|------------------------------------------------------------|
+| 400         | Missing required fields, blank code, or invalid sort field |
+| 404         | Dish or dish locale not found or already deleted           |
+| 401         | JWT token missing or invalid                               |
+| 403         | Authenticated user lacks permission                        |

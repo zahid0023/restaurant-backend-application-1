@@ -32,17 +32,17 @@ full `GET /{id}` response. All records support soft-delete.
 
 ### Dish Variant
 
-| Field         | Type       | Required | Constraints                    | Description                              |
-|---------------|------------|----------|--------------------------------|------------------------------------------|
-| `id`          | Long       | —        | read-only                      | Auto-generated identifier                |
-| `dish_id`     | Long       | —        | read-only                      | ID of the parent dish                    |
-| `code`        | String     | Yes      | not blank, max 50, create-only | Unique variant code (e.g., `SMALL`)      |
-| `sort_order`  | Integer    | Yes      | not null                       | Display order                            |
-| `price`       | BigDecimal | Yes      | not null, >= 0.00              | Variant price                            |
-| `is_default`  | Boolean    | Yes      | not null                       | Whether this is the default variant      |
-| `is_veg`      | Boolean    | Yes      | not null                       | Whether this variant is vegetarian       |
-| `locales`     | Array      | Yes      | -                              | All locale translations for this variant |
-| `ingredients` | Array      | Yes      | -                              | All ingredients for this variant         |
+| Field         | Type       | Required | Constraints                    | Description                                                               |
+|---------------|------------|----------|--------------------------------|---------------------------------------------------------------------------|
+| `id`          | Long       | —        | read-only                      | Auto-generated identifier                                                 |
+| `dish_id`     | Long       | —        | read-only, list response only  | ID of the parent dish (present in paginated list; omitted in `GET /{id}`) |
+| `code`        | String     | Yes      | not blank, max 50, create-only | Unique variant code (e.g., `SMALL`)                                       |
+| `sort_order`  | Integer    | Yes      | not null                       | Display order                                                             |
+| `price`       | BigDecimal | Yes      | not null, >= 0.00              | Variant price                                                             |
+| `is_default`  | Boolean    | Yes      | not null                       | Whether this is the default variant                                       |
+| `is_veg`      | Boolean    | Yes      | not null                       | Whether this variant is vegetarian                                        |
+| `locales`     | Array      | —        | read-only                      | All locale translations for this variant                                  |
+| `ingredients` | Array      | —        | read-only, `GET /{id}` only    | Embedded ingredients (only in single-get response, not in list)           |
 
 ### Dish Variant Locale
 
@@ -56,14 +56,16 @@ full `GET /{id}` response. All records support soft-delete.
 
 ### Dish Variant Ingredient
 
-| Field             | Type       | Required | Constraints                       | Description                     |
-|-------------------|------------|----------|-----------------------------------|---------------------------------|
-| `id`              | Long       | —        | read-only                         | Auto-generated identifier       |
-| `dish_variant_id` | Long       | —        | read-only                         | ID of the parent dish variant   |
-| `item_id`         | Long       | Yes      | not null, must exist, create-only | ID of the ingredient item       |
-| `quantity`        | BigDecimal | Yes      | not null, >= 0.000                | Amount of the item used         |
-| `unit_id`         | Long       | Yes      | not null, must exist              | ID of the unit for the quantity |
-| `sort_order`      | Integer    | Yes      | not null                          | Display order                   |
+| Field          | Type       | Context          | Constraints                       | Description                                                                |
+|----------------|------------|------------------|-----------------------------------|----------------------------------------------------------------------------|
+| `id`           | Long       | response         | read-only                         | Auto-generated identifier                                                  |
+| `dish_variant` | Object     | `GET /{id}`      | read-only                         | Full dish variant object (embedded only in single-get ingredient response) |
+| `item_id`      | Long       | request (create) | not null, must exist, create-only | ID of the ingredient item — set on create, cannot be changed               |
+| `item`         | Object     | response         | read-only                         | Full item object (`id`, `code`, `sort_order`, `locales[]`)                 |
+| `quantity`     | BigDecimal | request/response | not null, >= 0.000                | Amount of the item used                                                    |
+| `unit_id`      | Long       | request          | not null, must exist              | ID of the unit — provided on create and update                             |
+| `unit`         | Object     | response         | read-only                         | Full unit object with nested `unit_type`                                   |
+| `sort_order`   | Integer    | request/response | not null                          | Display order                                                              |
 
 ---
 
@@ -175,11 +177,13 @@ Returns a single dish variant with its locale translations and ingredients.
 
 ### Response `200 OK`
 
+The response embeds full `item` and `unit` objects in each ingredient. The `dish` field is omitted (not included at this
+level).
+
 ```json
 {
   "dish_variant": {
     "id": 1,
-    "dish_id": 1,
     "code": "SMALL",
     "sort_order": 1,
     "price": 5.99,
@@ -204,18 +208,98 @@ Returns a single dish variant with its locale translations and ingredients.
     "ingredients": [
       {
         "id": 1,
-        "dish_variant_id": 1,
-        "item_id": 3,
+        "item": {
+          "id": 3,
+          "code": "TOMATO",
+          "sort_order": 1,
+          "locales": [
+            {
+              "id": 1,
+              "locale_id": 1,
+              "name": "Tomato",
+              "description": "Fresh tomato",
+              "sort_order": 1
+            }
+          ]
+        },
         "quantity": 1.000,
-        "unit_id": 1,
+        "unit": {
+          "id": 1,
+          "unit_type": {
+            "id": 1,
+            "code": "WEIGHT",
+            "sort_order": 1,
+            "locales": [
+              {
+                "id": 1,
+                "locale_id": 1,
+                "name": "Weight",
+                "description": "",
+                "sort_order": 1
+              }
+            ]
+          },
+          "code": "KG",
+          "is_base": true,
+          "sort_order": 1,
+          "locales": [
+            {
+              "id": 1,
+              "locale_id": 1,
+              "name": "Kilogram",
+              "description": "",
+              "sort_order": 1
+            }
+          ]
+        },
         "sort_order": 1
       },
       {
         "id": 2,
-        "dish_variant_id": 1,
-        "item_id": 7,
+        "item": {
+          "id": 7,
+          "code": "CHEESE",
+          "sort_order": 2,
+          "locales": [
+            {
+              "id": 2,
+              "locale_id": 1,
+              "name": "Cheese",
+              "description": "",
+              "sort_order": 1
+            }
+          ]
+        },
         "quantity": 0.100,
-        "unit_id": 2,
+        "unit": {
+          "id": 1,
+          "unit_type": {
+            "id": 1,
+            "code": "WEIGHT",
+            "sort_order": 1,
+            "locales": [
+              {
+                "id": 1,
+                "locale_id": 1,
+                "name": "Weight",
+                "description": "",
+                "sort_order": 1
+              }
+            ]
+          },
+          "code": "KG",
+          "is_base": true,
+          "sort_order": 1,
+          "locales": [
+            {
+              "id": 1,
+              "locale_id": 1,
+              "name": "Kilogram",
+              "description": "",
+              "sort_order": 1
+            }
+          ]
+        },
         "sort_order": 2
       }
     ]
@@ -548,14 +632,88 @@ create and cannot be changed; delete and recreate to replace an ingredient.
 
 #### Response `200 OK`
 
+The single-get response embeds the full `dish_variant` (with its parent `dish`), `item`, and `unit` objects.
+
 ```json
 {
   "dish_variant_ingredient": {
     "id": 5,
-    "dish_variant_id": 1,
-    "item_id": 5,
+    "dish_variant": {
+      "id": 1,
+      "dish": {
+        "id": 1,
+        "code": "BURGER_CLASSIC",
+        "sort_order": 1,
+        "is_featured": false,
+        "locales": [
+          {
+            "id": 1,
+            "locale_id": 1,
+            "name": "Classic Burger",
+            "description": "A juicy beef patty with fresh vegetables.",
+            "sort_order": 1
+          }
+        ]
+      },
+      "code": "SMALL",
+      "sort_order": 1,
+      "price": 5.99,
+      "is_default": true,
+      "is_veg": false,
+      "locales": [
+        {
+          "id": 1,
+          "locale_id": 1,
+          "name": "Small",
+          "description": "Perfect for one person",
+          "sort_order": 1
+        }
+      ]
+    },
+    "item": {
+      "id": 5,
+      "code": "ONION",
+      "sort_order": 3,
+      "locales": [
+        {
+          "id": 5,
+          "locale_id": 1,
+          "name": "Onion",
+          "description": "",
+          "sort_order": 1
+        }
+      ]
+    },
     "quantity": 0.250,
-    "unit_id": 2,
+    "unit": {
+      "id": 2,
+      "unit_type": {
+        "id": 1,
+        "code": "WEIGHT",
+        "sort_order": 1,
+        "locales": [
+          {
+            "id": 1,
+            "locale_id": 1,
+            "name": "Weight",
+            "description": "",
+            "sort_order": 1
+          }
+        ]
+      },
+      "code": "KG",
+      "is_base": true,
+      "sort_order": 1,
+      "locales": [
+        {
+          "id": 1,
+          "locale_id": 1,
+          "name": "Kilogram",
+          "description": "",
+          "sort_order": 1
+        }
+      ]
+    },
     "sort_order": 1
   }
 }
@@ -567,7 +725,8 @@ create and cannot be changed; delete and recreate to replace an ingredient.
 
 `GET /api/v1/dishes/{dish-id}/variants/{variant-id}/ingredients`
 
-Returns a paginated list of active ingredients for a dish variant.
+Returns a paginated list of active ingredients for a dish variant. Items and units are returned as flat IDs (`item_id`,
+`unit_id`) in the list — use the single-get endpoint to retrieve full nested objects.
 
 #### Path Parameters
 

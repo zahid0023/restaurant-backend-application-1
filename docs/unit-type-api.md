@@ -118,22 +118,31 @@ Returns a paginated list of all active unit types.
     {
       "id": 1,
       "code": "WEIGHT",
-      "sort_order": 1
+      "sort_order": 1,
+      "locales": [
+        { "id": 1, "locale_id": 1, "name": "Weight", "description": "Units that measure mass", "sort_order": 1 }
+      ]
     },
     {
       "id": 2,
       "code": "VOLUME",
-      "sort_order": 2
+      "sort_order": 2,
+      "locales": [
+        { "id": 2, "locale_id": 1, "name": "Volume", "description": "Units that measure liquid volume", "sort_order": 1 }
+      ]
     },
     {
       "id": 3,
       "code": "COUNT",
-      "sort_order": 3
+      "sort_order": 3,
+      "locales": [
+        { "id": 3, "locale_id": 1, "name": "Count", "description": "Units that measure quantity", "sort_order": 1 }
+      ]
     }
   ],
   "current_page": 0,
   "total_pages": 1,
-  "total_elements": 1,
+  "total_elements": 3,
   "page_size": 10,
   "has_next": false,
   "has_previous": false

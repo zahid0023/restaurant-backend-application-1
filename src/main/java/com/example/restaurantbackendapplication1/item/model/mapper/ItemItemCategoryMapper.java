@@ -19,8 +19,8 @@ public class ItemItemCategoryMapper {
     public static ItemItemCategoryDto toDto(ItemItemCategoryEntity entity) {
         return ItemItemCategoryDto.builder()
                 .id(entity.getId())
-                .itemId(entity.getItemEntity().getId())
-                .itemCategoryId(entity.getItemCategoryEntity().getId())
+                .item(ItemMapper.toDto(entity.getItemEntity(), null, null))
+                .itemCategory(ItemCategoryMapper.toDto(entity.getItemCategoryEntity()))
                 .build();
     }
 }

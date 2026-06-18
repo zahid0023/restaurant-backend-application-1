@@ -1,5 +1,6 @@
 package com.example.restaurantbackendapplication1.item.model.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,6 +14,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class ItemCategoryDto {
     private Long id;
@@ -20,5 +22,4 @@ public class ItemCategoryDto {
     private Integer sortOrder;
     private List<ItemCategoryLocaleDto> locales;
     private List<ItemCategoryDto> subCategories;
-    private List<ItemSummaryDto> items;
 }
