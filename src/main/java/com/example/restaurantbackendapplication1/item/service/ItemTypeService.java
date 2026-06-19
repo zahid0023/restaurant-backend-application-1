@@ -24,5 +24,5 @@ public interface ItemTypeService {
 
     SuccessResponse update(ItemTypeEntity entity, UpdateItemTypeRequest request);
 
-    SuccessResponse delete(Long id);
+    SuccessResponse delete(ItemTypeEntity entity);
 }

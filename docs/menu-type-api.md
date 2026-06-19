@@ -2,7 +2,7 @@
 
 Base URL: `/api/v1`
 
-All endpoints require a valid JWT bearer token.
+Most endpoints require a valid JWT bearer token. Public endpoints are marked explicitly.
 
 ```
 Authorization: Bearer <token>
@@ -12,16 +12,86 @@ Authorization: Bearer <token>
 
 ## Endpoints
 
-| Method | Path | Description |
-|--------|------|-------------|
-| POST   | `/api/v1/menus` | Create a menu type |
-| GET    | `/api/v1/menus/{id}` | Get a menu type |
-| GET    | `/api/v1/menus` | List all menu types |
-| PUT    | `/api/v1/menus/{id}` | Update a menu type |
-| DELETE | `/api/v1/menus/{id}` | Delete a menu type |
-| POST   | `/api/v1/menus/{menu-id}/locales` | Create a menu type locale |
-| PUT    | `/api/v1/menus/{menu-id}/locales/{id}` | Update a menu type locale |
-| DELETE | `/api/v1/menus/{menu-id}/locales/{id}` | Delete a menu type locale |
+| Method | Path                                   | Auth     | Description                                  |
+|--------|----------------------------------------|----------|----------------------------------------------|
+| GET    | `/api/v1/menus/public`                 | Public   | Full menu tree (types → categories → dishes) |
+| POST   | `/api/v1/menus`                        | Required | Create a menu type                           |
+| GET    | `/api/v1/menus/{id}`                   | Required | Get a menu type                              |
+| GET    | `/api/v1/menus`                        | Required | List all menu types                          |
+| PUT    | `/api/v1/menus/{id}`                   | Required | Update a menu type                           |
+| DELETE | `/api/v1/menus/{id}`                   | Required | Delete a menu type                           |
+| POST   | `/api/v1/menus/{menu-id}/locales`      | Required | Create a menu type locale                    |
+| PUT    | `/api/v1/menus/{menu-id}/locales/{id}` | Required | Update a menu type locale                    |
+| DELETE | `/api/v1/menus/{menu-id}/locales/{id}` | Required | Delete a menu type locale                    |
+
+---
+
+## Public Menu
+
+### Get Public Menu
+
+**`GET /api/v1/menus/public`**
+
+**Public — no authentication required.**
+
+Returns all active menu types ordered by `sort_order`, each with their categories and the dishes assigned to each
+category. Intended for public-facing menus (e.g. website menu pages).
+
+#### Response `200 OK`
+
+```json
+[
+  {
+    "id": 1,
+    "locales": [
+      {
+        "locale_id": 1,
+        "name": "Lunch Menu",
+        "description": "Available from 12:00 to 15:00"
+      },
+      {
+        "locale_id": 2,
+        "name": "দুপুরের মেনু",
+        "description": "১২:০০ থেকে ১৫:০০ পর্যন্ত পরিবেশিত"
+      }
+    ],
+    "categories": [
+      {
+        "id": 1,
+        "locales": [
+          {
+            "locale_id": 1,
+            "name": "Starters",
+            "description": "Light appetizers to begin your meal"
+          }
+        ],
+        "dishes": [
+          {
+            "id": 11,
+            "locales": [
+              {
+                "locale_id": 1,
+                "name": "Spring Rolls",
+                "description": "Crispy vegetable spring rolls"
+              }
+            ],
+            "cheapest_variant_id": 5,
+            "price": 4.99,
+            "img": "https://cdn.shadcnstudio.com/ss-assets/template/landing-page/bistro/image-18.png",
+            "img_alt": "plate-1"
+          }
+        ]
+      }
+    ]
+  }
+]
+```
+
+#### Notes
+
+- No pagination — all active menu types are returned in a single list.
+- Menu types are ordered by `sort_order` ascending.
+- Soft-deleted menu types, categories, and dishes are excluded.
 
 ---
 
@@ -56,15 +126,15 @@ Creates a new menu type with optional embedded locale translations.
 }
 ```
 
-| Field | Type | Required | Constraints |
-|---|---|---|---|
-| `code` | string | yes | max 50 chars, not blank, immutable after creation |
-| `sort_order` | integer | yes | |
-| `locales` | array | no | see locale fields below |
-| `locales[].locale_id` | long | yes | must be an existing active locale |
-| `locales[].name` | string | yes | max 255 chars, not blank |
-| `locales[].description` | string | no | |
-| `locales[].sort_order` | integer | yes | |
+| Field                   | Type    | Required | Constraints                                       |
+|-------------------------|---------|----------|---------------------------------------------------|
+| `code`                  | string  | yes      | max 50 chars, not blank, immutable after creation |
+| `sort_order`            | integer | yes      |                                                   |
+| `locales`               | array   | no       | see locale fields below                           |
+| `locales[].locale_id`   | long    | yes      | must be an existing active locale                 |
+| `locales[].name`        | string  | yes      | max 255 chars, not blank                          |
+| `locales[].description` | string  | no       |                                                   |
+| `locales[].sort_order`  | integer | yes      |                                                   |
 
 #### Response `201 Created`
 
@@ -83,9 +153,9 @@ Creates a new menu type with optional embedded locale translations.
 
 #### Path Parameters
 
-| Parameter | Type | Description |
-|---|---|---|
-| `id` | long | Menu type ID |
+| Parameter | Type | Description  |
+|-----------|------|--------------|
+| `id`      | long | Menu type ID |
 
 #### Response `200 OK`
 
@@ -96,8 +166,20 @@ Creates a new menu type with optional embedded locale translations.
     "code": "LUNCH",
     "sort_order": 1,
     "locales": [
-      { "id": 1, "locale_id": 1, "name": "Lunch Menu", "description": "Available from 12:00 to 15:00", "sort_order": 1 },
-      { "id": 2, "locale_id": 2, "name": "দুপুরের মেনু", "description": "১২:০০ থেকে ১৫:০০ পর্যন্ত পরিবেশিত", "sort_order": 1 }
+      {
+        "id": 1,
+        "locale_id": 1,
+        "name": "Lunch Menu",
+        "description": "Available from 12:00 to 15:00",
+        "sort_order": 1
+      },
+      {
+        "id": 2,
+        "locale_id": 2,
+        "name": "দুপুরের মেনু",
+        "description": "১২:০০ থেকে ১৫:০০ পর্যন্ত পরিবেশিত",
+        "sort_order": 1
+      }
     ]
   }
 }
@@ -107,19 +189,20 @@ Creates a new menu type with optional embedded locale translations.
 
 ### List Menu Types
 
-Returns a paginated list of all active menu types. Use the `detail` parameter to control how much nested data is included.
+Returns a paginated list of all active menu types. Use the `detail` parameter to control how much nested data is
+included.
 
 **`GET /api/v1/menus`**
 
 #### Query Parameters
 
-| Parameter | Type | Default | Constraints | Description |
-|---|---|---|---|---|
-| `page` | integer | `0` | min 0 | Page index (zero-based) |
-| `size` | integer | `10` | 1–50 | Items per page |
-| `sort_by` | string | `id` | `id`, `code`, `sortOrder`, `createdAt` | Field to sort by |
-| `sort_dir` | string | `ASC` | `ASC`, `DESC` | Sort direction |
-| `detail` | string | `BASIC` | `BASIC`, `WITH_CATEGORIES`, `FULL` | Response detail level |
+| Parameter  | Type    | Default | Constraints                            | Description             |
+|------------|---------|---------|----------------------------------------|-------------------------|
+| `page`     | integer | `0`     | min 0                                  | Page index (zero-based) |
+| `size`     | integer | `10`    | 1–50                                   | Items per page          |
+| `sort_by`  | string  | `id`    | `id`, `code`, `sortOrder`, `createdAt` | Field to sort by        |
+| `sort_dir` | string  | `ASC`   | `ASC`, `DESC`                          | Sort direction          |
+| `detail`   | string  | `BASIC` | `BASIC`, `WITH_CATEGORIES`, `FULL`     | Response detail level   |
 
 ---
 
@@ -139,8 +222,20 @@ Returns menu type identity and locale translations only.
       "code": "LUNCH",
       "sort_order": 1,
       "locales": [
-        { "id": 1, "locale_id": 1, "name": "Lunch Menu", "description": "Available from 12:00 to 15:00", "sort_order": 1 },
-        { "id": 2, "locale_id": 2, "name": "দুপুরের মেনু", "description": "১২:০০ থেকে ১৫:০০ পর্যন্ত পরিবেশিত", "sort_order": 1 }
+        {
+          "id": 1,
+          "locale_id": 1,
+          "name": "Lunch Menu",
+          "description": "Available from 12:00 to 15:00",
+          "sort_order": 1
+        },
+        {
+          "id": 2,
+          "locale_id": 2,
+          "name": "দুপুরের মেনু",
+          "description": "১২:০০ থেকে ১৫:০০ পর্যন্ত পরিবেশিত",
+          "sort_order": 1
+        }
       ]
     }
   ],
@@ -171,7 +266,13 @@ Returns each menu type with its assigned categories and their locale translation
       "code": "LUNCH",
       "sort_order": 1,
       "locales": [
-        { "id": 1, "locale_id": 1, "name": "Lunch Menu", "description": "Available from 12:00 to 15:00", "sort_order": 1 }
+        {
+          "id": 1,
+          "locale_id": 1,
+          "name": "Lunch Menu",
+          "description": "Available from 12:00 to 15:00",
+          "sort_order": 1
+        }
       ],
       "categories": [
         {
@@ -179,7 +280,13 @@ Returns each menu type with its assigned categories and their locale translation
           "code": "STARTERS",
           "sort_order": 1,
           "locales": [
-            { "id": 1, "locale_id": 1, "name": "Starters", "description": "Light appetizers to begin your meal", "sort_order": 1 }
+            {
+              "id": 1,
+              "locale_id": 1,
+              "name": "Starters",
+              "description": "Light appetizers to begin your meal",
+              "sort_order": 1
+            }
           ]
         },
         {
@@ -187,7 +294,13 @@ Returns each menu type with its assigned categories and their locale translation
           "code": "MAIN_COURSE",
           "sort_order": 3,
           "locales": [
-            { "id": 3, "locale_id": 1, "name": "Main Course", "description": "Hearty main course dishes for lunch", "sort_order": 1 }
+            {
+              "id": 3,
+              "locale_id": 1,
+              "name": "Main Course",
+              "description": "Hearty main course dishes for lunch",
+              "sort_order": 1
+            }
           ]
         }
       ]
@@ -220,7 +333,13 @@ Returns each menu type with its categories, and each category with its assigned 
       "code": "LUNCH",
       "sort_order": 1,
       "locales": [
-        { "id": 1, "locale_id": 1, "name": "Lunch Menu", "description": "Available from 12:00 to 15:00", "sort_order": 1 }
+        {
+          "id": 1,
+          "locale_id": 1,
+          "name": "Lunch Menu",
+          "description": "Available from 12:00 to 15:00",
+          "sort_order": 1
+        }
       ],
       "categories": [
         {
@@ -228,7 +347,13 @@ Returns each menu type with its categories, and each category with its assigned 
           "code": "STARTERS",
           "sort_order": 1,
           "locales": [
-            { "id": 1, "locale_id": 1, "name": "Starters", "description": "Light appetizers to begin your meal", "sort_order": 1 }
+            {
+              "id": 1,
+              "locale_id": 1,
+              "name": "Starters",
+              "description": "Light appetizers to begin your meal",
+              "sort_order": 1
+            }
           ],
           "dishes": [
             {
@@ -236,8 +361,20 @@ Returns each menu type with its categories, and each category with its assigned 
               "code": "SPRING_ROLLS",
               "sort_order": 11,
               "locales": [
-                { "id": 21, "locale_id": 1, "name": "Spring Rolls", "description": "Crispy vegetable spring rolls", "sort_order": 11 },
-                { "id": 22, "locale_id": 2, "name": "স্প্রিং রোল", "description": "মুচমুচে সবজি স্প্রিং রোল", "sort_order": 11 }
+                {
+                  "id": 21,
+                  "locale_id": 1,
+                  "name": "Spring Rolls",
+                  "description": "Crispy vegetable spring rolls",
+                  "sort_order": 11
+                },
+                {
+                  "id": 22,
+                  "locale_id": 2,
+                  "name": "স্প্রিং রোল",
+                  "description": "মুচমুচে সবজি স্প্রিং রোল",
+                  "sort_order": 11
+                }
               ]
             },
             {
@@ -245,7 +382,13 @@ Returns each menu type with its categories, and each category with its assigned 
               "code": "BRUSCHETTA",
               "sort_order": 12,
               "locales": [
-                { "id": 23, "locale_id": 1, "name": "Bruschetta", "description": "Toasted bread topped with tomato and herbs", "sort_order": 12 }
+                {
+                  "id": 23,
+                  "locale_id": 1,
+                  "name": "Bruschetta",
+                  "description": "Toasted bread topped with tomato and herbs",
+                  "sort_order": 12
+                }
               ]
             }
           ]
@@ -266,15 +409,16 @@ Returns each menu type with its categories, and each category with its assigned 
 
 ### Update Menu Type
 
-Updates the mutable fields of an existing menu type. `code` is immutable and cannot be changed. Locale translations are managed separately via the Menu Type Locales endpoints.
+Updates the mutable fields of an existing menu type. `code` is immutable and cannot be changed. Locale translations are
+managed separately via the Menu Type Locales endpoints.
 
 **`PUT /api/v1/menus/{id}`**
 
 #### Path Parameters
 
-| Parameter | Type | Description |
-|---|---|---|
-| `id` | long | Menu type ID |
+| Parameter | Type | Description  |
+|-----------|------|--------------|
+| `id`      | long | Menu type ID |
 
 #### Request Body
 
@@ -284,9 +428,9 @@ Updates the mutable fields of an existing menu type. `code` is immutable and can
 }
 ```
 
-| Field | Type | Required | Constraints |
-|---|---|---|---|
-| `sort_order` | integer | yes | |
+| Field        | Type    | Required | Constraints |
+|--------------|---------|----------|-------------|
+| `sort_order` | integer | yes      |             |
 
 #### Response `200 OK`
 
@@ -307,9 +451,9 @@ Soft-deletes a menu type (sets `is_active = false`, `is_deleted = true`).
 
 #### Path Parameters
 
-| Parameter | Type | Description |
-|---|---|---|
-| `id` | long | Menu type ID |
+| Parameter | Type | Description  |
+|-----------|------|--------------|
+| `id`      | long | Menu type ID |
 
 #### Response `200 OK`
 
@@ -324,7 +468,8 @@ Soft-deletes a menu type (sets `is_active = false`, `is_deleted = true`).
 
 ## Menu Type Locales
 
-Manage locale-specific translations for a menu type. The `{menu-id}` in all paths must refer to an existing active menu type.
+Manage locale-specific translations for a menu type. The `{menu-id}` in all paths must refer to an existing active menu
+type.
 
 ---
 
@@ -334,8 +479,8 @@ Manage locale-specific translations for a menu type. The `{menu-id}` in all path
 
 #### Path Parameters
 
-| Parameter | Type | Description |
-|---|---|---|
+| Parameter | Type | Description  |
+|-----------|------|--------------|
 | `menu-id` | long | Menu type ID |
 
 #### Request Body
@@ -349,12 +494,12 @@ Manage locale-specific translations for a menu type. The `{menu-id}` in all path
 }
 ```
 
-| Field | Type | Required | Constraints |
-|---|---|---|---|
-| `locale_id` | long | yes | must be an existing active locale; unique per menu type |
-| `name` | string | yes | max 255 chars, not blank |
-| `description` | string | no | |
-| `sort_order` | integer | yes | |
+| Field         | Type    | Required | Constraints                                             |
+|---------------|---------|----------|---------------------------------------------------------|
+| `locale_id`   | long    | yes      | must be an existing active locale; unique per menu type |
+| `name`        | string  | yes      | max 255 chars, not blank                                |
+| `description` | string  | no       |                                                         |
+| `sort_order`  | integer | yes      |                                                         |
 
 #### Response `201 Created`
 
@@ -375,10 +520,10 @@ Updates the translation fields. The locale cannot be changed; use delete + creat
 
 #### Path Parameters
 
-| Parameter | Type | Description |
-|---|---|---|
-| `menu-id` | long | Menu type ID |
-| `id` | long | Menu type locale ID |
+| Parameter | Type | Description         |
+|-----------|------|---------------------|
+| `menu-id` | long | Menu type ID        |
+| `id`      | long | Menu type locale ID |
 
 #### Request Body
 
@@ -390,11 +535,11 @@ Updates the translation fields. The locale cannot be changed; use delete + creat
 }
 ```
 
-| Field | Type | Required | Constraints |
-|---|---|---|---|
-| `name` | string | yes | max 255 chars, not blank |
-| `description` | string | no | |
-| `sort_order` | integer | yes | |
+| Field         | Type    | Required | Constraints              |
+|---------------|---------|----------|--------------------------|
+| `name`        | string  | yes      | max 255 chars, not blank |
+| `description` | string  | no       |                          |
+| `sort_order`  | integer | yes      |                          |
 
 #### Response `200 OK`
 
@@ -415,10 +560,10 @@ Soft-deletes a locale translation.
 
 #### Path Parameters
 
-| Parameter | Type | Description |
-|---|---|---|
-| `menu-id` | long | Menu type ID |
-| `id` | long | Menu type locale ID |
+| Parameter | Type | Description         |
+|-----------|------|---------------------|
+| `menu-id` | long | Menu type ID        |
+| `id`      | long | Menu type locale ID |
 
 #### Response `200 OK`
 
@@ -460,8 +605,8 @@ Returned when request validation fails.
 
 ### 401 Unauthorized
 
-Returned when the JWT token is missing or invalid.
+Returned when the JWT token is missing or invalid. Not applicable to `GET /api/v1/menus/public`.
 
 ### 403 Forbidden
 
-Returned when the authenticated user lacks permission.
+Returned when the authenticated user lacks permission. Not applicable to `GET /api/v1/menus/public`.

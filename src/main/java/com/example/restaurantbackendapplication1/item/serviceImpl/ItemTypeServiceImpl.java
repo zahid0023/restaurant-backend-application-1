@@ -12,6 +12,8 @@ import com.example.restaurantbackendapplication1.locale.model.entity.LocaleEntit
 import com.example.restaurantbackendapplication1.item.model.enums.ItemTypeSortField;
 import com.example.restaurantbackendapplication1.item.model.mapper.ItemTypeMapper;
 import com.example.restaurantbackendapplication1.item.model.projection.ItemTypeSummary;
+import com.example.restaurantbackendapplication1.item.model.entity.ItemEntity;
+import com.example.restaurantbackendapplication1.item.repository.ItemRepository;
 import com.example.restaurantbackendapplication1.item.repository.ItemTypeRepository;
 import com.example.restaurantbackendapplication1.item.service.ItemTypeService;
 import com.example.restaurantbackendapplication1.commons.utils.Pagination;
@@ -22,6 +24,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -32,9 +35,11 @@ public class ItemTypeServiceImpl implements ItemTypeService {
     private static final Set<String> ALLOWED_SORT_FIELDS = ItemTypeSortField.allowedFields();
 
     private final ItemTypeRepository itemTypeRepository;
+    private final ItemRepository itemRepository;
 
-    public ItemTypeServiceImpl(ItemTypeRepository itemTypeRepository) {
+    public ItemTypeServiceImpl(ItemTypeRepository itemTypeRepository, ItemRepository itemRepository) {
         this.itemTypeRepository = itemTypeRepository;
+        this.itemRepository = itemRepository;
     }
 
     @Transactional
@@ -72,12 +77,19 @@ public class ItemTypeServiceImpl implements ItemTypeService {
 
     @Transactional
     @Override
-    public SuccessResponse delete(Long id) {
-        ItemTypeEntity entity = getEntityById(id);
+    public SuccessResponse delete(ItemTypeEntity entity) {
         entity.setIsDeleted(true);
         entity.setIsActive(false);
         itemTypeRepository.save(entity);
-        log.info("ItemType soft-deleted with id: {}", entity.getId());
+
+        List<ItemEntity> itemEntities =
+                itemRepository.findAllByItemTypeEntity_IdAndIsActiveAndIsDeleted(entity.getId(), true, false);
+        itemEntities.forEach(item -> {
+            item.setIsDeleted(true);
+            item.setIsActive(false);
+        });
+        itemRepository.saveAll(itemEntities);
+        log.info("ItemType soft-deleted with id: {}, cascaded to {} items", entity.getId(), itemEntities.size());
         return new SuccessResponse(true, entity.getId());
     }
 

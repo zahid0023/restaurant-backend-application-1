@@ -6,6 +6,7 @@ import com.example.restaurantbackendapplication1.commons.dto.response.SuccessRes
 import com.example.restaurantbackendapplication1.dish.dto.request.CreateDishRequest;
 import com.example.restaurantbackendapplication1.dish.dto.request.UpdateDishRequest;
 import com.example.restaurantbackendapplication1.dish.dto.response.DishResponse;
+import com.example.restaurantbackendapplication1.dish.model.dto.FeaturedDishDto;
 import com.example.restaurantbackendapplication1.dish.model.entity.DishEntity;
 import com.example.restaurantbackendapplication1.locale.model.entity.LocaleEntity;
 import com.example.restaurantbackendapplication1.dish.model.projection.DishSummary;
@@ -26,7 +27,7 @@ public interface DishService {
 
     SuccessResponse setFeatured(DishEntity entity, Boolean isFeatured);
 
-    PaginatedResponse<?> getFeatured(PaginatedRequest request);
+    PaginatedResponse<FeaturedDishDto> getFeatured(PaginatedRequest request);
 
     SuccessResponse delete(Long id);
 }

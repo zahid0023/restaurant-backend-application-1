@@ -3,10 +3,13 @@ package com.example.restaurantbackendapplication1.menu.serviceImpl;
 import com.example.restaurantbackendapplication1.commons.dto.request.PaginatedRequest;
 import com.example.restaurantbackendapplication1.commons.dto.response.PaginatedResponse;
 import com.example.restaurantbackendapplication1.commons.dto.response.SuccessResponse;
+import com.example.restaurantbackendapplication1.dish.model.mapper.DishMapper;
 import com.example.restaurantbackendapplication1.menu.dto.request.menutype.CreateMenuTypeRequest;
 import com.example.restaurantbackendapplication1.menu.dto.request.menutype.UpdateMenuTypeRequest;
 import com.example.restaurantbackendapplication1.menu.dto.response.MenuTypeResponse;
+import com.example.restaurantbackendapplication1.menu.model.dto.MenuCategoryPublicDto;
 import com.example.restaurantbackendapplication1.menu.model.dto.MenuTypeDto;
+import com.example.restaurantbackendapplication1.menu.model.dto.MenuTypePublicDto;
 import com.example.restaurantbackendapplication1.locale.model.entity.LocaleEntity;
 import com.example.restaurantbackendapplication1.menu.model.entity.MenuTypeEntity;
 import com.example.restaurantbackendapplication1.menu.model.enums.MenuTypeSortField;
@@ -18,11 +21,13 @@ import com.example.restaurantbackendapplication1.menu.repository.MenuTypeReposit
 import com.example.restaurantbackendapplication1.menu.service.MenuTypeService;
 import com.example.restaurantbackendapplication1.commons.utils.Pagination;
 import jakarta.persistence.EntityNotFoundException;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -62,23 +67,58 @@ public class MenuTypeServiceImpl implements MenuTypeService {
 
     @Override
     public PaginatedResponse<MenuTypeSummary> getAll(PaginatedRequest request) {
-        Page<MenuTypeSummary> page = menuTypeRepository.findAllByIsActiveAndIsDeleted(
+        Page<@NonNull MenuTypeSummary> page = menuTypeRepository.findAllByIsActiveAndIsDeleted(
                 true, false, request.toPageable(ALLOWED_SORT_FIELDS), MenuTypeSummary.class);
         return Pagination.buildPaginatedResponse(page);
     }
 
     @Override
     public PaginatedResponse<MenuTypeWithCategoriesSummary> getAllWithCategories(PaginatedRequest request) {
-        Page<MenuTypeWithCategoriesSummary> page = menuTypeRepository.findAllByIsActiveAndIsDeleted(
+        Page<@NonNull MenuTypeWithCategoriesSummary> page = menuTypeRepository.findAllByIsActiveAndIsDeleted(
                 true, false, request.toPageable(ALLOWED_SORT_FIELDS), MenuTypeWithCategoriesSummary.class);
         return Pagination.buildPaginatedResponse(page);
     }
 
     @Override
     public PaginatedResponse<MenuTypeFullSummary> getAllFull(PaginatedRequest request) {
-        Page<MenuTypeFullSummary> page = menuTypeRepository.findAllByIsActiveAndIsDeleted(
+        Page<@NonNull MenuTypeFullSummary> page = menuTypeRepository.findAllByIsActiveAndIsDeleted(
                 true, false, request.toPageable(ALLOWED_SORT_FIELDS), MenuTypeFullSummary.class);
         return Pagination.buildPaginatedResponse(page);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public List<MenuTypePublicDto> getPublicMenu() {
+        return menuTypeRepository.findAllByIsActiveAndIsDeletedOrderBySortOrder(true, false)
+                .stream()
+                .map(menuType -> MenuTypePublicDto.builder()
+                        .id(menuType.getId())
+                        .locales(menuType.getMenuTypeLocaleEntities().stream()
+                                .map(l -> MenuTypePublicDto.LocaleSummary.builder()
+                                        .localeId(l.getLocaleEntity().getId())
+                                        .name(l.getName())
+                                        .description(l.getDescription())
+                                        .build())
+                                .toList())
+                        .categories(menuType.getMenuCategoryEntities().stream()
+                                .filter(c -> Boolean.TRUE.equals(c.getIsActive()) && Boolean.FALSE.equals(c.getIsDeleted()))
+                                .map(category -> MenuCategoryPublicDto.builder()
+                                        .id(category.getId())
+                                        .locales(category.getMenuCategoryLocaleEntities().stream()
+                                                .map(l -> MenuCategoryPublicDto.LocaleSummary.builder()
+                                                        .localeId(l.getLocaleEntity().getId())
+                                                        .name(l.getName())
+                                                        .description(l.getDescription())
+                                                        .build())
+                                                .toList())
+                                        .dishes(category.getMenuCategoryDishEntities().stream()
+                                                .filter(d -> Boolean.TRUE.equals(d.getIsActive()) && Boolean.FALSE.equals(d.getIsDeleted()))
+                                                .map(d -> DishMapper.toFeaturedDto(d.getDishEntity()))
+                                                .toList())
+                                        .build())
+                                .toList())
+                        .build())
+                .toList();
     }
 
     @Transactional

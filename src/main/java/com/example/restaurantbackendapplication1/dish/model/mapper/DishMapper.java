@@ -6,11 +6,14 @@ import com.example.restaurantbackendapplication1.dish.dto.request.UpdateDishRequ
 import com.example.restaurantbackendapplication1.dish.model.dto.DishDto;
 import com.example.restaurantbackendapplication1.dish.model.dto.DishLocaleDto;
 import com.example.restaurantbackendapplication1.dish.model.dto.DishVariantDto;
+import com.example.restaurantbackendapplication1.dish.model.dto.FeaturedDishDto;
 import com.example.restaurantbackendapplication1.dish.model.entity.DishEntity;
 import com.example.restaurantbackendapplication1.dish.model.entity.DishLocaleEntity;
+import com.example.restaurantbackendapplication1.dish.model.entity.DishVariantEntity;
 import com.example.restaurantbackendapplication1.locale.model.entity.LocaleEntity;
 import lombok.experimental.UtilityClass;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -41,6 +44,28 @@ public class DishMapper {
 
     private void applyCommonFields(DishEntity entity, DishRequest request) {
         entity.setSortOrder(request.getSortOrder());
+    }
+
+    public FeaturedDishDto toFeaturedDto(DishEntity entity) {
+        List<FeaturedDishDto.LocaleSummary> locales = entity.getDishesLocaleEntities().stream()
+                .map(l -> FeaturedDishDto.LocaleSummary.builder()
+                        .localeId(l.getLocaleEntity().getId())
+                        .name(l.getName())
+                        .description(l.getDescription())
+                        .build())
+                .toList();
+        var cheapest = entity.getDishVariantEntities().stream()
+                .filter(v -> Boolean.TRUE.equals(v.getIsActive()) && Boolean.FALSE.equals(v.getIsDeleted()))
+                .min(Comparator.comparing(DishVariantEntity::getPrice))
+                .orElse(null);
+        return FeaturedDishDto.builder()
+                .id(entity.getId())
+                .locales(locales)
+                .cheapestVariantId(cheapest != null ? cheapest.getId() : null)
+                .price(cheapest != null ? cheapest.getPrice() : null)
+                .img("https://res.cloudinary.com/dg9kza9o9/image/upload/v1781891538/smoothie_z55k5f.jpg")
+                .imgAlt("smoothie")
+                .build();
     }
 
     public DishDto toDto(DishEntity entity, Boolean includeVariants) {

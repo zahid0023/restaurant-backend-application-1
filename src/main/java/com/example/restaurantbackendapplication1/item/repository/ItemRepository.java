@@ -18,6 +18,8 @@ public interface ItemRepository extends JpaRepository<@NonNull ItemEntity, @NonN
 
     List<ItemEntity> findAllByIdInAndIsActiveAndIsDeleted(Set<Long> ids, Boolean isActive, Boolean isDeleted);
 
+    List<ItemEntity> findAllByItemTypeEntity_IdAndIsActiveAndIsDeleted(Long itemTypeId, Boolean isActive, Boolean isDeleted);
+
     Page<@NonNull ItemSummary> findAllByIsActiveAndIsDeleted(Boolean isActive, Boolean isDeleted, Pageable pageable);
 
     Page<@NonNull ItemSummary> findAllByItemTypeEntity_IdAndIsActiveAndIsDeleted(Long id, Boolean isActive, Boolean isDeleted, Pageable pageable);

@@ -9,18 +9,18 @@ Dishes are standalone resources. Dish names and descriptions are locale-specific
 
 ## Endpoints
 
-| Method | Path                                    | Description            |
-|--------|-----------------------------------------|------------------------|
-| POST   | `/api/v1/dishes`                        | Create a dish          |
-| GET    | `/api/v1/dishes/{id}`                   | Get a dish             |
-| GET    | `/api/v1/dishes`                        | List all dishes        |
-| GET    | `/api/v1/dishes/featured`               | List featured dishes   |
-| PUT    | `/api/v1/dishes/{id}`                   | Update a dish          |
-| PATCH  | `/api/v1/dishes/{id}/featured`          | Set dish featured flag |
-| DELETE | `/api/v1/dishes/{id}`                   | Delete a dish          |
-| POST   | `/api/v1/dishes/{dish-id}/locales`      | Create a dish locale   |
-| PUT    | `/api/v1/dishes/{dish-id}/locales/{id}` | Update a dish locale   |
-| DELETE | `/api/v1/dishes/{dish-id}/locales/{id}` | Delete a dish locale   |
+| Method | Path                                    | Auth     | Description            |
+|--------|-----------------------------------------|----------|------------------------|
+| POST   | `/api/v1/dishes`                        | Required | Create a dish          |
+| GET    | `/api/v1/dishes/{id}`                   | Required | Get a dish             |
+| GET    | `/api/v1/dishes`                        | Required | List all dishes        |
+| GET    | `/api/v1/dishes/public/featured`        | Public   | List featured dishes   |
+| PUT    | `/api/v1/dishes/{id}`                   | Required | Update a dish          |
+| PATCH  | `/api/v1/dishes/{id}/featured`          | Required | Set dish featured flag |
+| DELETE | `/api/v1/dishes/{id}`                   | Required | Delete a dish          |
+| POST   | `/api/v1/dishes/{dish-id}/locales`      | Required | Create a dish locale   |
+| PUT    | `/api/v1/dishes/{dish-id}/locales/{id}` | Required | Update a dish locale   |
+| DELETE | `/api/v1/dishes/{dish-id}/locales/{id}` | Required | Delete a dish locale   |
 
 ---
 
@@ -258,10 +258,13 @@ endpoints.
 
 ## List Featured Dishes
 
-`GET /api/v1/dishes/featured`
+`GET /api/v1/dishes/public/featured`
 
-Returns a paginated list of all active dishes where `is_featured = true`. Intended for public-facing website sections (
-e.g. homepage banners, chef's picks).
+**Public — no authentication required.**
+
+Returns a paginated list of all active dishes where `is_featured = true`. Each item is a flat object containing the
+dish's locale translations and its cheapest active variant's details (id, price, and a default image). Intended for
+public-facing website sections (e.g. homepage banners, chef's picks).
 
 ### Query Parameters
 
@@ -272,6 +275,20 @@ e.g. homepage banners, chef's picks).
 | `sort_by`  | String  | `id`    | `id`, `code`, `sortOrder`, `createdAt` | Field to sort by         |
 | `sort_dir` | String  | `ASC`   | `ASC`, `DESC`                          | Sort direction           |
 
+### Response Fields
+
+| Field                   | Type       | Description                                    |
+|-------------------------|------------|------------------------------------------------|
+| `id`                    | Long       | Dish ID                                        |
+| `locales`               | Array      | Locale translations for this dish              |
+| `locales[].locale_id`   | Long       | Locale ID                                      |
+| `locales[].name`        | String     | Localized dish name                            |
+| `locales[].description` | String     | Localized dish description                     |
+| `cheapest_variant_id`   | Long       | ID of the active variant with the lowest price |
+| `price`                 | BigDecimal | Price of the cheapest active variant           |
+| `img`                   | String     | Default dish image URL                         |
+| `img_alt`               | String     | Default image alt text                         |
+
 ### Response `200 OK`
 
 ```json
@@ -279,46 +296,22 @@ e.g. homepage banners, chef's picks).
   "data": [
     {
       "id": 1,
-      "code": "BURGER_CLASSIC",
-      "sort_order": 1,
-      "is_featured": true,
       "locales": [
         {
-          "id": 1,
           "locale_id": 1,
           "name": "Classic Burger",
-          "description": "A juicy beef patty with fresh vegetables.",
-          "sort_order": 1
-        }
-      ],
-      "variants": [
-        {
-          "id": 1,
-          "dish_id": 1,
-          "code": "BURGER_CLASSIC_REG",
-          "sort_order": 1,
-          "price": "8.99",
-          "is_default": true,
-          "is_veg": false,
-          "locales": [
-            { "id": 1, "locale_id": 1, "name": "Regular", "description": null, "sort_order": 1 }
-          ],
-          "ingredients": []
+          "description": "A juicy beef patty with fresh vegetables."
         },
         {
-          "id": 2,
-          "dish_id": 1,
-          "code": "BURGER_CLASSIC_LRG",
-          "sort_order": 2,
-          "price": "11.99",
-          "is_default": false,
-          "is_veg": false,
-          "locales": [
-            { "id": 2, "locale_id": 1, "name": "Large", "description": null, "sort_order": 1 }
-          ],
-          "ingredients": []
+          "locale_id": 2,
+          "name": "ক্লাসিক বার্গার",
+          "description": "তাজা সবজি সহ রসালো বিফ প্যাটি।"
         }
-      ]
+      ],
+      "cheapest_variant_id": 1,
+      "price": 8.99,
+      "img": "https://cdn.shadcnstudio.com/ss-assets/template/landing-page/bistro/image-18.png",
+      "img_alt": "plate-1"
     }
   ],
   "current_page": 0,
@@ -510,9 +503,9 @@ Soft-deletes a dish locale translation.
 
 ## Error Responses
 
-| HTTP Status | Cause                                                      |
-|-------------|------------------------------------------------------------|
-| 400         | Missing required fields, blank code, or invalid sort field |
-| 404         | Dish or dish locale not found or already deleted           |
-| 401         | JWT token missing or invalid                               |
-| 403         | Authenticated user lacks permission                        |
+| HTTP Status | Cause                                                                          |
+|-------------|--------------------------------------------------------------------------------|
+| 400         | Missing required fields, blank code, or invalid sort field                     |
+| 404         | Dish or dish locale not found or already deleted                               |
+| 401         | JWT token missing or invalid (not applicable to `GET /public/featured`)        |
+| 403         | Authenticated user lacks permission (not applicable to `GET /public/featured`) |

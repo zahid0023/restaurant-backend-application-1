@@ -27,7 +27,7 @@ public class MenuTypeEntity extends AuditableEntity {
     @Column(name = "sort_order", nullable = false)
     private Integer sortOrder;
 
-    @OneToMany(mappedBy = "menuTypeEntity")
+    @OneToMany(mappedBy = "menuTypeEntity", cascade = CascadeType.ALL)
     private Set<MenuTypeLocaleEntity> menuTypeLocaleEntities = new LinkedHashSet<>();
 
     @OneToMany(mappedBy = "menuTypeEntity")

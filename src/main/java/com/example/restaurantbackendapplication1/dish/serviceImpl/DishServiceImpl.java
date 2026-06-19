@@ -7,6 +7,7 @@ import com.example.restaurantbackendapplication1.dish.dto.request.CreateDishRequ
 import com.example.restaurantbackendapplication1.dish.dto.request.UpdateDishRequest;
 import com.example.restaurantbackendapplication1.dish.dto.response.DishResponse;
 import com.example.restaurantbackendapplication1.dish.model.dto.DishDto;
+import com.example.restaurantbackendapplication1.dish.model.dto.FeaturedDishDto;
 import com.example.restaurantbackendapplication1.dish.model.entity.DishEntity;
 import com.example.restaurantbackendapplication1.locale.model.entity.LocaleEntity;
 import com.example.restaurantbackendapplication1.dish.model.enums.DishSortField;
@@ -84,11 +85,12 @@ public class DishServiceImpl implements DishService {
         return new SuccessResponse(true, entity.getId());
     }
 
+    @Transactional(readOnly = true)
     @Override
-    public PaginatedResponse<?> getFeatured(PaginatedRequest request) {
-        Page<?> page = dishRepository
+    public PaginatedResponse<FeaturedDishDto> getFeatured(PaginatedRequest request) {
+        Page<DishEntity> page = dishRepository
                 .findAllByIsFeaturedAndIsActiveAndIsDeleted(true, true, false, request.toPageable(ALLOWED_SORT_FIELDS));
-        return Pagination.buildPaginatedResponse(page);
+        return Pagination.buildPaginatedResponse(page.map(DishMapper::toFeaturedDto));
     }
 
     @Transactional

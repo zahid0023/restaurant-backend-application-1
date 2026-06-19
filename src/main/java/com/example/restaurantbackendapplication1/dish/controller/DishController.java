@@ -48,7 +48,7 @@ public class DishController {
         return ResponseEntity.ok(dishService.getAll(request));
     }
 
-    @GetMapping("/featured")
+    @GetMapping("/public/featured")
     public ResponseEntity<?> getFeatured(@Valid @ParameterObject PaginatedRequest request) {
         return ResponseEntity.ok(dishService.getFeatured(request));
     }

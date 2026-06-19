@@ -30,6 +30,11 @@ public class MenuTypeController {
         this.localeService = localeService;
     }
 
+    @GetMapping("/public")
+    public ResponseEntity<?> getPublicMenu() {
+        return ResponseEntity.ok(menuTypeService.getPublicMenu());
+    }
+
     @PostMapping
     public ResponseEntity<?> create(@Valid @RequestBody CreateMenuTypeRequest request) {
         Map<Long, LocaleEntity> localeEntityMap = LocaleUtils.resolveLocaleMap(
