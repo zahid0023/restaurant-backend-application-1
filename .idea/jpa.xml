@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="JpaBuddyIdeaProjectConfig">
-    <option name="reLastEntityCreationPackage" value="src/main/java/com/example/restaurantbackendapplication1/imagehosting/model/entity" />
+    <option name="reLastEntityCreationPackage" value="src/main/java/com/example/restaurantbackendapplication1/dish/model/entity" />
     <option name="reverseEngineeringLastDbConnectionId" value="df868be2-4be8-40be-8783-6fe8faae42b8" />
   </component>
 </project>

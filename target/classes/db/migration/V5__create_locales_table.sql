@@ -21,5 +21,5 @@ INSERT INTO locales (code,
                      sort_order,
                      created_by,
                      updated_by)
-VALUES ('en', 'English', 1, (SELECT id FROM users WHERE username = 'system'), (SELECT id FROM users WHERE username = 'system')),
-       ('bn', 'Bangla',  2, (SELECT id FROM users WHERE username = 'system'), (SELECT id FROM users WHERE username = 'system'));
+VALUES ('en', 'English', 1, (SELECT id FROM users WHERE username = 'system'),
+        (SELECT id FROM users WHERE username = 'system'));

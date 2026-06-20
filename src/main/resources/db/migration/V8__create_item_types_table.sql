@@ -66,25 +66,21 @@ $$
                            -- INGREDIENT
                            -- =========================
                            ('INGREDIENT', 'en', 'Ingredient', 'Items used in recipes or production'),
-                           ('INGREDIENT', 'bn', 'উপাদান', 'রেসিপি বা উৎপাদনে ব্যবহৃত উপকরণ'),
 
                            -- =========================
                            -- PACKAGING
                            -- =========================
                            ('PACKAGING', 'en', 'Packaging', 'Materials used for packaging products'),
-                           ('PACKAGING', 'bn', 'প্যাকেজিং', 'পণ্য মোড়কজাত করার উপকরণ'),
 
                            -- =========================
                            -- ASSET
                            -- =========================
                            ('ASSET', 'en', 'Asset', 'Long-term business-owned resources'),
-                           ('ASSET', 'bn', 'সম্পদ', 'ব্যবসার দীর্ঘমেয়াদি মালিকানাধীন সম্পদ'),
 
                            -- =========================
                            -- EQUIPMENT
                            -- =========================
-                           ('EQUIPMENT', 'en', 'Equipment', 'Tools and machines used in operations'),
-                           ('EQUIPMENT', 'bn', 'যন্ত্রপাতি', 'কার্যক্রমে ব্যবহৃত সরঞ্জাম ও মেশিন')
+                           ('EQUIPMENT', 'en', 'Equipment', 'Tools and machines used in operations')
                       ) v(code, locale_code, name, description) ON it.code = v.code
                  JOIN locales l ON l.code = v.locale_code;
     END

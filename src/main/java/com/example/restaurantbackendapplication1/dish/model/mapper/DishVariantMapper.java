@@ -3,14 +3,10 @@ package com.example.restaurantbackendapplication1.dish.model.mapper;
 import com.example.restaurantbackendapplication1.dish.dto.request.dishvariant.CreateDishVariantRequest;
 import com.example.restaurantbackendapplication1.dish.dto.request.dishvariant.DishVariantRequest;
 import com.example.restaurantbackendapplication1.dish.dto.request.dishvariant.UpdateDishVariantRequest;
-import com.example.restaurantbackendapplication1.dish.model.dto.DishDto;
-import com.example.restaurantbackendapplication1.dish.model.dto.DishVariantDto;
-import com.example.restaurantbackendapplication1.dish.model.dto.DishVariantIngredientDto;
-import com.example.restaurantbackendapplication1.dish.model.dto.DishVariantLocaleDto;
-import com.example.restaurantbackendapplication1.dish.model.entity.DishEntity;
-import com.example.restaurantbackendapplication1.dish.model.entity.DishVariantEntity;
-import com.example.restaurantbackendapplication1.dish.model.entity.DishVariantIngredientEntity;
-import com.example.restaurantbackendapplication1.dish.model.entity.DishVariantLocaleEntity;
+import com.example.restaurantbackendapplication1.dish.model.dto.*;
+import com.example.restaurantbackendapplication1.dish.model.entity.*;
+import com.example.restaurantbackendapplication1.imagehosting.dto.request.ImageRequest;
+import com.example.restaurantbackendapplication1.imagehosting.model.entity.RestaurantImageHostingConfigEntity;
 import com.example.restaurantbackendapplication1.item.model.entity.ItemEntity;
 import com.example.restaurantbackendapplication1.locale.model.entity.LocaleEntity;
 import com.example.restaurantbackendapplication1.unit.model.entity.UnitEntity;
@@ -28,7 +24,9 @@ public class DishVariantMapper {
                                     DishEntity dishEntity,
                                     Map<Long, LocaleEntity> localeEntityMap,
                                     Map<Long, ItemEntity> itemEntityMap,
-                                    Map<Long, UnitEntity> unitEntityMap) {
+                                    Map<Long, UnitEntity> unitEntityMap,
+                                    RestaurantImageHostingConfigEntity restaurantImageHostingConfigEntity,
+                                    List<ImageRequest> imageRequests) {
         DishVariantEntity entity = new DishVariantEntity();
         entity.setDishEntity(dishEntity);
         entity.setCode(request.getCode());
@@ -49,6 +47,13 @@ public class DishVariantMapper {
                             unitEntityMap.get(ir.getUnitId())))
                     .collect(Collectors.toSet());
             entity.setDishVariantIngredientEntities(ingredientEntities);
+        }
+
+        if (imageRequests != null) {
+            Set<DishVariantImageEntity> imageEntities = imageRequests.stream()
+                    .map(imageRequest -> DishVariantImageMapper.create(imageRequest, restaurantImageHostingConfigEntity, entity))
+                    .collect(Collectors.toSet());
+            entity.setDishVariantImageEntities(imageEntities);
         }
 
         return entity;
@@ -73,7 +78,7 @@ public class DishVariantMapper {
                 .toList();
 
         DishDto dish = includeDish ?
-                DishMapper.toDto(entity.getDishEntity(), false) :
+                DishMapper.toDto(entity.getDishEntity(), false, false, false) :
                 null;
 
         List<DishVariantIngredientDto> ingredients = includeIngredients ?
@@ -82,6 +87,10 @@ public class DishVariantMapper {
                         .map(i -> DishVariantIngredientMapper.toDto(i, false))
                         .toList() :
                 null;
+
+        List<DishVariantImageDto> images = entity.getDishVariantImageEntities().stream()
+                .map(DishVariantImageMapper::toDto)
+                .toList();
 
 
         return DishVariantDto.builder()
@@ -94,6 +103,7 @@ public class DishVariantMapper {
                 .isVeg(entity.getIsVeg())
                 .locales(locales)
                 .ingredients(ingredients)
+                .images(images)
                 .build();
     }
 }

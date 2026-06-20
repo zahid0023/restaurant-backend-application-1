@@ -28,4 +28,5 @@ public class DishVariantDto {
     private Boolean isVeg;
     private List<DishVariantLocaleDto> locales;
     private List<DishVariantIngredientDto> ingredients;
+    private List<DishVariantImageDto> images;
 }

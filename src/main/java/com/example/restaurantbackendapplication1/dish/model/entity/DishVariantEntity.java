@@ -56,4 +56,7 @@ public class DishVariantEntity extends AuditableEntity {
     @OneToMany(mappedBy = "dishVariantEntity", cascade = CascadeType.ALL)
     private Set<DishVariantIngredientEntity> dishVariantIngredientEntities = new LinkedHashSet<>();
 
+    @OneToMany(mappedBy = "dishVariantEntity", cascade = CascadeType.ALL)
+    private Set<DishVariantImageEntity> dishVariantImageEntities = new LinkedHashSet<>();
+
 }

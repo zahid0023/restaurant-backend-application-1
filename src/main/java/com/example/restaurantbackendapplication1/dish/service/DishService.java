@@ -4,9 +4,10 @@ import com.example.restaurantbackendapplication1.commons.dto.request.PaginatedRe
 import com.example.restaurantbackendapplication1.commons.dto.response.PaginatedResponse;
 import com.example.restaurantbackendapplication1.commons.dto.response.SuccessResponse;
 import com.example.restaurantbackendapplication1.dish.dto.request.CreateDishRequest;
+import com.example.restaurantbackendapplication1.dish.dto.request.DishFilterRequest;
 import com.example.restaurantbackendapplication1.dish.dto.request.UpdateDishRequest;
 import com.example.restaurantbackendapplication1.dish.dto.response.DishResponse;
-import com.example.restaurantbackendapplication1.dish.model.dto.FeaturedDishDto;
+import com.example.restaurantbackendapplication1.dish.model.dto.DishDto;
 import com.example.restaurantbackendapplication1.dish.model.entity.DishEntity;
 import com.example.restaurantbackendapplication1.locale.model.entity.LocaleEntity;
 import com.example.restaurantbackendapplication1.dish.model.projection.DishSummary;
@@ -23,11 +24,11 @@ public interface DishService {
 
     PaginatedResponse<DishSummary> getAll(PaginatedRequest request);
 
+    PaginatedResponse<DishDto> getAll(DishFilterRequest request);
+
     SuccessResponse update(DishEntity entity, UpdateDishRequest request);
 
     SuccessResponse setFeatured(DishEntity entity, Boolean isFeatured);
-
-    PaginatedResponse<FeaturedDishDto> getFeatured(PaginatedRequest request);
 
     SuccessResponse delete(Long id);
 }

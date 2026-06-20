@@ -8,12 +8,10 @@ import com.example.restaurantbackendapplication1.menu.dto.request.menutype.Updat
 import com.example.restaurantbackendapplication1.menu.dto.response.MenuTypeResponse;
 import com.example.restaurantbackendapplication1.locale.model.entity.LocaleEntity;
 import com.example.restaurantbackendapplication1.menu.model.entity.MenuTypeEntity;
-import com.example.restaurantbackendapplication1.menu.model.dto.MenuTypePublicDto;
 import com.example.restaurantbackendapplication1.menu.model.projection.MenuTypeFullSummary;
 import com.example.restaurantbackendapplication1.menu.model.projection.MenuTypeSummary;
 import com.example.restaurantbackendapplication1.menu.model.projection.MenuTypeWithCategoriesSummary;
 
-import java.util.List;
 import java.util.Map;
 
 public interface MenuTypeService {
@@ -29,8 +27,6 @@ public interface MenuTypeService {
     PaginatedResponse<MenuTypeWithCategoriesSummary> getAllWithCategories(PaginatedRequest request);
 
     PaginatedResponse<MenuTypeFullSummary> getAllFull(PaginatedRequest request);
-
-    List<MenuTypePublicDto> getPublicMenu();
 
     SuccessResponse update(MenuTypeEntity entity, UpdateMenuTypeRequest request);
 

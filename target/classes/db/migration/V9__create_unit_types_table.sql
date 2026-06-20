@@ -65,25 +65,21 @@ $$
                            -- WEIGHT
                            -- =========================
                            ('WEIGHT', 'en', 'Weight', 'Mass measurement units'),
-                           ('WEIGHT', 'bn', 'ওজন', 'ভর পরিমাপের একক'),
 
                            -- =========================
                            -- VOLUME
                            -- =========================
                            ('VOLUME', 'en', 'Volume', 'Liquid capacity measurement units'),
-                           ('VOLUME', 'bn', 'আয়তন', 'তরল ধারণক্ষমতা পরিমাপের একক'),
 
                            -- =========================
                            -- COUNT
                            -- =========================
                            ('COUNT', 'en', 'Count', 'Discrete item counting units like pcs, box, pack'),
-                           ('COUNT', 'bn', 'গণনা', 'পিস, বক্স, প্যাক ইত্যাদি পৃথক আইটেম গণনার একক'),
 
                            -- =========================
                            -- UNIT
                            -- =========================
-                           ('UNIT', 'en', 'Unit', 'Generic measurement unit category'),
-                           ('UNIT', 'bn', 'ইউনিট', 'সাধারণ পরিমাপের একক')
+                           ('UNIT', 'en', 'Unit', 'Generic measurement unit category')
                       ) v(code, locale_code, name, description) ON ut.code = v.code
                  JOIN locales l ON l.code = v.locale_code;
     END

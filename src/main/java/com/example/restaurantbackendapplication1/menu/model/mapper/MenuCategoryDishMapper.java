@@ -21,7 +21,7 @@ public class MenuCategoryDishMapper {
         return MenuCategoryDishDto.builder()
                 .id(entity.getId())
                 .menuCategoryId(entity.getMenuCategoryEntity().getId())
-                .dish(DishMapper.toDto(entity.getDishEntity(), false))
+                .dish(DishMapper.toDto(entity.getDishEntity(), false, false, false))
                 .build();
     }
 }

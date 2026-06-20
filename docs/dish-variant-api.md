@@ -3,8 +3,9 @@
 Base URL: `/api/v1`
 
 Dish variants represent size or style options for a dish (e.g. Small, Large). Each variant has optional locale
-translations and optional ingredients embedded inline on create. Locale translations and ingredients are embedded in the
-full `GET /{id}` response. All records support soft-delete.
+translations and optional ingredients embedded inline on create. Images may be uploaded at creation time or managed
+separately via the dedicated image endpoints. Locale translations and ingredients are embedded in the full `GET /{id}`
+response. All records support soft-delete.
 
 ---
 
@@ -25,6 +26,11 @@ full `GET /{id}` response. All records support soft-delete.
 | GET    | `/api/v1/dishes/{dish-id}/variants/{variant-id}/ingredients`      | List all dish variant ingredients |
 | PUT    | `/api/v1/dishes/{dish-id}/variants/{variant-id}/ingredients/{id}` | Update a dish variant ingredient  |
 | DELETE | `/api/v1/dishes/{dish-id}/variants/{variant-id}/ingredients/{id}` | Delete a dish variant ingredient  |
+| POST   | `/api/v1/dishes/{dish-id}/variants/{variant-id}/images`           | Upload images for a dish variant  |
+| GET    | `/api/v1/dishes/{dish-id}/variants/{variant-id}/images`           | List images for a dish variant    |
+| GET    | `/api/v1/dishes/{dish-id}/variants/{variant-id}/images/{id}`      | Get a dish variant image          |
+| PUT    | `/api/v1/dishes/{dish-id}/variants/{variant-id}/images/{id}`      | Update a dish variant image       |
+| DELETE | `/api/v1/dishes/{dish-id}/variants/{variant-id}/images/{id}`      | Delete a dish variant image       |
 
 ---
 
@@ -54,6 +60,23 @@ full `GET /{id}` response. All records support soft-delete.
 | `description` | String  | No       | —                        | Localized description               |
 | `sort_order`  | Integer | Yes      | not null                 | Display order for this locale entry |
 
+### Dish Variant Image
+
+Returned by image endpoints. Images are **not** embedded in the standard variant `GET /{id}` response; use the dedicated
+image endpoints.
+
+| Field             | Type    | Context  | Description                                            |
+|-------------------|---------|----------|--------------------------------------------------------|
+| `id`              | Long    | response | Auto-generated identifier                              |
+| `config_id`       | Long    | response | ID of the hosting config used for upload               |
+| `dish_variant_id` | Long    | response | ID of the parent dish variant (list responses)         |
+| `external_id`     | String  | response | Provider-assigned asset ID (e.g. Cloudinary public ID) |
+| `url`             | String  | response | Public URL of the uploaded image                       |
+| `caption`         | String  | response | Optional image caption                                 |
+| `sort_order`      | Integer | response | Display order                                          |
+
+---
+
 ### Dish Variant Ingredient
 
 | Field          | Type       | Context          | Constraints                       | Description                                                                |
@@ -73,7 +96,10 @@ full `GET /{id}` response. All records support soft-delete.
 
 `POST /api/v1/dishes/{dish-id}/variants`
 
-Creates a dish variant with optional locale translations and optional ingredients.
+**Content-Type:** `multipart/form-data`
+
+Creates a dish variant with optional locale translations, optional ingredients, and optionally uploads images in the
+same request. Images can also be added later via the dedicated image endpoints.
 
 ### Path Parameters
 
@@ -81,7 +107,19 @@ Creates a dish variant with optional locale translations and optional ingredient
 |-----------|------|----------------|
 | `dish-id` | Long | ID of the dish |
 
-### Request Body
+### Request Parts & Params
+
+| Name          | Kind           | Type       | Required               | Description                                                      |
+|---------------|----------------|------------|------------------------|------------------------------------------------------------------|
+| `config-id`   | Query param    | Long       | Conditional (see note) | ID of the `RestaurantImageHostingConfig` to use for image upload |
+| `data`        | Multipart part | JSON       | Yes                    | Main variant payload (see fields below)                          |
+| `images`      | Multipart part | File[]     | No                     | One or more image files to upload alongside the variant          |
+| `image-metas` | Multipart part | JSON Array | Conditional (see note) | Metadata for each image, matched by original filename            |
+
+> **Conditional validation:** if `images` is provided and non-empty, both `config-id` and `image-metas` become
+> required. Omitting either will result in `400 Bad Request`.
+
+### `data` Part (JSON)
 
 ```json
 {
@@ -121,8 +159,6 @@ Creates a dish variant with optional locale translations and optional ingredient
 }
 ```
 
-### Request Fields
-
 | Field         | Type       | Required | Validation                  |
 |---------------|------------|----------|-----------------------------|
 | `code`        | String     | Yes      | Not blank, max 50 chars     |
@@ -150,6 +186,26 @@ Creates a dish variant with optional locale translations and optional ingredient
 | `quantity`   | BigDecimal | Yes      | Not null, >= 0.000   |
 | `unit_id`    | Long       | Yes      | Not null, must exist |
 | `sort_order` | Integer    | Yes      | Not null             |
+
+### `image-metas` Part (JSON Array — required when images are provided)
+
+```json
+[
+  {
+    "client_image_id": "variant-small.jpg",
+    "caption": "Small variant front view",
+    "is_default": true,
+    "sort_order": 1
+  }
+]
+```
+
+| Field             | Type    | Required | Description                                                      |
+|-------------------|---------|----------|------------------------------------------------------------------|
+| `client_image_id` | String  | Yes      | Must match the original filename of the corresponding image file |
+| `caption`         | String  | No       | Image caption                                                    |
+| `is_default`      | Boolean | No       | Default: `false`                                                 |
+| `sort_order`      | Integer | No       | Default: `0`                                                     |
 
 ### Response `201 Created`
 
@@ -846,6 +902,217 @@ Soft-deletes a dish variant ingredient.
 
 ---
 
+## Dish Variant Images
+
+Manage images for a dish variant. Images can be uploaded at variant creation time or added/managed separately via these
+endpoints. Images are not embedded in the standard variant `GET /{id}` response.
+
+---
+
+### Upload Images
+
+`POST /api/v1/dishes/{dish-id}/variants/{variant-id}/images`
+
+**Content-Type:** `multipart/form-data`
+
+Uploads one or more images and saves them linked to the dish variant.
+
+#### Path Parameters
+
+| Parameter    | Type | Description            |
+|--------------|------|------------------------|
+| `dish-id`    | Long | ID of the dish         |
+| `variant-id` | Long | ID of the dish variant |
+
+#### Request Parts & Params
+
+| Name        | Kind           | Type       | Required | Description                                            |
+|-------------|----------------|------------|----------|--------------------------------------------------------|
+| `config_id` | Query param    | Long       | Yes      | ID of the active `RestaurantImageHostingConfig` to use |
+| `images`    | Multipart part | File[]     | Yes      | One or more image files                                |
+| `meta`      | Multipart part | JSON Array | Yes      | Metadata for each image, matched by original filename  |
+
+#### `meta` Array Item Schema
+
+```json
+[
+  {
+    "client_image_id": "variant-small.jpg",
+    "caption": "Small variant front view",
+    "is_default": true,
+    "sort_order": 1
+  }
+]
+```
+
+| Field             | Type    | Required | Description                                                      |
+|-------------------|---------|----------|------------------------------------------------------------------|
+| `client_image_id` | String  | Yes      | Must match the original filename of the corresponding image file |
+| `caption`         | String  | No       | Image caption                                                    |
+| `is_default`      | Boolean | No       | Default: `false`                                                 |
+| `sort_order`      | Integer | No       | Default: `0`                                                     |
+
+#### Response `201 Created`
+
+Returns an array of the created image records.
+
+```json
+[
+  {
+    "id": 1,
+    "config_id": 2,
+    "dish_variant_id": 1,
+    "external_id": "dish-variants/variant-small",
+    "url": "https://res.cloudinary.com/demo/image/upload/dish-variants/variant-small.jpg",
+    "caption": "Small variant front view",
+    "sort_order": 1
+  }
+]
+```
+
+---
+
+### List Images
+
+`GET /api/v1/dishes/{dish-id}/variants/{variant-id}/images`
+
+Returns a paginated list of active images for a dish variant.
+
+#### Path Parameters
+
+| Parameter    | Type | Description            |
+|--------------|------|------------------------|
+| `dish-id`    | Long | ID of the dish         |
+| `variant-id` | Long | ID of the dish variant |
+
+#### Query Parameters
+
+| Parameter  | Type    | Default | Constraints                    | Description              |
+|------------|---------|---------|--------------------------------|--------------------------|
+| `page`     | Integer | `0`     | >= 0                           | Zero-based page index    |
+| `size`     | Integer | `10`    | 1 – 50                         | Number of items per page |
+| `sort_by`  | String  | `id`    | `id`, `sortOrder`, `createdAt` | Field to sort by         |
+| `sort_dir` | String  | `ASC`   | `ASC`, `DESC`                  | Sort direction           |
+
+#### Response `200 OK`
+
+```json
+{
+  "data": [
+    {
+      "id": 1,
+      "dish_variant_id": 1,
+      "external_id": "dish-variants/variant-small",
+      "url": "https://res.cloudinary.com/demo/image/upload/dish-variants/variant-small.jpg",
+      "caption": "Small variant front view",
+      "sort_order": 1
+    }
+  ],
+  "current_page": 0,
+  "total_pages": 1,
+  "total_elements": 1,
+  "page_size": 10,
+  "has_next": false,
+  "has_previous": false
+}
+```
+
+---
+
+### Get Image by ID
+
+`GET /api/v1/dishes/{dish-id}/variants/{variant-id}/images/{id}`
+
+#### Path Parameters
+
+| Parameter    | Type | Description            |
+|--------------|------|------------------------|
+| `dish-id`    | Long | ID of the dish         |
+| `variant-id` | Long | ID of the dish variant |
+| `id`         | Long | ID of the image        |
+
+#### Response `200 OK`
+
+```json
+{
+  "dish_variant_image": {
+    "id": 1,
+    "config_id": 2,
+    "dish_variant_id": 1,
+    "external_id": "dish-variants/variant-small",
+    "url": "https://res.cloudinary.com/demo/image/upload/dish-variants/variant-small.jpg",
+    "caption": "Small variant front view",
+    "sort_order": 1
+  }
+}
+```
+
+---
+
+### Update Image
+
+`PUT /api/v1/dishes/{dish-id}/variants/{variant-id}/images/{id}`
+
+Updates the caption and/or sort order. Does **not** re-upload the file.
+
+#### Path Parameters
+
+| Parameter    | Type | Description            |
+|--------------|------|------------------------|
+| `dish-id`    | Long | ID of the dish         |
+| `variant-id` | Long | ID of the dish variant |
+| `id`         | Long | ID of the image        |
+
+#### Request Body
+
+```json
+{
+  "caption": "Updated caption",
+  "sort_order": 2
+}
+```
+
+| Field        | Type    | Required | Validation |
+|--------------|---------|----------|------------|
+| `caption`    | String  | No       | —          |
+| `sort_order` | Integer | Yes      | Not null   |
+
+#### Response `200 OK`
+
+```json
+{
+  "success": true,
+  "id": 1
+}
+```
+
+---
+
+### Delete Image
+
+`DELETE /api/v1/dishes/{dish-id}/variants/{variant-id}/images/{id}`
+
+Soft-deletes the image record.
+
+#### Path Parameters
+
+| Parameter    | Type | Description            |
+|--------------|------|------------------------|
+| `dish-id`    | Long | ID of the dish         |
+| `variant-id` | Long | ID of the dish variant |
+| `id`         | Long | ID of the image        |
+
+#### Response `200 OK`
+
+```json
+{
+  "success": true,
+  "id": 1
+}
+```
+
+---
+
 ## Error Responses
 
 All errors follow a common structure:
@@ -859,10 +1126,11 @@ All errors follow a common structure:
 }
 ```
 
-| HTTP Status | Error Code                 | Cause                                                                              |
-|-------------|----------------------------|------------------------------------------------------------------------------------|
-| 400         | `INVALID_ARGUMENT`         | Missing required fields, blank code, invalid sort field, or quantity below minimum |
-| 401         | `UNAUTHORIZED`             | JWT token missing or invalid                                                       |
-| 403         | `FORBIDDEN`                | Authenticated user lacks permission                                                |
-| 404         | `ENTITY_NOT_FOUND`         | Variant, dish, locale, ingredient, item, or unit not found or already deleted      |
-| 409         | `DATA_INTEGRITY_VIOLATION` | Duplicate code or duplicate (dish_variant_id, item_id) pair                        |
+| HTTP Status | Error Code                 | Cause                                                                                                      |
+|-------------|----------------------------|------------------------------------------------------------------------------------------------------------|
+| 400         | `INVALID_ARGUMENT`         | Missing required fields, blank code, invalid sort field, or quantity below minimum                         |
+| 400         | `BAD_REQUEST`              | `images` provided without `config-id`, or `images` provided without `image-metas` (or `image-metas` empty) |
+| 401         | `UNAUTHORIZED`             | JWT token missing or invalid                                                                               |
+| 403         | `FORBIDDEN`                | Authenticated user lacks permission                                                                        |
+| 404         | `ENTITY_NOT_FOUND`         | Variant, dish, locale, ingredient, item, unit, image, or config not found or already deleted               |
+| 409         | `DATA_INTEGRITY_VIOLATION` | Duplicate code or duplicate (dish_variant_id, item_id) pair                                                |

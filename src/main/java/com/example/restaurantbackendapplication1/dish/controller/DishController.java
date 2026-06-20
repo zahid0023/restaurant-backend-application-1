@@ -2,6 +2,7 @@ package com.example.restaurantbackendapplication1.dish.controller;
 
 import com.example.restaurantbackendapplication1.commons.dto.request.PaginatedRequest;
 import com.example.restaurantbackendapplication1.dish.dto.request.CreateDishRequest;
+import com.example.restaurantbackendapplication1.dish.dto.request.DishFilterRequest;
 import com.example.restaurantbackendapplication1.dish.dto.request.SetDishFeaturedRequest;
 import com.example.restaurantbackendapplication1.dish.dto.request.UpdateDishRequest;
 import com.example.restaurantbackendapplication1.dish.dto.request.dishlocale.CreateDishLocaleRequest;
@@ -48,9 +49,9 @@ public class DishController {
         return ResponseEntity.ok(dishService.getAll(request));
     }
 
-    @GetMapping("/public/featured")
-    public ResponseEntity<?> getFeatured(@Valid @ParameterObject PaginatedRequest request) {
-        return ResponseEntity.ok(dishService.getFeatured(request));
+    @GetMapping("/public/all")
+    public ResponseEntity<?> getAll(@Valid @ParameterObject DishFilterRequest request) {
+        return ResponseEntity.ok(dishService.getAll(request));
     }
 
     @PatchMapping("/{id}/featured")

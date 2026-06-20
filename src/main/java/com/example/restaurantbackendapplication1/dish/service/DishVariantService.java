@@ -8,11 +8,14 @@ import com.example.restaurantbackendapplication1.dish.dto.request.dishvariant.Up
 import com.example.restaurantbackendapplication1.dish.dto.response.DishVariantResponse;
 import com.example.restaurantbackendapplication1.dish.model.entity.DishEntity;
 import com.example.restaurantbackendapplication1.dish.model.entity.DishVariantEntity;
+import com.example.restaurantbackendapplication1.imagehosting.dto.request.ImageRequest;
+import com.example.restaurantbackendapplication1.imagehosting.model.entity.RestaurantImageHostingConfigEntity;
 import com.example.restaurantbackendapplication1.item.model.entity.ItemEntity;
 import com.example.restaurantbackendapplication1.locale.model.entity.LocaleEntity;
 import com.example.restaurantbackendapplication1.unit.model.entity.UnitEntity;
 import com.example.restaurantbackendapplication1.dish.model.projection.DishVariantSummary;
 
+import java.util.List;
 import java.util.Map;
 
 public interface DishVariantService {
@@ -21,7 +24,9 @@ public interface DishVariantService {
                            CreateDishVariantRequest request,
                            Map<Long, LocaleEntity> localeEntityMap,
                            Map<Long, ItemEntity> itemEntityMap,
-                           Map<Long, UnitEntity> unitEntityMap);
+                           Map<Long, UnitEntity> unitEntityMap,
+                           RestaurantImageHostingConfigEntity restaurantImageHostingConfigEntity,
+                           List<ImageRequest> imageRequests);
 
     DishVariantEntity getEntityById(Long dishId, Long id);
 

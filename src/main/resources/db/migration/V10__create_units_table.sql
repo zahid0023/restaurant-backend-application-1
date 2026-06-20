@@ -91,40 +91,29 @@ $$
                            -- =========================
                            -- WEIGHT
                            -- =========================
-                           ('KG',    'en', 'Kilogram',    'Metric unit of mass'),
-                           ('KG',    'bn', 'কিলোগ্রাম',  'ভরের মেট্রিক একক'),
-                           ('G',     'en', 'Gram',        'Metric unit of mass'),
-                           ('G',     'bn', 'গ্রাম',       'ভরের একক'),
-                           ('MG',    'en', 'Milligram',   'One thousandth of a gram'),
-                           ('MG',    'bn', 'মিলিগ্রাম',  'গ্রামের এক হাজার ভাগের এক ভাগ'),
-                           ('TON',   'en', 'Ton',         'Large unit of mass'),
-                           ('TON',   'bn', 'টন',          'বড় ভরের একক'),
+                           ('KG',    'en', 'Kilogram',   'Metric unit of mass'),
+                           ('G',     'en', 'Gram',       'Metric unit of mass'),
+                           ('MG',    'en', 'Milligram',  'One thousandth of a gram'),
+                           ('TON',   'en', 'Ton',        'Large unit of mass'),
 
                            -- =========================
                            -- VOLUME
                            -- =========================
-                           ('L',     'en', 'Liter',       'Unit of volume'),
-                           ('L',     'bn', 'লিটার',       'আয়তনের একক'),
-                           ('ML',    'en', 'Milliliter',  'One thousandth of a liter'),
-                           ('ML',    'bn', 'মিলিলিটার',  'লিটারের এক হাজার ভাগের এক ভাগ'),
+                           ('L',     'en', 'Liter',      'Unit of volume'),
+                           ('ML',    'en', 'Milliliter', 'One thousandth of a liter'),
 
                            -- =========================
                            -- COUNT
                            -- =========================
-                           ('PCS',   'en', 'Piece',       'Individual item unit'),
-                           ('PCS',   'bn', 'পিস',         'একক আইটেম'),
-                           ('BOX',   'en', 'Box',         'Boxed quantity'),
-                           ('BOX',   'bn', 'বক্স',        'বক্সজাত পরিমাণ'),
-                           ('PACK',  'en', 'Pack',        'Packaged group unit'),
-                           ('PACK',  'bn', 'প্যাক',       'প্যাকেজড ইউনিট'),
-                           ('DOZEN', 'en', 'Dozen',       'Twelve items'),
-                           ('DOZEN', 'bn', 'ডজন',         '১২টি আইটেম'),
+                           ('PCS',   'en', 'Piece',      'Individual item unit'),
+                           ('BOX',   'en', 'Box',        'Boxed quantity'),
+                           ('PACK',  'en', 'Pack',       'Packaged group unit'),
+                           ('DOZEN', 'en', 'Dozen',      'Twelve items'),
 
                            -- =========================
                            -- UNIT
                            -- =========================
-                           ('UNIT',  'en', 'Unit',        'Generic unit'),
-                           ('UNIT',  'bn', 'ইউনিট',      'সাধারণ ইউনিট')
+                           ('UNIT',  'en', 'Unit',       'Generic unit')
                       ) v(code, locale_code, name, description) ON u.code = v.code
                  JOIN locales l ON l.code = v.locale_code;
     END

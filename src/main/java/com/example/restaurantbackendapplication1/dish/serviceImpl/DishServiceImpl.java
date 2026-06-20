@@ -4,10 +4,10 @@ import com.example.restaurantbackendapplication1.commons.dto.request.PaginatedRe
 import com.example.restaurantbackendapplication1.commons.dto.response.PaginatedResponse;
 import com.example.restaurantbackendapplication1.commons.dto.response.SuccessResponse;
 import com.example.restaurantbackendapplication1.dish.dto.request.CreateDishRequest;
+import com.example.restaurantbackendapplication1.dish.dto.request.DishFilterRequest;
 import com.example.restaurantbackendapplication1.dish.dto.request.UpdateDishRequest;
 import com.example.restaurantbackendapplication1.dish.dto.response.DishResponse;
 import com.example.restaurantbackendapplication1.dish.model.dto.DishDto;
-import com.example.restaurantbackendapplication1.dish.model.dto.FeaturedDishDto;
 import com.example.restaurantbackendapplication1.dish.model.entity.DishEntity;
 import com.example.restaurantbackendapplication1.locale.model.entity.LocaleEntity;
 import com.example.restaurantbackendapplication1.dish.model.enums.DishSortField;
@@ -20,6 +20,7 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 import org.springframework.data.domain.Page;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -56,7 +57,7 @@ public class DishServiceImpl implements DishService {
     @Override
     public DishResponse getById(Long id) {
         DishEntity entity = getEntityById(id);
-        DishDto dto = DishMapper.toDto(entity, false);
+        DishDto dto = DishMapper.toDto(entity, false, false, false);
         return new DishResponse(dto);
     }
 
@@ -65,6 +66,22 @@ public class DishServiceImpl implements DishService {
         Page<@NonNull DishSummary> page = dishRepository
                 .findAllByIsActiveAndIsDeleted(true, false, request.toPageable(ALLOWED_SORT_FIELDS));
         return Pagination.buildPaginatedResponse(page);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public PaginatedResponse<DishDto> getAll(DishFilterRequest request) {
+        Specification<@NonNull DishEntity> spec = Specification
+                .<DishEntity>where((root, query, cb) -> cb.equal(root.get("isActive"), true))
+                .and((root, query, cb) -> cb.equal(root.get("isDeleted"), false));
+
+        if (Boolean.TRUE.equals(request.getIsFeatured())) {
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("isFeatured"), true));
+        }
+
+        Page<@NonNull DishEntity> page = dishRepository.findAll(spec, request.toPageable(ALLOWED_SORT_FIELDS));
+        Page<@NonNull DishDto> dishDtoPage = page.map(dishEntity -> DishMapper.toDto(dishEntity, true, false, true));
+        return Pagination.buildPaginatedResponse(dishDtoPage);
     }
 
     @Transactional
@@ -83,14 +100,6 @@ public class DishServiceImpl implements DishService {
         dishRepository.save(entity);
         log.info("Dish id: {} is_featured set to: {}", entity.getId(), isFeatured);
         return new SuccessResponse(true, entity.getId());
-    }
-
-    @Transactional(readOnly = true)
-    @Override
-    public PaginatedResponse<FeaturedDishDto> getFeatured(PaginatedRequest request) {
-        Page<DishEntity> page = dishRepository
-                .findAllByIsFeaturedAndIsActiveAndIsDeleted(true, true, false, request.toPageable(ALLOWED_SORT_FIELDS));
-        return Pagination.buildPaginatedResponse(page.map(DishMapper::toFeaturedDto));
     }
 
     @Transactional
