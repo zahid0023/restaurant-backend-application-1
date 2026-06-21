@@ -21,7 +21,9 @@ public class CorsConfig {
                 "http://localhost:3000",
                 "http://localhost:3001",
                 "http://localhost:8080",
-                "https://restaurant-frontend-application-1.vercel.app"
+                "https://restaurant-frontend-application-1.vercel.app",
+                "https://backend.restaurant.builtfromvision.com",
+                "https://restaurant-frontend-application-use.vercel.app"
         ));
 
         // Allow HTTP methods
