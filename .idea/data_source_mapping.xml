@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourcePerFileMappings">
-    <file url="file://$APPLICATION_CONFIG_DIR$/consoles/db/4be7f3a5-1d08-455a-8b64-5790d3231f22/console.sql" value="4be7f3a5-1d08-455a-8b64-5790d3231f22" />
     <file url="file://$APPLICATION_CONFIG_DIR$/consoles/db/df868be2-4be8-40be-8783-6fe8faae42b8/console.sql" value="df868be2-4be8-40be-8783-6fe8faae42b8" />
     <file url="file://$APPLICATION_CONFIG_DIR$/consoles/db/df868be2-4be8-40be-8783-6fe8faae42b8/console_1.sql" value="df868be2-4be8-40be-8783-6fe8faae42b8" />
     <file url="file://$APPLICATION_CONFIG_DIR$/consoles/db/df868be2-4be8-40be-8783-6fe8faae42b8/console_2.sql" value="df868be2-4be8-40be-8783-6fe8faae42b8" />
@@ -13,6 +12,7 @@
     <file url="file://$PROJECT_DIR$/src/main/resources/db/migration/V23__create_restaurant_image_hosting_config_table.sql" value="df868be2-4be8-40be-8783-6fe8faae42b8" />
     <file url="file://$PROJECT_DIR$/src/main/resources/db/migration/V24__create_restaurant_images_table.sql" value="df868be2-4be8-40be-8783-6fe8faae42b8" />
     <file url="file://$PROJECT_DIR$/src/main/resources/db/migration/V26__create_dish_variants_images_table.sql" value="df868be2-4be8-40be-8783-6fe8faae42b8" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/db/migration/V30__create_restaurant_operating_hours_table.sql" value="df868be2-4be8-40be-8783-6fe8faae42b8" />
     <file url="file://$PROJECT_DIR$/src/main/resources/db/migration/V7__create_cities_table.sql" value="df868be2-4be8-40be-8783-6fe8faae42b8" />
     <file url="file://$PROJECT_DIR$/src/main/resources/db/migration/V8__create_item_types_table.sql" value="df868be2-4be8-40be-8783-6fe8faae42b8" />
   </component>

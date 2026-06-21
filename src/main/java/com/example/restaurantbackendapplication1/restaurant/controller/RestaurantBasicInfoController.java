@@ -25,7 +25,8 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/restaurant-basic-info")
-public class RestaurantBasicInfoController {
+public class
+RestaurantBasicInfoController {
 
     private final RestaurantBasicInfoService restaurantBasicInfoService;
     private final CountryService countryService;
@@ -47,6 +48,11 @@ public class RestaurantBasicInfoController {
 
     @GetMapping
     public ResponseEntity<?> get() {
+        return ResponseEntity.ok(restaurantBasicInfoService.get());
+    }
+
+    @GetMapping("/public")
+    public ResponseEntity<?> getPublic() {
         return ResponseEntity.ok(restaurantBasicInfoService.get());
     }
 

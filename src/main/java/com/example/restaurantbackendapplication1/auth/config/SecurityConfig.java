@@ -50,6 +50,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/locales/**").permitAll()
                         .requestMatchers("/api/v1/dishes/public/**").permitAll()
                         .requestMatchers("/api/v1/menus/public/**").permitAll()
+                        .requestMatchers("/api/v1/restaurant-basic-info/public/**").permitAll()
+                        .requestMatchers("/api/v1/restaurant-operating-hours/public/**").permitAll()
                         .requestMatchers("/api/v1/admins/**").hasRole("ADMIN")
                         .requestMatchers("/api/v1/users/**").hasRole("USER")
                         .anyRequest().authenticated()

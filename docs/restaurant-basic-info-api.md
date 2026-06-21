@@ -9,23 +9,43 @@ read and updated.
 
 ## Authentication
 
-All endpoints require a valid JWT token in the `Authorization` header.
+Most endpoints require a valid JWT token in the `Authorization` header.
 
 ```
 Authorization: Bearer <token>
 ```
 
+The public endpoint (`GET /public`) does **not** require authentication.
+
 ---
 
 ## Endpoints
 
-### 1. Get Restaurant Info
+### 1. Get Restaurant Info (Public)
+
+Retrieves the restaurant's basic information without authentication. Identical response to the authenticated GET.
+
+```
+GET /api/v1/restaurant-basic-info/public
+```
+
+**Auth required:** no
+
+**Request body:** none
+
+**Response `200 OK`:** same as [Get Restaurant Info (Authenticated)](#2-get-restaurant-info-authenticated) below.
+
+---
+
+### 2. Get Restaurant Info (Authenticated)
 
 Retrieves the restaurant's basic information including full country, city, and all locale translations.
 
 ```
 GET /api/v1/restaurant-basic-info
 ```
+
+**Auth required:** yes
 
 **Request body:** none
 
@@ -120,7 +140,7 @@ GET /api/v1/restaurant-basic-info
 
 ---
 
-### 2. Update Restaurant Info
+### 3. Update Restaurant Info
 
 Updates the restaurant's mutable fields.
 
@@ -163,7 +183,7 @@ PUT /api/v1/restaurant-basic-info
 
 ---
 
-### 3. Upload Logo
+### 4. Upload Logo
 
 Uploads a logo image to the specified image hosting provider and saves the resulting URL as `logo_url`.
 
@@ -209,7 +229,7 @@ Base path: `/api/v1/restaurant-basic-info/1/locales`
 
 ---
 
-### 4. Add Locale
+### 5. Add Locale
 
 Adds a translation for a specific locale. Each locale can only be added once.
 
@@ -248,7 +268,7 @@ POST /api/v1/restaurant-basic-info/1/locales
 
 ---
 
-### 5. Update Locale
+### 6. Update Locale
 
 Updates an existing locale entry. The locale itself (`locale_id`) cannot be changed.
 
@@ -291,7 +311,7 @@ PUT /api/v1/restaurant-basic-info/1/locales/{id}
 
 ---
 
-### 6. Delete Locale
+### 7. Delete Locale
 
 Soft-deletes a locale entry.
 
@@ -323,6 +343,6 @@ DELETE /api/v1/restaurant-basic-info/1/locales/{id}
 | Status | Scenario                                                         |
 |--------|------------------------------------------------------------------|
 | `400`  | Validation failure (missing required field, constraint violated) |
-| `401`  | Missing or invalid JWT token                                     |
+| `401`  | Missing or invalid JWT token (not applicable to `/public`)       |
 | `404`  | Country, city, locale entry, or image hosting config not found   |
 | `409`  | Locale already exists for this restaurant                        |
