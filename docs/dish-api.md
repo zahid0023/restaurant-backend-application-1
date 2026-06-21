@@ -262,9 +262,13 @@ endpoints.
 
 **Public — no authentication required.**
 
-Returns a paginated list of active dishes with full locale translations. When `is_featured=true` is passed, only
-featured dishes are returned. When omitted or `false`, all active dishes are returned. Intended for public-facing pages
-(menus, homepage sections, etc.).
+Returns a paginated list of active dishes with full locale translations and embedded variants. Each variant includes its
+own locale translations, ingredients (with full `item` and `unit` objects), and images. When `isFeatured=true` is
+passed, only featured dishes are returned. When omitted or `false`, all active dishes are returned. Intended for
+public-facing pages (menus, homepage sections, etc.).
+
+Unlike the authenticated `GET /api/v1/dishes` list, this endpoint returns full `DishDto` objects with `variants[]`
+embedded — not lightweight summaries.
 
 ### Query Parameters
 
@@ -277,6 +281,11 @@ featured dishes are returned. When omitted or `false`, all active dishes are ret
 | `isFeatured` | Boolean | —       | `true` / `false`                       | If `true`, returns only featured dishes |
 
 ### Response `200 OK`
+
+Each dish in `data` includes:
+- `locales[]` — all locale translations for the dish
+- `variants[]` — all active variants, each with `locales[]`, `ingredients[]` (full `item` + `unit` objects), and
+  `images[]`. The `dish` field is omitted inside each variant to avoid circular nesting.
 
 ```json
 {
@@ -301,27 +310,92 @@ featured dishes are returned. When omitted or `false`, all active dishes are ret
           "description": "তাজা সবজি সহ রসালো বিফ প্যাটি।",
           "sort_order": 2
         }
-      ]
-    },
-    {
-      "id": 2,
-      "code": "VEGGIE_WRAP",
-      "sort_order": 2,
-      "is_featured": false,
-      "locales": [
+      ],
+      "variants": [
         {
-          "id": 3,
-          "locale_id": 1,
-          "name": "Veggie Wrap",
-          "description": "Fresh vegetables in a soft wrap.",
-          "sort_order": 1
+          "id": 1,
+          "code": "SMALL",
+          "sort_order": 1,
+          "price": 5.99,
+          "is_default": true,
+          "is_veg": false,
+          "locales": [
+            {
+              "id": 1,
+              "locale_id": 1,
+              "name": "Small",
+              "description": "Perfect for one person",
+              "sort_order": 1
+            }
+          ],
+          "ingredients": [
+            {
+              "id": 1,
+              "item": {
+                "id": 3,
+                "code": "TOMATO",
+                "sort_order": 1,
+                "locales": [
+                  {
+                    "id": 1,
+                    "locale_id": 1,
+                    "name": "Tomato",
+                    "description": "Fresh tomato",
+                    "sort_order": 1
+                  }
+                ]
+              },
+              "quantity": 1.000,
+              "unit": {
+                "id": 1,
+                "unit_type": {
+                  "id": 1,
+                  "code": "WEIGHT",
+                  "sort_order": 1,
+                  "locales": [
+                    {
+                      "id": 1,
+                      "locale_id": 1,
+                      "name": "Weight",
+                      "description": "",
+                      "sort_order": 1
+                    }
+                  ]
+                },
+                "code": "KG",
+                "is_base": true,
+                "sort_order": 1,
+                "locales": [
+                  {
+                    "id": 1,
+                    "locale_id": 1,
+                    "name": "Kilogram",
+                    "description": "",
+                    "sort_order": 1
+                  }
+                ]
+              },
+              "sort_order": 1
+            }
+          ],
+          "images": [
+            {
+              "id": 1,
+              "config_id": 2,
+              "dish_variant_id": 1,
+              "external_id": "dish-variants/burger-small",
+              "url": "https://res.cloudinary.com/demo/image/upload/dish-variants/burger-small.jpg",
+              "caption": "Small burger front view",
+              "sort_order": 1
+            }
+          ]
         }
       ]
     }
   ],
   "current_page": 0,
   "total_pages": 1,
-  "total_elements": 2,
+  "total_elements": 1,
   "page_size": 10,
   "has_next": false,
   "has_previous": false

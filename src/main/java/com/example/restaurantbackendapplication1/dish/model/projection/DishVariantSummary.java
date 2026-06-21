@@ -23,6 +23,9 @@ public interface DishVariantSummary {
     @Value("#{target.dishVariantLocaleEntities}")
     List<LocaleSummary> getLocales();
 
+    @Value("#{target.dishVariantImageEntities}")
+    List<ImageSummary> getImages();
+
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     interface LocaleSummary {
         Long getId();
@@ -32,6 +35,14 @@ public interface DishVariantSummary {
 
         String getName();
         String getDescription();
+        Integer getSortOrder();
+    }
+
+    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    interface ImageSummary {
+        Long getId();
+        String getUrl();
+        String getCaption();
         Integer getSortOrder();
     }
 }

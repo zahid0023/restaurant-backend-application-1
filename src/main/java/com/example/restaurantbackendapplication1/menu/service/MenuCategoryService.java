@@ -24,6 +24,8 @@ public interface MenuCategoryService {
 
     PaginatedResponse<MenuCategorySummary> getAll(PaginatedRequest request);
 
+    PaginatedResponse<MenuCategorySummary> getAll(Long menuTypeId, PaginatedRequest request);
+
     SuccessResponse update(MenuCategoryEntity entity,
                            UpdateMenuCategoryRequest request);
 

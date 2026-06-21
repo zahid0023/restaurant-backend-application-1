@@ -16,4 +16,6 @@ public interface MenuCategoryRepository extends JpaRepository<@NonNull MenuCateg
 
     Page<@NonNull MenuCategorySummary> findAllByIsActiveAndIsDeleted(
             Boolean isActive, Boolean isDeleted, Pageable pageable);
+
+    Page<@NonNull MenuCategorySummary> findAllByMenuTypeEntity_IdAndIsActiveAndIsDeleted(Long menuTypeId, Boolean isActive, Boolean isDeleted, Pageable pageable);
 }

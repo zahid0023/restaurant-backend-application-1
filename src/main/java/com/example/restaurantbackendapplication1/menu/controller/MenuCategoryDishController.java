@@ -1,5 +1,6 @@
 package com.example.restaurantbackendapplication1.menu.controller;
 
+import com.example.restaurantbackendapplication1.commons.dto.request.PaginatedRequest;
 import com.example.restaurantbackendapplication1.menu.dto.request.menucategorydish.CreateMenuCategoryDishRequest;
 import com.example.restaurantbackendapplication1.dish.model.entity.DishEntity;
 import com.example.restaurantbackendapplication1.menu.model.entity.MenuCategoryDishEntity;
@@ -8,6 +9,7 @@ import com.example.restaurantbackendapplication1.dish.service.DishService;
 import com.example.restaurantbackendapplication1.menu.service.MenuCategoryDishService;
 import com.example.restaurantbackendapplication1.menu.service.MenuCategoryService;
 import jakarta.validation.Valid;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

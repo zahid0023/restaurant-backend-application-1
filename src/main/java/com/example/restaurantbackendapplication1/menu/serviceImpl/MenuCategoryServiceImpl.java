@@ -69,6 +69,12 @@ public class MenuCategoryServiceImpl implements MenuCategoryService {
         return Pagination.buildPaginatedResponse(page);
     }
 
+    @Override
+    public PaginatedResponse<MenuCategorySummary> getAll(Long menuTypeId, PaginatedRequest request) {
+        Page<@NonNull MenuCategorySummary> page = menuCategoryRepository.findAllByMenuTypeEntity_IdAndIsActiveAndIsDeleted(menuTypeId, true, false, request.toPageable(ALLOWED_SORT_FIELDS));
+        return Pagination.buildPaginatedResponse(page);
+    }
+
     @Transactional
     @Override
     public SuccessResponse update(MenuCategoryEntity entity, UpdateMenuCategoryRequest request) {
